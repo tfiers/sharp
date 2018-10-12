@@ -1,0 +1,8 @@
+code/tests/system/data/processed/
+*.log
+
+*.egg-info
+__pycache__/
+.pytest_cache/
+
+.idea/

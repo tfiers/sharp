@@ -1,0 +1,35 @@
+# Configure the following environment variables:
+# - LUIGI_CONFIG_PARSER = toml
+
+[core]
+logging_conf_file = "../../logging.cfg"
+
+
+[worker]
+task_process_context = ""  # Luigi bugfix.
+keep_alive = false
+
+
+[DataConfig]
+output_dir = "data/processed"
+raw_data_dir = "data/raw"
+probe_number = 2
+electrode_number = 6
+
+
+[ThresholdSweeper]
+num_thresholds = 6
+recall_best = 0.90
+
+
+# Set low detection thresholds, to make sure we have at least one reference
+# segment on our (non-ripply and short) test data.
+[MakeReference]
+mult_detect = 2
+mult_support = 1
+
+
+[NeuralNetConfig]
+num_layers = 1
+num_units_per_layer = 25
+num_epochs = 3
