@@ -11,7 +11,9 @@ in the thesis.
 
 Docstrings are provided for most modules, classes, and methods.
 
-Care is taken to name objects and organize the code in a logical way.
+Care is taken to organize the code and name objects in a logical way.
+
+Also see the _Usage_ section below.
 
 
 ## Installation
@@ -20,17 +22,15 @@ The software is written in Python 3.7, and requires recent installations of
 [SciPy](https://scipy.org/) and [PyTorch](https://pytorch.org/).
 These are most easily installed with the [(mini)conda package manager](https://conda.io/docs/index.html).
 
-Clone this git repository to your computer:
+Clone this repository to your computer:
 ```sh
-cd ~/code
-git clone 
+$ git clone git@github.com:tfiers/sharp.git ~/code/sharp
 ```
 
-Then:
+Then, install custom-made dependencies from their respective git repositories:
 ```sh
-pip install -r requirements.txt
+~/code/sharp$  pip install -r requirements.txt
 ```
-(This installs custom-made dependencies from their respective git repositories).
 
 > For now the dependency `fklab-python-core` is closed source, and needs to be
 installed manually. Request access to its git repository by contacting
@@ -38,9 +38,9 @@ installed manually. Request access to its git repository by contacting
 its directory, and install with `pip install .`. Verify that it is installed
 correctly by trying `import fklab` in Python. See also the notes below.
 
-Next, install this package (and additional PyPI dependencies) by running:
+Next, install this package (and its dependencies from [PyPI](https://pypi.org/)):
 ```sh
-pip install -e .
+~/code/sharp$  pip install -e .
 ```
 
 You can verify whether the installation was succesful by running Python and
@@ -48,10 +48,6 @@ trying:
 ```py
 import sharp
 ```
-
-To actually apply the software to data, you need to tell it where this data can
-be found, and where it may store output files. See the _Usage_ section below.
-
 
 #### Notes
 
@@ -75,10 +71,28 @@ be found, and where it may store output files. See the _Usage_ section below.
 
 ## Usage
 
-Create a new directory to store run configuration, logs, and (by default) output
+Create a new directory to store run configuration, logs, and (optionally) output
 files:
 ```sh
-mkdir ~/sharp-run
+$ mkdir ~/sharp-run
+```
+
+In this directory, create a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html),
+named `luigi.toml`.
+
+The [test `luigi.toml` file](https://github.com/tfiers/sharp/blob/master/tests/system/luigi.toml)
+from this repository can be used as a template:
+```sh
+$ cp ~/code/sharp/tests/system/luigi.toml ~/sharp-run
+$ vim ~/sharp-run/luigi.toml
+```
+
+> On Windows, make sure to either use forward slashes in paths, or to escape
+backslashes. Examples:
+```toml
+raw_data_dir = "D:/data/probe/L2"
+output_dir = "subdir/of/current/working/directory"
+logging_conf_file = "D:\\code\\sharp\\logging.cfg"
 ```
 
 Set the following environment variable:
@@ -86,37 +100,18 @@ Set the following environment variable:
 export LUIGI_CONFIG_PARSER=toml
 ```
 
-Create a run configuration file named `luigi.toml`, using 
-[TOML syntax](https://github.com/toml-lang/toml#readme).
-The [test config file](https://github.com/tfiers/sharp/blob/master/tests/system/luigi.toml)
-from this repository's system test directory can be used as a starting point:
-```sh
-cp ~/code/sharp/tests/system/luigi.toml ~/sharp-run
-vim ~/sharp-run/luigi.toml
-```
-
-> On Windows, make sure to either use forward slashes in paths, or to escape
-backslashes. Example:
-```toml
-raw_data_dir = "D:/data/probe/L2"
-output_dir = "subdir/of/current/working/directory"
-logging_conf_file = "D:\\code\\sharp\\logging.cfg"
-```
-
 When the `luigi.toml` config file is tailored to your needs, process the raw
 data and generate figures by running:
 ```sh
-cd ~/sharp-run
-python -m sharp --local-scheduler
+~/sharp-run$  python -m sharp --local-scheduler
 ```
 
 Show command documentation with:
 ```sh
-python -m sharp --help
+$ python -m sharp --help
 ```
 
-
-### Parallelization
+#### Parallelization
 
 To run subtasks in parallel, a central Luigi task scheduler should be used
 instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
@@ -129,6 +124,5 @@ To run multiple configurations (each with their own run directory and
 `luigi.toml` file) in parallel, run each Python process with a different setting
 for the `LUIGI_TASK_NAMESPACE` environment variable. Example:
 ```sh
-cd ~/sharp-run-two-RNN-layers
-LUIGI_TASK_NAMESPACE=two-layers python -m sharp
+~/sharp-run-two-RNN-layers$ LUIGI_TASK_NAMESPACE=two-layers  python -m sharp
 ```
