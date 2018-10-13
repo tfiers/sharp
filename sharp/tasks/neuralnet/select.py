@@ -38,7 +38,7 @@ class CalcValidLoss(NeuralNetTask):
 
     def run(self):
         with torch.no_grad():
-            valid_tuples = self.make_io_tuples(self.valid_segs)
+            valid_tuples = self.make_io_tuple(self.valid_segs)
             model: RNN = self.trainer.output().read()
             loss = 0
             for input_slice, target_slice in valid_tuples:

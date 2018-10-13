@@ -22,6 +22,7 @@ from sharp.tasks.plot.util.scalebar import (
     add_voltage_scalebar,
 )
 from sharp.tasks.plot.util.signal import plot_signal
+from sharp.tasks.signal.split import TrainTestSplitter
 
 TimeRange = Tuple[float, float]
 
@@ -36,6 +37,13 @@ class TimeRangesPlotter(PosterFigureMaker):
 
     window_size: float = FloatParameter(0.6, significant=False)
     # Duration of each time slice (and thus of each plot). In seconds.
+
+    data = TrainTestSplitter()
+    # We won't use the envelope slice of the result -- only the input and
+    # reference segment slices.
+
+    def requires(self):
+        return self.data
 
     def output(self):
         for start, stop in self.time_ranges:
@@ -52,7 +60,7 @@ class TimeRangesPlotter(PosterFigureMaker):
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
         num_ranges = int(ceil(self.input_signal.duration / self.window_size))
-        eval_start, eval_stop = self.evaluation.slice.eval_range
+        eval_start, eval_stop = self.data.test.range
         start = eval_start
         for i in range(num_ranges):
             stop = start + self.window_size
@@ -80,7 +88,7 @@ class TimeRangesPlotter(PosterFigureMaker):
         self.plot_input_signal(time_range, input_ax)
         self.plot_other_signals(time_range, extra_axes)
         self.post_plot(time_range, input_ax, extra_axes)
-        add_segments(input_ax, self.evaluation.slice.reference_segs)
+        add_segments(input_ax, self.data.test.reference_segs)
         add_time_scalebar(
             extra_axes[0], 100, "ms", pos_along=0.74, pos_across=1.1
         )
@@ -115,7 +123,7 @@ class TimeRangesPlotter(PosterFigureMaker):
 
     @property
     def input_signal(self) -> Signal:
-        return self.evaluation.slice.input_signal
+        return self.data.test.input
 
     @property
     def extra_signals(self) -> Sequence[Signal]:

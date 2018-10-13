@@ -31,4 +31,4 @@ class EnvelopeMaker(SharpTask):
         return self.reference_maker.output().read()
 
     def output(self) -> SignalFile:
-        ...
+        """ Implement me """

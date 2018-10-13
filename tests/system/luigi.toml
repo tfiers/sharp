@@ -21,10 +21,6 @@ probe_number = 2
 electrode_number = 13
 
 
-# [EvaluationSliceMaker]
-# eval_seg = [0, 0.4]
-
-
 # Set low detection thresholds, to make sure we have at least one reference
 # segment on our (non-ripply and short) test data.
 [MakeReference]
@@ -35,9 +31,10 @@ mult_support = 6
 [ThresholdSweeper]
 num_thresholds = 6
 recall_best = 0.90
+eval_seg = "[0, 0.4]"
 
 
 [NeuralNet]
 num_layers = 1
 num_units_per_layer = 25
-num_epochs = 3
+num_epochs = 2

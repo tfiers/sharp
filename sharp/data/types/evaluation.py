@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -194,10 +194,49 @@ class ThresholdSweep:
 
     @property
     def best(self) -> ThresholdEvaluation:
-        """ Return the `best` threshold evaluation. """
+        """
+        Return the `best` threshold evaluation, according to the `recall_best`
+        parameter.
+        """
         if len(self.threshold_evaluations) > 0:
             if self.recall_best is None:
                 best_index = np.argmax(self.F2)
             else:
                 best_index = np.argmax(self.recall > self.recall_best)
             return self.threshold_evaluations[best_index]
+
+    def add_threshold_evaluation(self, new: ThresholdEvaluation):
+        """
+        Inserts the given object into `self.threshold_evaluations`, such that
+        `self.thresholds` stays sorted from high to low.
+        """
+        if len(self.thresholds) == 0:
+            insertion_index = 0
+        elif new.threshold < np.min(self.thresholds):
+            insertion_index = len(self.thresholds)
+        else:
+            insertion_index = np.argmin(new.threshold < self.thresholds)
+        self.threshold_evaluations.insert(insertion_index, new)
+
+    def get_next_threshold(self, threshold_range: Tuple[float, float]) -> float:
+        """
+        Succesive calls yield a sequence of thresholds within `threshold_range`
+        that cover the [0, 1] domains of `recall` and `precision` well.
+        """
+        if len(self.thresholds) == 0:
+            return max(threshold_range)
+        elif len(self.thresholds) == 1:
+            return min(threshold_range)
+        else:
+            R_gap = np.abs(np.diff(self.recall))
+            P_gap = np.abs(np.diff(self.precision))
+            index_largest_R_gap = np.argmax(R_gap)
+            index_largest_P_gap = np.argmax(P_gap)
+            largest_R_gap = R_gap[index_largest_R_gap]
+            largest_P_gap = P_gap[index_largest_P_gap]
+            if largest_R_gap > largest_P_gap:
+                index = index_largest_R_gap
+            else:
+                index = index_largest_P_gap
+            surrounding_thresholds = self.thresholds[index : index + 2]
+            return np.mean(surrounding_thresholds)

@@ -57,7 +57,7 @@ class TrainRNN(NeuralNetTask):
         self.output().write(self.model)
 
     def tune_weights(self):
-        train_tuples = self.make_io_tuples(self.train_segs)
+        train_tuples = self.make_io_tuple(self.train_segs)
         chunks = self.to_chunks(train_tuples)
         total_training_loss = 0
         # Get a random initial hidden state.

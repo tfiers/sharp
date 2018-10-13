@@ -3,16 +3,16 @@ from typing import Callable, Iterable, Tuple
 
 import numpy as np
 import torch
-from luigi import TupleParameter
 
 from fklab.segments import Segment
+from sharp.data.files.config import output_root
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
-from sharp.data.files.config import output_root
 from sharp.tasks.neuralnet.config import neural_net_config
 from sharp.tasks.neuralnet.util import numpy_to_torch, to_batch
 from sharp.tasks.signal.base import EnvelopeMaker
+from sharp.tasks.signal.split import TrainTestSplitter
 from sharp.tasks.signal.util import fraction_to_index, time_to_index
 
 log = getLogger(__name__)
@@ -24,34 +24,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Memory location of model (either at a GPU, or at the CPU).
 log.info(f"Using {device} device.")
 
-# Useful locations when choosing train_segs / valid_segs:
-#
-# Timestamps of KloostermanLab scientists labelling L2 data ('labelface'):
-# common_last = 161 / 2040 = 0.0789
-# last_last = 860 / 2040 = 0.4216
-
 
 class NeuralNetTask(EnvelopeMaker):
-
-    train_segs = TupleParameter(
-        default=((0.1, 0.8),),
-        description=(
-            "Sequence of 2-tuples that define which input data will be "
-            "used as training data. In fractions of total signal duration."
-        ),
-        significant=False,
-    )
-
-    valid_segs = TupleParameter(
-        default=((0.8, 1.0),),
-        description=(
-            "Same as `train_segs`, but for validation data. Should "
-            "have no overlap with `train_segs`."
-        ),
-        significant=False,
-    )
+    """
+    Base class for other neural network tasks.
+    """
 
     _model: RNN = None
+
+    split_data = TrainTestSplitter()
 
     @property
     def output_dir(self):
@@ -113,9 +94,7 @@ class NeuralNetTask(EnvelopeMaker):
             sig[slice(*ix)] = 1
         return BinarySignal(sig, self.input_signal.fs).as_matrix()
 
-    def make_io_tuples(
-        self, fraction_segs: Tuple[Tuple[float, float], ...]
-    ) -> Iterable[IOTuple]:
+    def make_io_tuple(self, fraction_seg: Tuple[float, float]) -> IOTuple:
         """
         Cut out the given segments from the input and target signal, and
         combines these as PyTorch-ready (input_slice, target_slice)-tuples.

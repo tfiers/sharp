@@ -56,12 +56,10 @@ class MakeReference(SharpTask):
         return Signal(envelope, self.input_signal.fs)
 
     @property
-    @cached
     def envelope_center(self):
         return np.median(self.envelope)
 
     @property
-    @cached
     def envelope_spread(self):
         return np.percentile(self.envelope, 75) - self.envelope_center
 

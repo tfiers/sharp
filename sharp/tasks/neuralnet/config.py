@@ -23,8 +23,13 @@ class NeuralNet(Config):
     # training step. Should improve generalisation performance. Only relevant
     # for num_layers > 1.
 
-    num_epochs = IntParameter()
+    num_epochs: int = IntParameter()
     # How many times to pass over the training data when training an RNN.
+
+    valid_fraction: float = FloatParameter(0.22)
+    # How much of the training data to use for validation (estimation of
+    # generalisation performance -- to choose net of epoch where this was
+    # best). The rest of the data is used for training proper.
 
 
 neural_net_config = NeuralNet()
