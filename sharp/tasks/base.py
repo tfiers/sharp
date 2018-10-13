@@ -1,16 +1,26 @@
-from os import environ
 from typing import List
 
-import luigi
 from luigi import Target, Task
-from luigi.task import flatten
+from luigi.task import Config, Parameter, flatten
 
 
-class SafeTask(Task):
+class SharpConfig(Config):
+    config_id = Parameter()
+    # Setting this to a custom value allows to run multiple pipelines (each
+    # with a different `luigi.toml` config file) in parallel. Each such
+    # pipeline / config file corresponds to a different `config_id`.
+
+
+class SharpTask(Task):
     """
+    Base class for all tasks in this package.
+
     A luigi Task in which `output()` is only ever executed by luigi if all
     dependencies specified in `requires()` have been completed.
     """
+
+    config_id = Parameter(default=SharpConfig().config_id)
+    # (This `default` trick is an ugly luigi hack).
 
     def complete(self) -> bool:
         return all(
@@ -26,27 +36,9 @@ class SafeTask(Task):
         return flatten(self.output())
 
 
-class NamespacedTask(Task):
+class ExternalTask(SharpTask):
     """
-    Base class for all tasks in this package.
-    When inheriting from multiple tasks, this class should be the first parent.
-    """
-
-    task_namespace = environ.get("LUIGI_TASK_NAMESPACE", "")
-    # Setting this to a custom value allows to run multiple pipelines (each
-    # with a different `luigi.toml` config file) in parallel. Each such
-    # pipeline / config file corresponds to a different `task_namespace`.
-
-
-class SharpTask(NamespacedTask, SafeTask):
-    """
-    Base class for all (non-wrapper or -external) tasks in this package.
+    Makes sure external dependencies exist.
     """
 
-
-class ExternalTask(NamespacedTask, luigi.ExternalTask):
-    pass
-
-
-class WrapperTask(NamespacedTask, luigi.WrapperTask):
-    pass
+    run = None

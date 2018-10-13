@@ -2,7 +2,7 @@ from typing import Dict, NewType, Sequence, Tuple, TypeVar
 
 from sharp.data.types.evaluation import ThresholdSweep
 from sharp.data.types.signal import Signal
-from sharp.tasks.base import WrapperTask
+from sharp.tasks.base import SharpTask
 from sharp.tasks.evaluate.slice import EvaluationSliceMaker
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.neuralnet.apply import ApplyRNN
@@ -13,7 +13,7 @@ T = TypeVar("T")
 SweeperID = NewType("SweeperID", str)
 
 
-class EvaluateAlgorithms(WrapperTask):
+class EvaluateAlgorithms(SharpTask):
     def requires(self) -> Dict[SweeperID, ThresholdSweeper]:
         return self.threshold_sweepers
 

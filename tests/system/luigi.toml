@@ -10,6 +10,10 @@ task_process_context = ""  # Luigi bugfix.
 keep_alive = false
 
 
+[SharpConfig]
+config_id = "test"
+
+
 [DataConfig]
 output_dir = "data/processed"
 raw_data_dir = "data/raw"

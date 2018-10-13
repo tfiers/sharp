@@ -120,9 +120,7 @@ for instructions.
 When the central scheduler is running, simply start multiple `python -m sharp` 
 processes from the directory containing the `luigi.toml` configuration file.
 
-To run multiple configurations (each with their own run directory and 
-`luigi.toml` file) in parallel, run each Python process with a different setting
-for the `LUIGI_TASK_NAMESPACE` environment variable. Example:
-```sh
-~/sharp-run-two-RNN-layers$ LUIGI_TASK_NAMESPACE=two-layers  python -m sharp
-```
+You can also run multiple configurations in parallel (each with their own run
+directory and `luigi.toml` file). To do this, make sure the
+`SharpConfig.config_id` setting has a unique value in each `luigi.toml` file.
+Then simply start Python processes from the respective run directories.

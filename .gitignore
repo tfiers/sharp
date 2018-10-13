@@ -1,4 +1,4 @@
-code/tests/system/data/processed/
+tests/system/data/processed/
 *.log
 
 *.egg-info
