@@ -18,19 +18,23 @@ config_id = "test"
 output_dir = "data/processed"
 raw_data_dir = "data/raw"
 probe_number = 2
-electrode_number = 6
+electrode_number = 13
 
 
-[ThresholdSweeper]
-num_thresholds = 6
-recall_best = 0.90
+# [EvaluationSliceMaker]
+# eval_seg = [0, 0.4]
 
 
 # Set low detection thresholds, to make sure we have at least one reference
 # segment on our (non-ripply and short) test data.
 [MakeReference]
-mult_detect = 2
-mult_support = 1
+mult_detect = 10
+mult_support = 6
+
+
+[ThresholdSweeper]
+num_thresholds = 6
+recall_best = 0.90
 
 
 [NeuralNetConfig]
