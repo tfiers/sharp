@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from datetime import date
 from functools import lru_cache
 from logging import getLogger
 from logging.config import fileConfig
@@ -11,7 +12,7 @@ from luigi.interface import core
 from luigi.task import flatten
 
 from sharp.data.files.base import FileTarget
-from sharp.data.files.config import output_root
+from sharp.data.files.config import output_root, data_config
 
 log = getLogger(__name__)
 
@@ -47,10 +48,14 @@ def _clear(target: Union[FileTarget, Iterable[FileTarget]]):
             return
 
 
-def config_logging():
+def init_log():
     # Luigi hasn't initalised logging yet when this is called in __main__.py,
     # so we apply the config file ourselves.
     fileConfig(core().logging_conf_file, disable_existing_loggers=False)
+    log = getLogger("sharp")
+    log.info(f"Hello, it's {date.today():%b %d, %Y}.")
+    log.info(f"Output root directory: {output_root}")
+    log.info(f"Data config: {data_config}")
 
 
 @contextmanager
