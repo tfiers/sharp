@@ -122,5 +122,5 @@ processes from the directory containing the `luigi.toml` configuration file.
 
 You can also run multiple configurations in parallel (each with their own run
 directory and `luigi.toml` file). To do this, make sure the
-`SharpConfig.config_id` setting has a unique value in each `luigi.toml` file.
+`Sharp.config_id` setting has a unique value in each `luigi.toml` file.
 Then simply start Python processes from the respective run directories.

@@ -1,7 +1,7 @@
 from luigi import Config, IntParameter, FloatParameter
 
 
-class NeuralNetConfig(Config):
+class NeuralNet(Config):
     # RNN architecture
     # ----------------
     num_layers: int = IntParameter(2)
@@ -27,4 +27,4 @@ class NeuralNetConfig(Config):
     # How many times to pass over the training data when training an RNN.
 
 
-neural_net_config = NeuralNetConfig()
+neural_net_config = NeuralNet()

@@ -3,9 +3,9 @@ from pathlib import Path
 from luigi import Config, IntParameter, Parameter
 
 
-class DataConfig(Config):
+class Data(Config):
     """
-    At instantiation, reads in parameter values from the `[DataConfig]`
+    At instantiation, reads in parameter values from the `[Data]`
     section of the `luigi.toml` file.
     """
 
@@ -22,5 +22,5 @@ class DataConfig(Config):
 
 
 # Global config objects, for use in any Task.
-data_config = DataConfig()
+data_config = Data()
 output_root = Path(data_config.output_dir).absolute()

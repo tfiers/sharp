@@ -4,7 +4,7 @@ from luigi import Target, Task
 from luigi.task import Config, Parameter, flatten
 
 
-class SharpConfig(Config):
+class Sharp(Config):
     config_id = Parameter()
     # Setting this to a custom value allows to run multiple pipelines (each
     # with a different `luigi.toml` config file) in parallel. Each such
@@ -19,7 +19,7 @@ class SharpTask(Task):
     dependencies specified in `requires()` have been completed.
     """
 
-    config_id = Parameter(default=SharpConfig().config_id)
+    config_id = Parameter(default=Sharp().config_id)
     # (This `default` trick is an ugly luigi hack).
 
     def complete(self) -> bool:
