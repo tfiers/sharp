@@ -97,7 +97,7 @@ logging_conf_file = "D:\\code\\sharp\\logging.cfg"
 
 Set the following environment variable:
 ```sh
-export LUIGI_CONFIG_PARSER=toml
+$ export LUIGI_CONFIG_PARSER=toml
 ```
 
 When the `luigi.toml` config file is tailored to your needs, process the raw
