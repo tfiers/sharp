@@ -43,7 +43,7 @@ def evaluate_threshold(
     )
 
 
-@numba.jit("i4[:](f8[:], f8, i4)", nopython=True)
+@numba.jit("i4[:](f8[:], f8, i4)", nopython=True, cache=True)
 def calc_detection_indices(
     signal: NumpyArray, threshold: float, lockout_samples: int
 ) -> NumpyArray:
