@@ -32,7 +32,7 @@ class DownsampleRecording(SharpTask):
         return Neuralynx_NCS_Directory()
 
     def output(self) -> SignalFile:
-        return SignalFile(output_root, filename="downsampled")
+        return SignalFile(output_root, filename="downsampled-recording")
 
     @property
     @cached
