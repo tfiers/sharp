@@ -40,9 +40,7 @@ class PlotLatency(SummaryFigureMaker):
         algo_header = "Algorithm"
         df_dicts = (
             {data_header: sweep.best.rel_delays, algo_header: title}
-            for sweep, title in zip(
-                self.evaluation.threshold_sweeps, self.titles
-            )
+            for sweep, title in zip(self.threshold_sweeps, self.titles)
         )
         df: DataFrame = concat(DataFrame(dic) for dic in df_dicts)
         if not df.empty:

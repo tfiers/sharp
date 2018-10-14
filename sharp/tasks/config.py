@@ -1,21 +1,20 @@
-from sharp.tasks.evaluate.algorithms import EvaluateAlgorithms
-from sharp.tasks.plot.signals.detectors import PlotDetectors
+from sharp.tasks.multilin.apply import SpatiotemporalConvolution
+from sharp.tasks.neuralnet.apply import ApplyRNN
+from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.signals.reference import PlotReferenceMaker
-from sharp.tasks.plot.summary.PR_tradeoff import PlotPR
-from sharp.tasks.plot.summary.latency import PlotLatency
-from sharp.tasks.plot.summary.training import PlotValidLoss
-from sharp.tasks.plot.summary.latency_scatter import PlotLatencyScatter
-from sharp.tasks.plot.summary.PR_tradeoff import CONTINUOUS, DISCRETE
+from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
-
-CNSN_POSTER = (
-    PlotLatency(),
-    PlotLatencyScatter(),
-    PlotPR(start_proportion=0, line_kwargs=CONTINUOUS, figsize_multiplier=0.7),
-    PlotPR(start_proportion=0.65, line_kwargs=DISCRETE, ticks_topright=True),
-    PlotValidLoss(),
-    PlotDetectors(),
+TASKS_TO_RUN = (
     PlotReferenceMaker(),
+    MultiEnvelopeFigureMaker(
+        combi_ID="CNSN-poster", envelope_makers=(ApplyOnlineBPF(), ApplyRNN())
+    ),
+    MultiEnvelopeFigureMaker(
+        combi_ID="chapter-multi-lin",
+        envelope_makers=(
+            ApplyOnlineBPF(),
+            SpatiotemporalConvolution(delays=0),
+            SpatiotemporalConvolution(delays=3),
+        ),
+    ),
 )
-
-TASKS_TO_RUN = CNSN_POSTER

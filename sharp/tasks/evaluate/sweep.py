@@ -1,36 +1,32 @@
 from logging import getLogger
-from typing import Type
 
 import numpy as np
-from luigi import FloatParameter, IntParameter, TaskParameter
+from luigi import FloatParameter, IntParameter
 
 from sharp.data.files.config import output_root
 from sharp.data.files.evaluation import ThresholdSweepFile
 from sharp.data.types.evaluation import ThresholdSweep
-from sharp.tasks.base import SharpTask
+from sharp.tasks.base import SharpTask, TaskParameter
 from sharp.tasks.evaluate.threshold import evaluate_threshold
-from sharp.tasks.signal.base import EnvelopeMaker
+from sharp.tasks.signal.base import EnvelopeMaker, InputDataMixin
 
 log = getLogger(__name__)
 
 
-class ThresholdSweeper(SharpTask):
+class ThresholdSweeper(SharpTask, InputDataMixin):
     """
     Calculate performance of a detector based on its output envelope, for
     different detection thresholds.
     """
 
-    envelope_maker_class: Type[EnvelopeMaker] = TaskParameter()
+    envelope_maker: EnvelopeMaker = TaskParameter()
+
     num_thresholds = IntParameter()
     recall_best = FloatParameter(0.90)
     lockout_percentile = FloatParameter(25)
 
-    @property
-    def envelope_maker(self):
-        return self.envelope_maker_class()
-
     def requires(self):
-        return self.envelope_maker
+        return self.input_data_makers + (self.envelope_maker,)
 
     def output(self) -> ThresholdSweepFile:
         filename = self.envelope_maker.output().stem
@@ -39,7 +35,7 @@ class ThresholdSweeper(SharpTask):
     @property
     def lockout_time(self) -> float:
         return np.percentile(
-            self.envelope_maker.reference_segs_train.duration, self.lockout_percentile
+            self.reference_segs_all.duration, self.lockout_percentile
         )
 
     def run(self):
@@ -52,7 +48,7 @@ class ThresholdSweeper(SharpTask):
                 self.envelope_maker.envelope_test,
                 threshold,
                 self.lockout_time,
-                self.envelope_maker._reference_maker.reference_segs_test,
+                self.reference_segs_test,
             )
             sweep.add_threshold_evaluation(new_threshold_evaluation)
 

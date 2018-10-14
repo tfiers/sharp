@@ -20,9 +20,7 @@ class PlotLatencyScatter(SummaryFigureMaker):
                 delay: 1000 * sweep.best.abs_delays,
                 algo: title,
             }
-            for sweep, title in zip(
-                self.evaluation.threshold_sweeps, self.titles
-            )
+            for sweep, title in zip(self.threshold_sweeps, self.titles)
         )
         df: DataFrame = concat(DataFrame(dic) for dic in df_dicts)
         grid = JointGrid(x=swr_duration, y=delay, data=df, height=5)

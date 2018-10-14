@@ -42,6 +42,7 @@ class InputDataMixin:
 class EnvelopeMaker(SharpTask, InputDataMixin):
 
     output_dir = output_root / "output-envelopes"
+    title: str = ...
 
     def requires(self):
         return self.input_data_makers

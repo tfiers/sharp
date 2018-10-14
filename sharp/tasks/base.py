@@ -20,7 +20,7 @@ class SharpTask(Task):
     """
 
     config_id = Parameter(default=Sharp().config_id)
-    # (This `default` trick is an ugly luigi hack).
+    # (This `default` trick is an ugly but necessary luigi hack).
 
     def complete(self) -> bool:
         return all(
@@ -42,3 +42,19 @@ class ExternalTask(SharpTask):
     """
 
     run = None
+
+
+class TaskParameter(Parameter):
+    """
+    An instantiated task (not like luigi.TaskParameter, which should actually
+    be a TaskTypeParameter).
+    Only to be used programatically (we do not implement the parse() method to
+    convert a string to an instance).
+    """
+
+    def _warn_on_wrong_param_type(self, param_name, param_value):
+        """ Don't check param type. """
+
+
+class TaskListParameter(TaskParameter):
+    """ A sequence of instantiated tasks """

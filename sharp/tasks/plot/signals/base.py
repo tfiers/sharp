@@ -5,14 +5,12 @@ from luigi import FloatParameter
 from matplotlib import pyplot as plt
 from numpy.core.umath import ceil
 
-from fklab.segments import Segment
 from sharp.data.files.config import output_root
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import Axes, Figure
-from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
 from sharp.data.types.split import TrainTestSplit
-from sharp.tasks.plot.base import PosterFigureMaker
+from sharp.tasks.plot.base import FigureMaker
 from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
     add_scalebar,
@@ -27,10 +25,10 @@ TimeRange = Tuple[float, float]
 log = getLogger(__name__)
 
 
-class TimeRangesPlotter(PosterFigureMaker, InputDataMixin):
+class TimeRangesPlotter(FigureMaker, InputDataMixin):
     """
     Makes many plots of a set of time ranges, that together cover the entire
-    evaluation slice.
+    test slice.
     """
 
     window_size: float = FloatParameter(0.6, significant=False)
@@ -62,18 +60,13 @@ class TimeRangesPlotter(PosterFigureMaker, InputDataMixin):
         for i in range(num_ranges):
             stop = start + self.window_size
             time_range = (start, min(stop, eval_stop))
-            if self.contains_detection(time_range):
+            if self.include(time_range):
                 yield time_range
             start = stop
 
-    def contains_detection(self, time_range: TimeRange) -> bool:
-        return any(
-            SegmentEventIntersection(
-                Segment(time_range), sweep.best.detections
-            ).num_events_in_seg
-            > 0
-            for sweep in self.evaluation.threshold_sweeps
-        )
+    def include(self, time_range: TimeRange) -> bool:
+        """ Whether to plot the given time range. """
+        return True
 
     def make_figure(self, time_range):
         nrows = 1 + len(self.extra_signals)
@@ -85,7 +78,7 @@ class TimeRangesPlotter(PosterFigureMaker, InputDataMixin):
         self.plot_input_signal(time_range, input_ax)
         self.plot_other_signals(time_range, extra_axes)
         self.post_plot(time_range, input_ax, extra_axes)
-        add_segments(input_ax, self._reference_maker.reference_segs_test)
+        add_segments(input_ax, self.reference_segs_test)
         add_time_scalebar(
             extra_axes[0], 100, "ms", pos_along=0.74, pos_across=1.1
         )

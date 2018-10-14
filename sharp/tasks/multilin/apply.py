@@ -2,6 +2,7 @@ from typing import Optional
 
 import numba
 import numpy as np
+from luigi import IntParameter
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.aliases import NumpyArray
@@ -10,9 +11,11 @@ from sharp.tasks.multilin.train import MaximiseSNR
 from sharp.tasks.signal.base import EnvelopeMaker
 
 
-class MultiChannelFilter(EnvelopeMaker):
+class SpatiotemporalConvolution(EnvelopeMaker):
 
+    delays = IntParameter(0)
     trainer = MaximiseSNR()
+    title = "Multi-channel linear filter"
 
     def requires(self):
         return (self.trainer,) + super().requires()

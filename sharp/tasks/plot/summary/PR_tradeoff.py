@@ -45,15 +45,15 @@ class PlotPR(SummaryFigureMaker):
         self.output().write(fig)
 
     def plot_curves(self, ax: Axes):
-        for sweep, title in zip(self.evaluation.threshold_sweeps, self.titles):
+        for sweep, title in zip(self.threshold_sweeps, self.titles):
             ax.plot(sweep.recall, sweep.FDR, label=title, **self.line_kwargs)
 
     def plot_AUC(self, ax: Axes):
         """
         Fill area under each PR-curve with a light shade. Plot shades with
-        highest AUC at the bottom (first).
+        highest AUC at the bottom (i.e. first, most hidden).
         """
-        tups = zip(self.evaluation.threshold_sweeps, self.colors)
+        tups = zip(self.threshold_sweeps, self.colors)
         tups = sorted(tups, key=lambda tup: rank_higher_AUC_lower(tup[0]))
         for sweep, color in tups:
             fc = set_hls_values(color, l=0.9)
@@ -89,7 +89,7 @@ class PlotPR(SummaryFigureMaker):
         return self.margin * (1 - self.start_proportion)
 
     def mark_selected_recall_line(self, ax: Axes):
-        for sweep in self.evaluation.threshold_sweeps:
+        for sweep in self.threshold_sweeps:
             recall = sweep.best.recall
             precision = sweep.best.precision
             ax.plot(

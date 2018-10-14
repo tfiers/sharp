@@ -44,6 +44,8 @@ class NeuralNetTask(EnvelopeMaker):
 
     _model: RNN = None
 
+    title = "Recurrent neural network"
+
     @property
     def output_dir(self):
         return output_root / "trained-networks"

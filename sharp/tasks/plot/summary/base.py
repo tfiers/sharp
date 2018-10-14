@@ -1,7 +1,7 @@
-from sharp.tasks.plot.base import PosterFigureMaker
+from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
 
 
-class SummaryFigureMaker(PosterFigureMaker):
+class SummaryFigureMaker(MultiEnvelopeFigureMaker):
     @property
     def output_dir(self):
-        return super().output_dir / "summary"
+        return super().output_dir / "summaries"

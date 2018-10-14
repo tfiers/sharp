@@ -12,6 +12,9 @@ log = getLogger(__name__)
 
 
 class ApplyOnlineBPF(EnvelopeMaker):
+
+    title = "Online band-pass filter"
+
     def output(self):
         self.output_dir
         return SignalFile(self.output_dir, filename="causal-BPF")
