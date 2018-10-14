@@ -12,7 +12,7 @@ from sharp.data.types.signal import Signal
 
 def time_to_index(
     t: ArrayLike, fs: float, arr_size: int = np.inf, clip: bool = False
-) -> Union[IndexList, bool]:
+) -> IndexList:
     """
     Convert times to array indices.
 
@@ -20,8 +20,8 @@ def time_to_index(
     :param fs:  Sampling frequency, in hertz.
     :param arr_size:  Size of the array in which the indices will be used.
     :param clip:  If True, clips the indices between 0 and the `arr_size`.
-                If False (default), returns `False` when the indices cannot be
-                used to index an array of size `arr_size`.
+                If False (default), raises a ValueError when the indices cannot
+                be used to index an array of size `arr_size`.
     :return: Indices.
     """
     indices = (np.array(t) * fs).round()
@@ -31,7 +31,10 @@ def time_to_index(
         if np.all(indices >= 0) and np.all(indices < arr_size):
             return indices.astype("int")
         else:
-            return False
+            raise ValueError(
+                f"Times {t} cannot be used to index an array of size "
+                f"{arr_size} at sampling frequency {fs}."
+            )
 
 
 def fraction_to_index(signal: Signal, fractions: ArrayLike) -> ArrayLike:
