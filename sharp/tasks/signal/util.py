@@ -2,12 +2,10 @@
 Utility functions for signal sample indices, times, and the conversion between
 them.
 """
-from typing import Union
 
 import numpy as np
 
 from sharp.data.types.aliases import ArrayLike, IndexList, NumpyArray
-from sharp.data.types.signal import Signal
 
 
 def time_to_index(
@@ -35,14 +33,6 @@ def time_to_index(
                 f"Times {t} cannot be used to index an array of size "
                 f"{arr_size} at sampling frequency {fs}."
             )
-
-
-def fraction_to_index(signal: Signal, fractions: ArrayLike) -> ArrayLike:
-    """
-    Convert fractions of total signal length to indices into this signal.
-    """
-    t = np.array(fractions) * signal.duration
-    return time_to_index(t, signal.fs, signal.num_samples, clip=True)
 
 
 def view(time: ArrayLike, *args) -> NumpyArray:

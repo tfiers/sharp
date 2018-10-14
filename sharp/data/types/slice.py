@@ -3,7 +3,6 @@ from typing import Optional, Tuple
 from fklab.segments import Segment
 from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
-from sharp.tasks.signal.util import fraction_to_index
 
 
 class Slice:
@@ -20,7 +19,7 @@ class Slice:
     ):
         self._signal_full = signal
         self._segments_full = segments
-        self._indices = fraction_to_index(signal, bounds)
+        self._indices = signal.fraction_to_index(bounds)
 
     @property
     def signal(self) -> Signal:

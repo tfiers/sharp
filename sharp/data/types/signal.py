@@ -1,11 +1,16 @@
+from typing import Sequence
+
 import numpy as np
 
+from fklab.segments import Segment
 from sharp.data.types.aliases import ArrayLike, NumpyArray
-
 
 # How to subclass np.ndarray:
 # https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
 #
+from sharp.tasks.signal.util import time_to_index
+
+
 class Signal(NumpyArray):
     def __new__(cls, input_array: ArrayLike, fs: float):
         """
@@ -84,6 +89,27 @@ class Signal(NumpyArray):
             t0, t0 + self.duration, self.num_samples, endpoint=False
         )
         return time
+
+    def extract(self, segments: Segment) -> Sequence["Signal"]:
+        """ Cut out segments from this signal. """
+        return [self.time_slice(*seg) for seg in segments]
+
+    def time_slice(self, start: float, stop: float) -> "Signal":
+        indices = time_to_index(
+            [start, stop], self.fs, self.num_samples, clip=True
+        )
+        result = self.as_matrix()[slice(*indices), :]
+        if self.ndim == 1:
+            return result.as_vector()
+        else:
+            return result
+
+    def fraction_to_index(self, fractions: ArrayLike) -> ArrayLike:
+        """
+        Convert fractions of total signal length to indices into this signal.
+        """
+        t = np.array(fractions) * self.duration
+        return time_to_index(t, self.fs, self.num_samples, clip=True)
 
 
 class BinarySignal(Signal):
