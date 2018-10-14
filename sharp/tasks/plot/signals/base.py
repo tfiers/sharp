@@ -20,15 +20,14 @@ from sharp.tasks.plot.util.scalebar import (
     add_voltage_scalebar,
 )
 from sharp.tasks.plot.util.signal import plot_signal
-from sharp.tasks.signal.downsample import DownsampleRecording
-from sharp.tasks.signal.reference import MakeReference
+from sharp.tasks.signal.base import InputDataMixin
 
 TimeRange = Tuple[float, float]
 
 log = getLogger(__name__)
 
 
-class TimeRangesPlotter(PosterFigureMaker):
+class TimeRangesPlotter(PosterFigureMaker, InputDataMixin):
     """
     Makes many plots of a set of time ranges, that together cover the entire
     evaluation slice.
@@ -37,11 +36,8 @@ class TimeRangesPlotter(PosterFigureMaker):
     window_size: float = FloatParameter(0.6, significant=False)
     # Duration of each time slice (and thus of each plot). In seconds.
 
-    downsampler = DownsampleRecording()
-    reference_maker = MakeReference()
-
     def requires(self):
-        return (self.downsampler, self.reference_maker)
+        return self.input_data_makers
 
     def output(self):
         for start, stop in self.time_ranges:
@@ -57,8 +53,10 @@ class TimeRangesPlotter(PosterFigureMaker):
 
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
-        num_ranges = int(ceil(self.input_signal.duration / self.window_size))
-        split = TrainTestSplit(self.downsampler.downsampled_signal)
+        num_ranges = int(
+            ceil(self.input_signal_test.duration / self.window_size)
+        )
+        split = TrainTestSplit(self.input_signal_all)
         eval_start, eval_stop = split.time_range_test
         start = eval_start
         for i in range(num_ranges):
@@ -87,7 +85,7 @@ class TimeRangesPlotter(PosterFigureMaker):
         self.plot_input_signal(time_range, input_ax)
         self.plot_other_signals(time_range, extra_axes)
         self.post_plot(time_range, input_ax, extra_axes)
-        add_segments(input_ax, self.reference_maker.reference_segs_test)
+        add_segments(input_ax, self._reference_maker.reference_segs_test)
         add_time_scalebar(
             extra_axes[0], 100, "ms", pos_along=0.74, pos_across=1.1
         )
@@ -95,9 +93,9 @@ class TimeRangesPlotter(PosterFigureMaker):
         return fig
 
     def plot_input_signal(self, time_range: TimeRange, ax: Axes):
-        plot_clean_sig(self.input_signal, time_range, ax)
+        plot_clean_sig(self.input_signal_test, time_range, ax)
         add_voltage_scalebar(ax, 1, "mV", pos_along=0, pos_across=0)
-        ax.set_ylim(self.input_signal.range)
+        ax.set_ylim(self.input_signal_test.range)
 
     def plot_other_signals(self, time_range: TimeRange, axes: Sequence[Axes]):
         for ax, signal in zip(axes, self.extra_signals):
@@ -119,10 +117,6 @@ class TimeRangesPlotter(PosterFigureMaker):
         Optional hook to override. Called after all signals have been plotted.
         """
         pass
-
-    @property
-    def input_signal(self) -> Signal:
-        return self.downsampler.downsampled_signal_test
 
     @property
     def extra_signals(self) -> Sequence[Signal]:

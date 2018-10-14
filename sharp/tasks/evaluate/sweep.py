@@ -52,7 +52,7 @@ class ThresholdSweeper(SharpTask):
                 self.envelope_maker.envelope_test,
                 threshold,
                 self.lockout_time,
-                self.envelope_maker.reference_maker.reference_segs_test,
+                self.envelope_maker._reference_maker.reference_segs_test,
             )
             sweep.add_threshold_evaluation(new_threshold_evaluation)
 

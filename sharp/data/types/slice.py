@@ -9,7 +9,7 @@ from sharp.tasks.signal.util import fraction_to_index
 class Slice:
     """
     Given a slicing range (given as fractions of total signal length), a full
-    signal, and optional segments, calculates signal and segment extracts.
+    signal, and optional segments, calculates signal and segment extract.
     """
 
     def __init__(
