@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from luigi import Config, IntParameter, Parameter
+from luigi import BoolParameter, Config, FloatParameter, IntParameter, Parameter
 
 
 class Data(Config):
@@ -17,8 +17,18 @@ class Data(Config):
     # figures. (Absolute path, or path relative to where the code is run from).
 
     probe_number = IntParameter()
-
     electrode_number = IntParameter()
+
+    train_fraction = FloatParameter(0.9)
+    # Border between training and testing data, as a fraction of total signal
+    # duration.
+    train_first = BoolParameter(False)
+    # Whether the training data comes before the test data or not.
+
+    # Useful for choosing split boundary: relative timestamps of Kloosterman
+    # Lab scientists labelling L2 data ('labelface'):
+    #  - common set last event = 161 / 2040 = 0.0789
+    #  - last labeller last event = 860 / 2040 = 0.4216
 
 
 # Global config objects, for use in any Task.

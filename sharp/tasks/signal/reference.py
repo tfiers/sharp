@@ -10,11 +10,11 @@ from luigi import FloatParameter, TupleParameter
 from fklab.segments import Segment
 from fklab.signals.core import detect_mountains
 from fklab.signals.filter import compute_envelope
-from sharp.data.types.signal import Signal
-
-from sharp.data.files.numpy import SegmentsFile
-from sharp.tasks.base import SharpTask
 from sharp.data.files.config import output_root
+from sharp.data.files.numpy import SegmentsFile
+from sharp.data.types.signal import Signal
+from sharp.data.types.split import TrainTestSplit
+from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.downsample import DownsampleRecording
 from sharp.util import cached, ignore
 
@@ -27,18 +27,38 @@ class MakeReference(SharpTask):
     min_duration: float = FloatParameter(25E-3)
     min_separation: float = FloatParameter(10E-3)
 
+    downsampler = DownsampleRecording()
+
     def requires(self):
-        return DownsampleRecording()
+        return self.downsampler
 
     def output(self):
         return SegmentsFile(output_root, "autoref-segments")
 
-    def run(self):
-        self.output().write(self.segments)
+    @property
+    def reference_segs_train(self):
+        return self._train_test_split.segments_train
+
+    @property
+    def reference_segs_test(self):
+        return self._train_test_split.segments_test
+
+    @property
+    def _train_test_split(self):
+        return TrainTestSplit(self.input_signal, self.reference_segs)
+
+    @property
+    @cached
+    def reference_segs(self):
+        return self.output().read()
 
     @property
     def input_signal(self) -> Signal:
-        return self.input().read()
+        return self.downsampler.output().read()
+
+    def run(self):
+        segs = self.calc_segments()
+        self.output().write(segs)
 
     @property
     @cached
@@ -71,8 +91,7 @@ class MakeReference(SharpTask):
     def threshold_high(self):
         return self.envelope_center + self.mult_detect * self.envelope_spread
 
-    @property
-    def segments(self) -> Segment:
+    def calc_segments(self) -> Segment:
         """ Start and end times of sharp wave-ripple events. """
         return detect_mountains(
             self.envelope,

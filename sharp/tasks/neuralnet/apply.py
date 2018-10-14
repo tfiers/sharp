@@ -1,9 +1,9 @@
 import torch
 
+from sharp.data.files.numpy import SignalFile
 from sharp.data.types.aliases import NumpyArray, TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import Signal
-from sharp.data.files.numpy import SignalFile
 from sharp.tasks.neuralnet.base import NeuralNetTask
 from sharp.tasks.neuralnet.select import SelectBestRNN
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -21,7 +21,7 @@ class ApplyRNN(NeuralNetTask):
 
     def run(self):
         with torch.no_grad():
-            inputt = self.as_model_io(self.input_signal.as_matrix())
+            inputt = self.as_model_io(self.input_signal_all.as_matrix())
             model: RNN = self.model_selector.output().read()
             h0 = model.get_init_h()
             output, _ = model(inputt, h0)
@@ -29,5 +29,5 @@ class ApplyRNN(NeuralNetTask):
             envelope: TorchArray = torch.sigmoid(output.squeeze())
             envelope_cpu = envelope.to("cpu")
             envelope_numpy: NumpyArray = envelope_cpu.numpy()
-            sig = Signal(envelope_numpy, self.input_signal.fs)
+            sig = Signal(envelope_numpy, self.input_signal_all.fs)
             self.output().write(sig)

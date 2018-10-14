@@ -1,16 +1,17 @@
 """
-Fit sharp wave-ripple detectors to labelled data.
+Fit a sharp wave-ripple detector to labelled data.
 """
-from logging import getLogger
-from typing import Iterable, Sequence, Optional
 
-import numpy as np
+from logging import getLogger
+from typing import Iterable, Optional, Sequence
+
 import torch
 from luigi import IntParameter
+
 from sharp.data.files.neuralnet import NeuralModelFile
 from sharp.tasks.neuralnet.base import IOTuple, NeuralNetTask
 from sharp.tasks.neuralnet.config import neural_net_config
-from sharp.tasks.signal.util import fraction_to_index, time_to_index
+from sharp.tasks.signal.util import time_to_index
 from sharp.util import cached
 
 log = getLogger(__name__)
@@ -57,8 +58,7 @@ class TrainRNN(NeuralNetTask):
         self.output().write(self.model)
 
     def tune_weights(self):
-        train_tuples = self.make_io_tuple(self.train_segs)
-        chunks = self.to_chunks(train_tuples)
+        chunks = self.to_chunks([self.io_tuple_train])
         total_training_loss = 0
         # Get a random initial hidden state.
         h0 = self.model.get_init_h()
@@ -122,7 +122,7 @@ class TrainRNN(NeuralNetTask):
     def chunk_size(self) -> int:
         """ Number of samples per chunk. """
         size = time_to_index(
-            neural_net_config.chunk_duration, self.input_signal.fs
+            neural_net_config.chunk_duration, self.input_signal_all.fs
         )
         return int(size)
 
@@ -130,8 +130,5 @@ class TrainRNN(NeuralNetTask):
     @cached
     def num_training_chunks(self) -> int:
         """ Total number of training chunks, over all traininig IO tuples."""
-        train_seg_indices = fraction_to_index(
-            self.input_signal, self.train_segs
-        )
-        num_training_samples = sum(np.diff(train_seg_indices))
+        num_training_samples = self.input_signal_train_proper.size
         return int(num_training_samples // self.chunk_size)

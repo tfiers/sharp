@@ -21,8 +21,8 @@ class EvaluateAlgorithms(SharpTask):
     def threshold_sweepers(self) -> Sequence[ThresholdSweeper]:
         return self.sort_values_by_sweeper(
             {
-                "sota": ThresholdSweeper(envelope_maker=ApplyOnlineBPF),
-                "proposal": ThresholdSweeper(envelope_maker=ApplyRNN),
+                "sota": ThresholdSweeper(envelope_maker_class=ApplyOnlineBPF),
+                "proposal": ThresholdSweeper(envelope_maker_class=ApplyRNN),
             }
         )
 
@@ -35,4 +35,7 @@ class EvaluateAlgorithms(SharpTask):
 
     @property
     def envelopes(self) -> Sequence[Signal]:
-        return [sweeper.envelope for sweeper in self.threshold_sweepers]
+        return [
+            sweeper.envelope_maker.envelope
+            for sweeper in self.threshold_sweepers
+        ]

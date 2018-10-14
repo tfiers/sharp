@@ -4,10 +4,10 @@ from typing import Iterable
 import torch
 from luigi import IntParameter
 
-from sharp.data.types.neuralnet import RNN
 from sharp.data.files.neuralnet import NeuralModelFile
 from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.files.stdlib import FloatFile
+from sharp.data.types.neuralnet import RNN
 from sharp.tasks.neuralnet.base import NeuralNetTask
 from sharp.tasks.neuralnet.config import neural_net_config
 from sharp.tasks.neuralnet.train import TrainRNN
@@ -38,7 +38,7 @@ class CalcValidLoss(NeuralNetTask):
 
     def run(self):
         with torch.no_grad():
-            valid_tuples = self.make_io_tuple(self.valid_segs)
+            valid_tuples = [self.io_tuple_valid]
             model: RNN = self.trainer.output().read()
             loss = 0
             for input_slice, target_slice in valid_tuples:
@@ -87,7 +87,9 @@ class SelectBestRNN(NeuralNetTask):
         # Get index of model with lowest validation loss.
         valid_losses = self.input().read()
         best_epoch = int(valid_losses.argmin())
-        log.info(f"Best estim. general. perf. at epoch {best_epoch}.")
+        log.info(
+            f"Best estimated generalisation performance at epoch: {best_epoch}"
+        )
         # Use this index to copy model file.
         valid_loss_calculators = list(self.valid_loss_gatherer.requires())
         best_valid_loss_calculator = valid_loss_calculators[best_epoch]

@@ -4,17 +4,18 @@ import numpy as np
 from luigi import FloatParameter
 from scipy.signal import cheby1, filtfilt
 
-from sharp.data.types.aliases import NumpyArray
-from sharp.data.types.signal import Signal
-from sharp.data.files.numpy import SignalFile
+from sharp.data.files.config import data_config, output_root
 from sharp.data.files.neuralynx import (
     Neuralynx_NCS_Directory,
     Neuralynx_NCS_File,
 )
+from sharp.data.files.numpy import SignalFile
+from sharp.data.types.aliases import NumpyArray
+from sharp.data.types.signal import Signal
+from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.data.files.config import data_config, output_root
 from sharp.tasks.signal.util import time_to_index
-from sharp.util import ignore
+from sharp.util import cached, ignore
 
 
 class DownsampleRecording(SharpTask):
@@ -32,6 +33,19 @@ class DownsampleRecording(SharpTask):
 
     def output(self) -> SignalFile:
         return SignalFile(output_root, filename="downsampled")
+
+    @property
+    @cached
+    def downsampled_signal(self):
+        return self.output().read()
+
+    @property
+    def downsampled_signal_train(self):
+        return TrainTestSplit(self.downsampled_signal).signal_train
+
+    @property
+    def downsampled_signal_test(self):
+        return TrainTestSplit(self.downsampled_signal).signal_test
 
     def run(self):
         in_file = self.requires().get_file(

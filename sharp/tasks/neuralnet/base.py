@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Callable, Iterable, Tuple
+from typing import Callable, Tuple
 
 import numpy as np
 import torch
@@ -9,11 +9,11 @@ from sharp.data.files.config import output_root
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
+from sharp.data.types.split import DataSplit
 from sharp.tasks.neuralnet.config import neural_net_config
 from sharp.tasks.neuralnet.util import numpy_to_torch, to_batch
 from sharp.tasks.signal.base import EnvelopeMaker
-from sharp.tasks.signal.split import TrainTestSplitter
-from sharp.tasks.signal.util import fraction_to_index, time_to_index
+from sharp.tasks.signal.util import time_to_index
 
 log = getLogger(__name__)
 
@@ -25,6 +25,18 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 log.info(f"Using {device} device.")
 
 
+class TrainValidSplit(DataSplit):
+    split_fraction = 1 - neural_net_config.valid_fraction
+
+    @property
+    def train_proper_slice(self):
+        return self._left_slice
+
+    @property
+    def valid_slice(self):
+        return self._right_slice
+
+
 class NeuralNetTask(EnvelopeMaker):
     """
     Base class for other neural network tasks.
@@ -32,32 +44,9 @@ class NeuralNetTask(EnvelopeMaker):
 
     _model: RNN = None
 
-    split_data = TrainTestSplitter()
-
     @property
     def output_dir(self):
         return output_root / "trained-networks"
-
-    @property
-    def target_signal(self) -> BinarySignal:
-        """ Binary target, or training signal, as a one-column matrix. """
-        segs = self.reference_segs.scale(
-            1 + neural_net_config.reference_seg_extension, reference=1
-        )
-        return self.to_binary_signal(segs)
-
-    @property
-    def cost_function(self) -> Callable[[TorchArray, TorchArray], TorchArray]:
-        """
-        Quantifies RNN performance by comparing network output with target
-        signal (with lower values being better).
-
-        Return a function that applies a sigmoid squashing function to its
-        first argument, and that compares the result of this squashing with its
-        second argument (a binary signal), by calculating the binary cross
-        entropy between them.
-        """
-        return torch.nn.BCEWithLogitsLoss(reduction="sum")
 
     @property
     def model(self) -> RNN:
@@ -83,27 +72,70 @@ class NeuralNetTask(EnvelopeMaker):
         model.to(device)
         return model
 
+    @property
+    def cost_function(self) -> Callable[[TorchArray, TorchArray], TorchArray]:
+        """
+        Quantifies RNN performance by comparing network output with target
+        signal (with lower values being better).
+
+        Return a function that applies a sigmoid squashing function to its
+        first argument, and that compares the result of this squashing with its
+        second argument (a binary signal), by calculating the binary cross
+        entropy between them.
+        """
+        return torch.nn.BCEWithLogitsLoss(reduction="sum")
+
+    @property
+    def target_signal(self) -> BinarySignal:
+        """ Binary target, or training signal, as a one-column matrix. """
+        segs = self.reference_segs_train.scale(
+            1 + neural_net_config.reference_seg_extension, reference=1
+        )
+        return self.to_binary_signal(segs)
+
     def to_binary_signal(self, segs: Segment) -> BinarySignal:
         """
-        Convert segment times to a binary signal (in a one-column matrix).
+        Convert segment times to a binary signal (in a one-column matrix) that
+        is as long as the full training input signal.
         """
-        N = self.input_signal.shape[0]
+        N = self.input_signal_train.shape[0]
         sig = np.zeros(N)
         for seg in segs:
-            ix = time_to_index(seg, self.input_signal.fs, N, clip=True)
+            ix = time_to_index(seg, self.input_signal_train.fs, N, clip=True)
             sig[slice(*ix)] = 1
-        return BinarySignal(sig, self.input_signal.fs).as_matrix()
+        return BinarySignal(sig, self.input_signal_train.fs).as_matrix()
 
-    def make_io_tuple(self, fraction_seg: Tuple[float, float]) -> IOTuple:
-        """
-        Cut out the given segments from the input and target signal, and
-        combines these as PyTorch-ready (input_slice, target_slice)-tuples.
-        """
-        for start, stop in fraction_to_index(self.input_signal, fraction_segs):
-            yield (
-                self.as_model_io(self.input_signal[start:stop]),
-                self.as_model_io(self.target_signal[start:stop]),
-            )
+    @property
+    def io_tuple_train(self) -> IOTuple:
+        return (
+            self.as_model_io(self.input_signal_train_proper),
+            self.as_model_io(self.target_signal_train_proper),
+        )
+
+    @property
+    def io_tuple_valid(self) -> IOTuple:
+        return (
+            self.as_model_io(self.input_signal_valid),
+            self.as_model_io(self.target_signal_valid),
+        )
+
+    @property
+    def input_signal_train_proper(self):
+        return TrainValidSplit(
+            self.input_signal_train
+        ).train_proper_slice.signal
+
+    @property
+    def input_signal_valid(self):
+        return TrainValidSplit(self.input_signal_train).valid_slice.signal
+
+    @property
+    def target_signal_train_proper(self):
+        return TrainValidSplit(self.target_signal).train_proper_slice.signal
+
+    @property
+    def target_signal_valid(self):
+        return TrainValidSplit(self.target_signal).valid_slice.signal
 
     def as_model_io(self, sig: Signal) -> TorchArray:
         """
@@ -113,6 +145,6 @@ class NeuralNetTask(EnvelopeMaker):
         input shape: (num_samples, num_channels)
         output shape: (1, num_samples, num_channels)
         """
-        pytorch_array = numpy_to_torch(sig)
+        pytorch_array = numpy_to_torch(sig.as_matrix())
         batched = to_batch(pytorch_array, one_sample=True)
         return batched.to(device)

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 from fklab.segments import Segment
 from sharp.data.types.aliases import NumpyArray
@@ -8,35 +8,31 @@ from sharp.tasks.signal.util import fraction_to_index
 
 class Slice:
     """
-    Given full signals, calculates signal extracts (using a given range, given
-    as fractions of total signal length).
+    Given a slicing range (given as fractions of total signal length), a full
+    signal, and optional segments, calculates signal and segment extracts.
     """
 
     def __init__(
         self,
-        border_fractions: Tuple[float, float],
-        input: Signal,
-        envelope: Signal = None,
-        reference_segs: Segment = None,
+        bounds: Tuple[float, float],
+        signal: Signal,
+        segments: Optional[Segment] = None,
     ):
-        self._range_indices = fraction_to_index(input, border_fractions)
-        self._full_input = input
-        self._full_envelope = envelope
-        self._full_reference_segs = reference_segs
+        self._signal_full = signal
+        self._segments_full = segments
+        self._indices = fraction_to_index(signal, bounds)
 
     @property
-    def input(self) -> Signal:
-        return self._full_input[slice(*self._range_indices)]
+    def signal(self) -> Signal:
+        return self._signal_full[slice(*self._indices)]
 
     @property
-    def envelope(self) -> Signal:
-        return self._full_envelope[slice(*self._range_indices)]
+    def segments(self) -> Segment:
+        selected_segs = self._segments_full.intersection(self.time_range)
+        offset_segs = selected_segs - self.time_range[0]
+        return offset_segs
 
     @property
-    def reference_segs(self) -> Segment:
-        return self._full_reference_segs.intersection(self.range)
-
-    @property
-    def range(self) -> NumpyArray:
+    def time_range(self) -> NumpyArray:
         """ (start, stop) times of the slice. """
-        return self._range_indices / self._full_input.fs
+        return self._indices / self._signal_full.fs

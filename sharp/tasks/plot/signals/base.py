@@ -6,14 +6,12 @@ from matplotlib import pyplot as plt
 from numpy.core.umath import ceil
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import Figure, Axes
+from sharp.data.files.config import output_root
+from sharp.data.files.figure import FigureTarget
+from sharp.data.types.aliases import Axes, Figure
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
-from sharp.data.files.config import output_root
-
-from sharp.data.files.figure import FigureTarget
-
-
+from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.plot.base import PosterFigureMaker
 from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
@@ -22,7 +20,8 @@ from sharp.tasks.plot.util.scalebar import (
     add_voltage_scalebar,
 )
 from sharp.tasks.plot.util.signal import plot_signal
-from sharp.tasks.signal.split import TrainTestSplitter
+from sharp.tasks.signal.downsample import DownsampleRecording
+from sharp.tasks.signal.reference import MakeReference
 
 TimeRange = Tuple[float, float]
 
@@ -38,12 +37,11 @@ class TimeRangesPlotter(PosterFigureMaker):
     window_size: float = FloatParameter(0.6, significant=False)
     # Duration of each time slice (and thus of each plot). In seconds.
 
-    data = TrainTestSplitter()
-    # We won't use the envelope slice of the result -- only the input and
-    # reference segment slices.
+    downsampler = DownsampleRecording()
+    reference_maker = MakeReference()
 
     def requires(self):
-        return self.data
+        return (self.downsampler, self.reference_maker)
 
     def output(self):
         for start, stop in self.time_ranges:
@@ -60,7 +58,8 @@ class TimeRangesPlotter(PosterFigureMaker):
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
         num_ranges = int(ceil(self.input_signal.duration / self.window_size))
-        eval_start, eval_stop = self.data.test.range
+        split = TrainTestSplit(self.downsampler.downsampled_signal)
+        eval_start, eval_stop = split.time_range_test
         start = eval_start
         for i in range(num_ranges):
             stop = start + self.window_size
@@ -88,7 +87,7 @@ class TimeRangesPlotter(PosterFigureMaker):
         self.plot_input_signal(time_range, input_ax)
         self.plot_other_signals(time_range, extra_axes)
         self.post_plot(time_range, input_ax, extra_axes)
-        add_segments(input_ax, self.data.test.reference_segs)
+        add_segments(input_ax, self.reference_maker.reference_segs_test)
         add_time_scalebar(
             extra_axes[0], 100, "ms", pos_along=0.74, pos_across=1.1
         )
@@ -123,7 +122,7 @@ class TimeRangesPlotter(PosterFigureMaker):
 
     @property
     def input_signal(self) -> Signal:
-        return self.data.test.input
+        return self.downsampler.downsampled_signal_test
 
     @property
     def extra_signals(self) -> Sequence[Signal]:
