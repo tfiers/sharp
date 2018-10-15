@@ -1,9 +1,10 @@
 from typing import Sequence
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import ArrayLike, NumpyArray
+from sharp.data.types.aliases import ArrayLike
 from sharp.tasks.signal.util import time_to_index
 
 
@@ -70,7 +71,7 @@ class Signal(np.ndarray):
             raise ValueError("Signal has more than one channel.")
 
     @property
-    def range(self) -> NumpyArray:
+    def range(self) -> ndarray:
         """ (min, max) of signal values. """
         return np.array([self.min(), self.max()])
 
@@ -80,11 +81,11 @@ class Signal(np.ndarray):
         return np.diff(self.range)
 
     @property
-    def time(self) -> NumpyArray:
+    def time(self) -> ndarray:
         """ A time vector for this signal, starting at t = 0 seconds. """
         return self.get_time_vector(t0=0)
 
-    def get_time_vector(self, t0: float) -> NumpyArray:
+    def get_time_vector(self, t0: float) -> ndarray:
         """ A time vector for this signal, starting at t0. In seconds. """
         time = np.linspace(
             t0, t0 + self.duration, self.num_samples, endpoint=False

@@ -5,11 +5,10 @@ Describes how processed data is stored, and how it can be accessed.
 import numpy as np
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import NumpyArray, ArrayLike
-from sharp.data.types.signal import Signal
-
 from sharp.data.files.base import FileTarget
 from sharp.data.files.stdlib import FloatFile
+from sharp.data.types.aliases import ArrayLike
+from sharp.data.types.signal import Signal
 from sharp.util import cached
 
 
@@ -21,7 +20,7 @@ class NumpyArrayFile(FileTarget):
     extension = ".npy"
 
     @cached
-    def read(self) -> NumpyArray:
+    def read(self) -> np.ndarray:
         # ToDo: try mmap
         return np.load(self.path_string)
 

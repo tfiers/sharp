@@ -4,8 +4,9 @@ them.
 """
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 
-from sharp.data.types.aliases import ArrayLike, IndexList, NumpyArray
+from sharp.data.types.aliases import ArrayLike, IndexList
 
 
 def time_to_index(
@@ -35,7 +36,7 @@ def time_to_index(
             )
 
 
-def view(time: ArrayLike, *args) -> NumpyArray:
+def view(time: ArrayLike, *args) -> ndarray:
     """
     A range around some timestamp(s). Useful for plotting.
 

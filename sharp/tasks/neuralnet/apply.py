@@ -1,7 +1,8 @@
 import torch
+from numpy.core.multiarray import ndarray
 
 from sharp.data.files.numpy import SignalFile
-from sharp.data.types.aliases import NumpyArray, TorchArray
+from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import Signal
 from sharp.tasks.neuralnet.base import NeuralNetTask
@@ -28,6 +29,6 @@ class ApplyRNN(NeuralNetTask):
             # Cannot use torch.nn.functional.sigmoid (deprecated).
             envelope: TorchArray = torch.sigmoid(output.squeeze())
             envelope_cpu = envelope.to("cpu")
-            envelope_numpy: NumpyArray = envelope_cpu.numpy()
+            envelope_numpy: ndarray = envelope_cpu.numpy()
             sig = Signal(envelope_numpy, self.input_signal_all.fs)
             self.output().write(sig)

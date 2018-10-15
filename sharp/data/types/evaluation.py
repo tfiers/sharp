@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import BooleanArray, EventList, NumpyArray
+from sharp.data.types.aliases import BooleanArray, EventList, ndarray
 from sharp.data.types.intersection import SegmentEventIntersection
 
 
@@ -127,7 +127,7 @@ class ThresholdEvaluation:
         return self.detections[self.intersection.first_event_in_seg]
 
     @property
-    def abs_delays(self) -> NumpyArray:
+    def abs_delays(self) -> ndarray:
         """
         Absolute detection delays. One data point per detected reference
         segment. Positive if the detection happened after the start of the
@@ -136,7 +136,7 @@ class ThresholdEvaluation:
         return self.first_detections - self.detected_reference_segs.start
 
     @property
-    def rel_delays(self) -> NumpyArray:
+    def rel_delays(self) -> ndarray:
         """
         Detection delays, as a fraction of the duration of the corresponding
         reference segments. One data point per detected reference segment.
@@ -149,7 +149,7 @@ def vectorized_property(name: str):
     :param name: Name of a scalar attribute of a ThresholdEvaluation instance.
     """
 
-    def vectorize_attribute(self: "ThresholdSweep") -> NumpyArray:
+    def vectorize_attribute(self: "ThresholdSweep") -> ndarray:
         """
         Gathers a scalar measure from different threshold evaluations.
         """
@@ -174,14 +174,14 @@ class ThresholdSweep:
     # At which approximate recall value the `best` threshold should be chosen.
     # If not specified, chooses the threshold with maximal F2-score.
 
-    threshold: NumpyArray = vectorized_property("threshold")
-    recall: NumpyArray = vectorized_property("recall")
-    precision: NumpyArray = vectorized_property("precision")
-    FDR: NumpyArray = vectorized_property("FDR")
-    F1: NumpyArray = vectorized_property("F1")
-    F2: NumpyArray = vectorized_property("F2")
+    threshold: ndarray = vectorized_property("threshold")
+    recall: ndarray = vectorized_property("recall")
+    precision: ndarray = vectorized_property("precision")
+    FDR: ndarray = vectorized_property("FDR")
+    F1: ndarray = vectorized_property("F1")
+    F2: ndarray = vectorized_property("F2")
 
-    thresholds: NumpyArray = threshold
+    thresholds: ndarray = threshold
     # Alias, for readability.
 
     @property

@@ -1,9 +1,10 @@
 import torch
+from numpy.core.multiarray import ndarray
 
-from sharp.data.types.aliases import TorchArray, NumpyArray
+from sharp.data.types.aliases import TorchArray
 
 
-def numpy_to_torch(array: NumpyArray) -> TorchArray:
+def numpy_to_torch(array: ndarray) -> TorchArray:
     """
     Convert a NumPy array to a PyTorch tensor, of the right data type. The
     input and output objects share the same data in memory.

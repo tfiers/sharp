@@ -1,9 +1,9 @@
 from logging import getLogger
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.evaluation import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
@@ -45,8 +45,8 @@ def evaluate_threshold(
 
 @compiled
 def calc_detection_indices(
-    signal: NumpyArray, threshold: float, lockout_samples: int
-) -> NumpyArray:
+    signal: ndarray, threshold: float, lockout_samples: int
+) -> ndarray:
     N = signal.size
     max_detections = N // lockout_samples
     detection_indices = np.empty(max_detections, dtype=np.int32)

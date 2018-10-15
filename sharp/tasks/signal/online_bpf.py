@@ -1,9 +1,9 @@
 from logging import getLogger
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 from scipy.signal import cheb2ord, cheby2, lfilter
 
-from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
 from sharp.data.files.numpy import SignalFile
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -29,13 +29,13 @@ class ApplyOnlineBPF(EnvelopeMaker):
 
 def get_SOTA_online_BPF(
     fs: float,
-    left_edge: NumpyArray = (90, 110),
-    right_edge: NumpyArray = (190, 210),
+    left_edge: ndarray = (90, 110),
+    right_edge: ndarray = (190, 210),
     passband_ripple: float = 1,
     #   Maximum attenuation in the passband, in dB.,
     attenuation: float = 40,
     #   Minimum attenuation of the stopband, in dB.
-) -> (NumpyArray, NumpyArray):
+) -> (ndarray, ndarray):
     """
     State of the art online IIR band pass filter.
 

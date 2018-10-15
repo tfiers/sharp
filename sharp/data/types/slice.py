@@ -1,7 +1,8 @@
 from typing import Optional, Tuple
 
+from numpy.core.multiarray import ndarray
+
 from fklab.segments import Segment
-from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
 
 
@@ -32,6 +33,6 @@ class Slice:
         return offset_segs
 
     @property
-    def time_range(self) -> NumpyArray:
+    def time_range(self) -> ndarray:
         """ (start, stop) times of the slice. """
         return self._indices / self._signal_full.fs

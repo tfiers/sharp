@@ -1,7 +1,8 @@
 import numpy as np
+from numpy.core.multiarray import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import EventList, BooleanArray, NumpyArray
+from sharp.data.types.aliases import EventList, BooleanArray
 
 
 class SegmentEventIntersection:
@@ -21,11 +22,11 @@ class SegmentEventIntersection:
         return self._isinseg
 
     @property
-    def num_events_in_seg(self) -> NumpyArray:
+    def num_events_in_seg(self) -> ndarray:
         return self._ninseg
 
     @property
-    def first_event_in_seg(self) -> NumpyArray:
+    def first_event_in_seg(self) -> ndarray:
         """
         For each segment with at least one event in it, the index of the first
         such event.

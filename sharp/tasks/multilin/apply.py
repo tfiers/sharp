@@ -4,7 +4,6 @@ import numpy as np
 from luigi import IntParameter
 
 from sharp.data.files.numpy import SignalFile
-from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
 from sharp.tasks.multilin.train import MaximiseSNR
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -35,8 +34,8 @@ class SpatiotemporalConvolution(EnvelopeMaker):
 
 @compiled
 def convolve_spatiotemporal(
-    signal: NumpyArray, weights: NumpyArray, delays: Optional[NumpyArray] = None
-) -> NumpyArray:
+    signal: np.ndarray, weights: np.ndarray, delays: Optional[np.ndarray] = None
+) -> np.ndarray:
     """
     :param signal:  shape = (N, C)
     :param weights:  shape = (d*C,)

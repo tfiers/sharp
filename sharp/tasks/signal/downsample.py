@@ -2,6 +2,7 @@ from warnings import warn
 
 import numpy as np
 from luigi import FloatParameter
+from numpy.core.multiarray import ndarray
 from scipy.signal import cheby1, filtfilt
 
 from sharp.data.files.config import data_config, output_root
@@ -10,7 +11,6 @@ from sharp.data.files.neuralynx import (
     Neuralynx_NCS_File,
 )
 from sharp.data.files.numpy import SignalFile
-from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
@@ -133,7 +133,7 @@ def downsample_raw(
 
 def _get_anti_alias_filter(
     q: int, n: int = 8, rp: float = 0.05, cutoff: float = 0.8
-) -> (NumpyArray, NumpyArray):
+) -> (ndarray, ndarray):
     """
     (Default arguments correspond to the default anti-aliasing filter of
     scipy.signal.decimate).
