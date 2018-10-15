@@ -10,7 +10,7 @@ Usage:
 from click import command, option
 from luigi import build
 
-from sharp.tasks.config import TASKS_TO_RUN
+from sharp.tasks.main import TASKS_TO_RUN
 from sharp.util import clear_all_output, clear_output, init_log
 
 
@@ -35,7 +35,7 @@ from sharp.util import clear_all_output, clear_output, init_log
 )
 def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
-    Run the tasks specified in `tasks/config.py`, by starting a luigi worker
+    Run the tasks specified in `tasks/main.py`, by starting a luigi worker
     process. Optionally force tasks to re-run, even if they have been completed
     previously, by deleting their output files before starting luigi.
 

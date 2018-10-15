@@ -9,6 +9,9 @@ logging_conf_file = "../../logging.cfg"
 task_process_context = ""  # Luigi bugfix.
 keep_alive = false
 
+[execution_summary]
+summary_length = 0  # Display _all_ ran tasks.
+
 
 [Sharp]
 config_id = "test"
