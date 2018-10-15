@@ -1,14 +1,14 @@
 from logging import getLogger
 
-import numba
 import numpy as np
+
+from fklab.segments import Segment
+from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.evaluation import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
-from sharp.data.types.aliases import NumpyArray
 from sharp.tasks.signal.util import time_to_index
-
-from fklab.segments import Segment
+from sharp.util import compiled
 
 log = getLogger(__name__)
 
@@ -43,7 +43,7 @@ def evaluate_threshold(
     )
 
 
-@numba.jit("i4[:](f8[:], f8, i4)", nopython=True, cache=True)
+@compiled
 def calc_detection_indices(
     signal: NumpyArray, threshold: float, lockout_samples: int
 ) -> NumpyArray:

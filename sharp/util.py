@@ -1,3 +1,4 @@
+import numba
 from contextlib import contextmanager
 from datetime import date
 from functools import lru_cache
@@ -76,3 +77,6 @@ def ignore(warning_type: Type[Warning]):
 # change the cache size).
 # NOTE: when combined with @property, @cached goes nearest to the function.
 cached = lru_cache(maxsize=256)
+
+# Another short alias
+compiled = numba.jit(cache=True, nopython=True)

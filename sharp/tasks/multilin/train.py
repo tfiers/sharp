@@ -18,12 +18,10 @@ class MaximiseSNR(SharpTask, InputDataMixin):
         return NumpyArrayFile(self.output_dir, "GEVec")
 
     def run(self):
-        reference = concatenate(
-            self.input_signal_train.extract(self.reference_segs_train)
-        )
-        background = concatenate(
-            self.input_signal_train.extract(self.reference_segs_train.invert())
-        )
+        signal = self.input_signal_train.as_matrix()
+        segments = self.reference_segs_train
+        reference = concatenate(signal.extract(segments))
+        background = concatenate(signal.extract(segments.invert()))
         Rss = cov(reference, rowvar=False)
         Rnn = cov(background, rowvar=False)
         _, GEVecs = eig(Rss, Rnn)

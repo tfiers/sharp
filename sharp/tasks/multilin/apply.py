@@ -1,6 +1,5 @@
 from typing import Optional
 
-import numba
 import numpy as np
 from luigi import IntParameter
 
@@ -9,13 +8,17 @@ from sharp.data.types.aliases import NumpyArray
 from sharp.data.types.signal import Signal
 from sharp.tasks.multilin.train import MaximiseSNR
 from sharp.tasks.signal.base import EnvelopeMaker
+from sharp.util import compiled
 
 
 class SpatiotemporalConvolution(EnvelopeMaker):
 
-    delays = IntParameter(0)
-    trainer = MaximiseSNR()
+    num_delays = IntParameter(5)
     title = "Multi-channel linear filter"
+
+    @property
+    def trainer(self):
+        return MaximiseSNR(num_delays=self.num_delays)
 
     def requires(self):
         return (self.trainer,) + super().requires()
@@ -30,7 +33,7 @@ class SpatiotemporalConvolution(EnvelopeMaker):
         self.output().write(Signal(envelope, input_signal.fs))
 
 
-@numba.jit(nopython=True, cached=True)
+@compiled
 def convolve_spatiotemporal(
     signal: NumpyArray, weights: NumpyArray, delays: Optional[NumpyArray] = None
 ) -> NumpyArray:
