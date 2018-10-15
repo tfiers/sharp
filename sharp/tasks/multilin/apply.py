@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 from luigi import IntParameter
 from numba import prange
@@ -14,7 +12,7 @@ from sharp.util import compiled
 
 class SpatiotemporalConvolution(EnvelopeMaker):
 
-    num_delays = IntParameter(5)
+    num_delays = IntParameter()
     title = "Multi-channel linear filter"
 
     @property
@@ -30,27 +28,27 @@ class SpatiotemporalConvolution(EnvelopeMaker):
     def run(self):
         input_signal = self.input_signal_all.as_matrix()
         filter_weights = self.trainer.output().read()
-        envelope = convolve_spatiotemporal(input_signal, filter_weights)
+        delays = np.arange(self.num_delays)
+        filtered = convolve_spatiotemporal(input_signal, filter_weights, delays)
+        envelope = np.abs(filtered)
         self.output().write(Signal(envelope, input_signal.fs))
 
 
 @compiled
 def convolve_spatiotemporal(
-    signal: ndarray, weights: ndarray, delays: Optional[ndarray] = None
+    signal: ndarray, weights: ndarray, delays: ndarray
 ) -> ndarray:
     """
+    Implicitly stack delayed channels while convolving signal with weights.
+
     :param signal:  shape = (N, C)
     :param weights:  shape = (d*C,)
-    :param delays:  shape = (d,). If None, assumes consecutive delays (i.e. no
-                gaps)
+    :param delays:  shape = (d,)
     :return:  An array of shape (N,)
     """
     num_samples = signal.shape[0]
     num_channels = signal.shape[1]
     num_weights = weights.size
-    if delays is None:
-        delays = np.arange(num_weights // num_channels)
-
     num_delays = delays.size
     output = np.empty(num_samples)
     for sample in prange(num_samples):
