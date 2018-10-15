@@ -4,14 +4,15 @@ import numpy as np
 
 from fklab.segments import Segment
 from sharp.data.types.aliases import ArrayLike, NumpyArray
-
-# How to subclass np.ndarray:
-# https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
-#
 from sharp.tasks.signal.util import time_to_index
 
 
-class Signal(NumpyArray):
+class Signal(np.ndarray):
+    # How to subclass np.ndarray:
+    # https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+    #
+    # Subclassing alias NumpyArray makes PyCharm not show numpy properties.
+
     def __new__(cls, input_array: ArrayLike, fs: float):
         """
         fs: signal sampling frequency, in hertz.
