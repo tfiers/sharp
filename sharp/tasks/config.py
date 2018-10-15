@@ -17,8 +17,8 @@ chapter_multi_lin = MultiEnvelopeFigureMaker(
     combi_ID="chapter-multi-lin",
     envelope_makers=(
         ApplyOnlineBPF(),
-        SpatiotemporalConvolution(delays=0),
-        SpatiotemporalConvolution(delays=3),
+        SpatiotemporalConvolution(num_delays=0),
+        SpatiotemporalConvolution(num_delays=3),
     ),
 )
 

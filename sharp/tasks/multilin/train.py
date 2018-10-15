@@ -1,5 +1,7 @@
+from luigi import IntParameter
 from numpy import cov
 from numpy.core.multiarray import concatenate
+from numpy.core.records import ndarray
 from scipy.linalg import eig
 
 from sharp.data.files.config import output_root
@@ -9,6 +11,9 @@ from sharp.tasks.signal.base import InputDataMixin
 
 
 class MaximiseSNR(SharpTask, InputDataMixin):
+
+    num_delays = IntParameter()
+
     def requires(self):
         return self.input_data_makers
 
@@ -22,8 +27,15 @@ class MaximiseSNR(SharpTask, InputDataMixin):
         segments = self.reference_segs_train
         reference = concatenate(signal.extract(segments))
         background = concatenate(signal.extract(segments.invert()))
-        Rss = cov(reference, rowvar=False)
-        Rnn = cov(background, rowvar=False)
+        Rss = as_matrix(cov(reference, rowvar=False))
+        Rnn = as_matrix(cov(background, rowvar=False))
         _, GEVecs = eig(Rss, Rnn)
         first_GEVec = GEVecs[0, :]
         self.output().write(first_GEVec)
+
+
+def as_matrix(array: ndarray):
+    if array.shape == ():
+        return array.reshape((1, 1))
+    else:
+        return array
