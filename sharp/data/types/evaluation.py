@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import BooleanArray, EventList, ndarray
+from sharp.data.types.aliases import BooleanArray, EventList
 from sharp.data.types.intersection import SegmentEventIntersection
 
 
