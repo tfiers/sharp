@@ -2,6 +2,8 @@ from typing import Optional
 
 import numpy as np
 from luigi import IntParameter
+from numba import prange
+from numpy.core.multiarray import ndarray
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
@@ -34,8 +36,8 @@ class SpatiotemporalConvolution(EnvelopeMaker):
 
 @compiled
 def convolve_spatiotemporal(
-    signal: np.ndarray, weights: np.ndarray, delays: Optional[np.ndarray] = None
-) -> np.ndarray:
+    signal: ndarray, weights: ndarray, delays: Optional[ndarray] = None
+) -> ndarray:
     """
     :param signal:  shape = (N, C)
     :param weights:  shape = (d*C,)
@@ -51,16 +53,16 @@ def convolve_spatiotemporal(
 
     num_delays = delays.size
     output = np.empty(num_samples)
-    for sample in range(num_samples):
+    for sample in prange(num_samples):
         y = 0
         for i, delay in enumerate(delays):
             if sample - delay < 0:
-                signal = signal[0, :]
+                data = signal[0, :]
             else:
-                signal = signal[sample - delay, :]
+                data = signal[sample - delay, :]
 
             w = weights[i * num_channels : (i + 1) * num_channels]
-            y += np.sum(signal * w)
+            y += np.sum(data * w)
 
         output[sample] = y
 
