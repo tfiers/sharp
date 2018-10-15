@@ -27,7 +27,7 @@ class MultiEnvelopeFigureMaker(FigureMaker):
 
     @property
     def output_dir(self):
-        return self.output_dir / self.combi_ID
+        return super().output_dir / self.combi_ID
 
     def requires(self):
         return self.threshold_sweepers

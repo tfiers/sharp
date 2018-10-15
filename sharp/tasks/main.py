@@ -1,11 +1,11 @@
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.neuralnet.apply import ApplyRNN
-from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.signals.reference import PlotReferenceMaker
+from sharp.tasks.plot.wrapper import PlotEvaluations
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 # fmt: off
-CNSN_poster = MultiEnvelopeFigureMaker(
+poster_CNSN = PlotEvaluations(
     combi_ID="CNSN-poster",
     envelope_makers=(
         ApplyOnlineBPF(),
@@ -13,7 +13,7 @@ CNSN_poster = MultiEnvelopeFigureMaker(
     )
 )
 
-chapter_multi_lin = MultiEnvelopeFigureMaker(
+chapter_multi_lin = PlotEvaluations(
     combi_ID="chapter-multi-lin",
     envelope_makers=(
         ApplyOnlineBPF(),
@@ -24,6 +24,7 @@ chapter_multi_lin = MultiEnvelopeFigureMaker(
 
 TASKS_TO_RUN = (
     PlotReferenceMaker(),
+    # PlotValidLoss(),
     chapter_multi_lin,
 )
 # fmt: on

@@ -5,10 +5,10 @@ from seaborn import set_hls_values
 
 from raincloud import distplot
 from sharp.data.files.figure import FigureTarget
-from sharp.tasks.plot.summary.base import SummaryFigureMaker
+from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
 
 
-class PlotLatency(SummaryFigureMaker):
+class PlotLatency(MultiEnvelopeSummary):
     """
     Plots the distribution of relative detection delays, at a fixed recall
     value.

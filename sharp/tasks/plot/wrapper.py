@@ -1,9 +1,8 @@
 from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.signals.envelopes import PlotEnvelopes
-from sharp.tasks.plot.summary.PR_tradeoff import PlotPR, CONTINUOUS, DISCRETE
+from sharp.tasks.plot.summary.PR_tradeoff import CONTINUOUS, DISCRETE, PlotPR
 from sharp.tasks.plot.summary.latency import PlotLatency
 from sharp.tasks.plot.summary.latency_scatter import PlotLatencyScatter
-from sharp.tasks.plot.summary.training import PlotValidLoss
 
 
 class PlotEvaluations(MultiEnvelopeFigureMaker):
@@ -28,6 +27,5 @@ class PlotEvaluations(MultiEnvelopeFigureMaker):
                 ticks_topright=True,
                 **kwargs,
             ),
-            PlotValidLoss(**kwargs),
             PlotEnvelopes(**kwargs),
         )

@@ -2,10 +2,10 @@ from pandas import DataFrame, concat
 from seaborn import JointGrid, kdeplot
 
 from sharp.data.files.figure import FigureTarget
-from sharp.tasks.plot.summary.base import SummaryFigureMaker
+from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
 
 
-class PlotLatencyScatter(SummaryFigureMaker):
+class PlotLatencyScatter(MultiEnvelopeSummary):
     def output(self):
         return FigureTarget(self.output_dir, "latency-scatter")
 

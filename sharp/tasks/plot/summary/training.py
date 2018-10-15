@@ -2,10 +2,10 @@ from matplotlib.pyplot import figure
 
 from sharp.data.files.figure import FigureTarget
 from sharp.tasks.neuralnet.select import GatherValidLosses
-from sharp.tasks.plot.summary.base import SummaryFigureMaker
+from sharp.tasks.plot.base import FigureMaker
 
 
-class PlotValidLoss(SummaryFigureMaker):
+class PlotValidLoss(FigureMaker):
     """
     Plots validation loss versus epoch number for all training epochs.
     """

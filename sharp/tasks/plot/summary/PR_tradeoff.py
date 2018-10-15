@@ -7,13 +7,13 @@ from seaborn import set_hls_values
 from sharp.data.types.aliases import Axes
 from sharp.data.types.evaluation import ThresholdSweep
 from sharp.data.files.figure import FigureTarget
-from sharp.tasks.plot.summary.base import SummaryFigureMaker
+from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
 
 DISCRETE = dict(lw=2, marker=".", ms=10)
 CONTINUOUS = dict(lw=4)
 
 
-class PlotPR(SummaryFigureMaker):
+class PlotPR(MultiEnvelopeSummary):
     """
     Draws curves of precision-recall points, one point for each threshold, and
     one curve for each algorithm.

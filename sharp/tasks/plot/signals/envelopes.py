@@ -19,12 +19,11 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
 
     @property
     def output_dir(self):
-        parent_dir = super(MultiEnvelopeFigureMaker, self).output_dir
-        return parent_dir / "envelopes"
+        return super().output_dir / "envelopes"
 
     @property
     def extra_signals(self):
-        return self.evaluation.envelopes
+        return self.test_envelopes
 
     def include(self, time_range: TimeRange):
         return self.contains_detection(time_range)

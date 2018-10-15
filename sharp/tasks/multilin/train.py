@@ -27,6 +27,7 @@ class MaximiseSNR(SharpTask, InputDataMixin):
         segments = self.reference_segs_train
         reference = concatenate(signal.extract(segments))
         background = concatenate(signal.extract(segments.invert()))
+        # Columns = channels are variables. Rows are (time) samples.
         Rss = as_matrix(cov(reference, rowvar=False))
         Rnn = as_matrix(cov(background, rowvar=False))
         _, GEVecs = eig(Rss, Rnn)
