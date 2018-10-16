@@ -22,7 +22,7 @@ class ApplyRNN(NeuralNetTask):
 
     def run(self):
         with torch.no_grad():
-            inputt = self.as_model_io(self.input_signal_all.as_matrix())
+            inputt = self.as_model_io(self.reference_channel_full.as_matrix())
             model: RNN = self.model_selector.output().read()
             h0 = model.get_init_h()
             output, _ = model(inputt, h0)
@@ -30,5 +30,5 @@ class ApplyRNN(NeuralNetTask):
             envelope: TorchArray = torch.sigmoid(output.squeeze())
             envelope_cpu = envelope.to("cpu")
             envelope_numpy: ndarray = envelope_cpu.numpy()
-            sig = Signal(envelope_numpy, self.input_signal_all.fs)
+            sig = Signal(envelope_numpy, self.reference_channel_full.fs)
             self.output().write(sig)

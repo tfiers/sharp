@@ -100,12 +100,12 @@ class NeuralNetTask(EnvelopeMaker):
         Convert segment times to a binary signal (in a one-column matrix) that
         is as long as the full training input signal.
         """
-        N = self.input_signal_train.shape[0]
+        N = self.reference_channel_train.shape[0]
         sig = np.zeros(N)
         for seg in segs:
-            ix = time_to_index(seg, self.input_signal_train.fs, N, clip=True)
+            ix = time_to_index(seg, self.reference_channel_train.fs, N, clip=True)
             sig[slice(*ix)] = 1
-        return BinarySignal(sig, self.input_signal_train.fs).as_matrix()
+        return BinarySignal(sig, self.reference_channel_train.fs).as_matrix()
 
     @property
     def io_tuple_train(self) -> IOTuple:
@@ -124,12 +124,12 @@ class NeuralNetTask(EnvelopeMaker):
     @property
     def input_signal_train_proper(self):
         return TrainValidSplit(
-            self.input_signal_train
+            self.reference_channel_train
         ).train_proper_slice.signal
 
     @property
     def input_signal_valid(self):
-        return TrainValidSplit(self.input_signal_train).valid_slice.signal
+        return TrainValidSplit(self.reference_channel_train).valid_slice.signal
 
     @property
     def target_signal_train_proper(self):

@@ -17,7 +17,9 @@ chapter_multi_lin = PlotEvaluations(
     combi_ID="chapter-multi-lin",
     envelope_makers=(
         ApplyOnlineBPF(),
-        SpatiotemporalConvolution(num_delays=3),
+        SpatiotemporalConvolution(num_delays=0),
+        SpatiotemporalConvolution(num_delays=1),
+        SpatiotemporalConvolution(num_delays=2),
         SpatiotemporalConvolution(num_delays=10),
     ),
 )

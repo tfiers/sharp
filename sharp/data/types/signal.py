@@ -40,6 +40,11 @@ class Signal(np.ndarray):
         else:
             return 1
 
+    @classmethod
+    def from_channels(cls, channels: Sequence["Signal"]):
+        data = np.stack([ch.as_vector() for ch in channels], axis=1)
+        return cls(data, channels[0].fs)
+
     @property
     def duration(self) -> float:
         """ Length of signal, in seconds. """
@@ -105,13 +110,6 @@ class Signal(np.ndarray):
             return result.as_vector()
         else:
             return result
-
-    def fraction_to_index(self, fractions: ArrayLike) -> ArrayLike:
-        """
-        Convert fractions of total signal length to indices into this signal.
-        """
-        t = np.array(fractions) * self.duration
-        return time_to_index(t, self.fs, self.num_samples, clip=True)
 
 
 class BinarySignal(Signal):

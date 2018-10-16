@@ -12,27 +12,40 @@ from sharp.tasks.signal.base import InputDataMixin
 from sharp.util import compiled
 
 
-class MaximiseSNR(SharpTask, InputDataMixin):
+class GEVecMixin:
 
     num_delays = IntParameter()
+    # Set to zero to use only the current sample.
+    # (number of temporal samples used = num_delays + 1)
 
+    @property
+    def delays(self):
+        """ Includes the current time sample, as delay = 0. """
+        return arange(self.num_delays + 1)
+
+    @property
+    def filename(self):
+        return f"{self.num_delays}-delays"
+
+
+class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
     def requires(self):
         return self.input_data_makers
 
-    output_dir = output_root / "linear-filters"
+    output_dir = output_root / "GEVecs"
 
     def output(self):
-        return NumpyArrayFile(self.output_dir, "GEVec")
+        return NumpyArrayFile(self.output_dir, self.filename)
 
     def run(self):
-        signal = self.input_signal_train.as_matrix()
+        signal = self.multichannel_train
         segments = self.reference_segs_train
-        delays = arange(self.num_delays)
         if signal.num_channels == 1 and self.num_delays == 0:
+            # Actually no, just convert cov output to matrix format.
             raise ValueError(
-                "Need more than one channel or at least one delay to calc GEVec."
+                "Need more than one channel, or at least one delay, to calc GEVec."
             )
-        data = delay_stack(signal, delays)
+        data = delay_stack(signal, self.delays)
         data_signal = Signal(data, signal.fs)
         reference = concatenate(data_signal.extract(segments))
         background = concatenate(data_signal.extract(segments.invert()))
@@ -47,9 +60,9 @@ class MaximiseSNR(SharpTask, InputDataMixin):
 @compiled
 def delay_stack(signal: ndarray, delays: ndarray):
     """
-    At each time-sample, add new channels that are copies from previous time
-    samples. For samples at the beginning, add multiple copies of the first
-    sample, if necessary.
+    At each multichannel time-sample, add copies of previous time samples as
+    new 'channels'. For samples at the beginning, add multiple copies of the
+    first sample, if necessary.
 
     :param signal:  array of shape (N, C)
     :param delays:  integer array of shape (d,)

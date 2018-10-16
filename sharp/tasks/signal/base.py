@@ -2,41 +2,71 @@ from sharp.data.files.config import output_root
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.tasks.signal.downsample import DownsampleRecording
+from sharp.tasks.signal.downsample import Downsample
 from sharp.tasks.signal.reference import MakeReference
 from sharp.util import cached
 
 
 class InputDataMixin:
-    _downsampler = DownsampleRecording()
+    _downsampler = Downsample()
     _reference_maker = MakeReference()
 
     input_data_makers = (_downsampler, _reference_maker)
     # Should be included in the return values of a Task's `requires()`.
 
-    @property
-    def input_signal_all(self):
-        return self._downsampler.downsampled_signal
+    # -------------
+    # All channels:
 
     @property
-    def input_signal_train(self):
-        return self._downsampler.downsampled_signal_train
+    @cached
+    def multichannel_full(self):
+        return self._downsampler.get_multichannel()
 
     @property
-    def input_signal_test(self):
-        return self._downsampler.downsampled_signal_test
+    def multichannel_train(self):
+        return TrainTestSplit(self.multichannel_full).signal_train
 
     @property
+    def multichannel_test(self):
+        return TrainTestSplit(self.multichannel_full).signal_test
+
+    # -----------------
+    # Selected channel:
+
+    @property
+    @cached
+    def reference_channel_full(self):
+        return self._downsampler.get_reference_channel()
+
+    @property
+    def reference_channel_train(self):
+        return TrainTestSplit(self.reference_channel_full).signal_train
+
+    @property
+    def reference_channel_test(self):
+        return TrainTestSplit(self.reference_channel_full).signal_test
+
+    # -------------------
+    # Reference segments:
+
+    @property
+    @cached
     def reference_segs_all(self):
-        return self._reference_maker.reference_segs
+        return self._reference_maker.output().read()
 
     @property
     def reference_segs_train(self):
-        return self._reference_maker.reference_segs_train
+        return self._split_refsegs.segments_train
 
     @property
     def reference_segs_test(self):
-        return self._reference_maker.reference_segs_test
+        return self._split_refsegs.segments_test
+
+    @property
+    def _split_refsegs(self):
+        return TrainTestSplit(
+            self.reference_channel_full, self.reference_segs_all
+        )
 
 
 class EnvelopeMaker(SharpTask, InputDataMixin):

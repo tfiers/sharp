@@ -52,9 +52,9 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
         num_ranges = int(
-            ceil(self.input_signal_test.duration / self.window_size)
+            ceil(self.reference_channel_test.duration / self.window_size)
         )
-        split = TrainTestSplit(self.input_signal_all)
+        split = TrainTestSplit(self.reference_channel_full)
         eval_start, eval_stop = split.time_range_test
         start = eval_start
         for i in range(num_ranges):
@@ -86,9 +86,9 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         return fig
 
     def plot_input_signal(self, time_range: TimeRange, ax: Axes):
-        plot_clean_sig(self.input_signal_test, time_range, ax)
+        plot_clean_sig(self.reference_channel_test, time_range, ax)
         add_voltage_scalebar(ax, 1, "mV", pos_along=0, pos_across=0)
-        ax.set_ylim(self.input_signal_test.range)
+        ax.set_ylim(self.reference_channel_test.range)
 
     def plot_other_signals(self, time_range: TimeRange, axes: Sequence[Axes]):
         for ax, signal in zip(axes, self.extra_signals):

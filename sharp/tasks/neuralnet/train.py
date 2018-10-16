@@ -122,7 +122,7 @@ class TrainRNN(NeuralNetTask):
     def chunk_size(self) -> int:
         """ Number of samples per chunk. """
         size = time_to_index(
-            neural_net_config.chunk_duration, self.input_signal_all.fs
+            neural_net_config.chunk_duration, self.reference_channel_full.fs
         )
         return int(size)
 

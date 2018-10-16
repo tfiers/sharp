@@ -1,18 +1,17 @@
 import numpy as np
-from luigi import IntParameter
 from numba import prange
 from numpy.core.multiarray import ndarray
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
-from sharp.tasks.multilin.train import MaximiseSNR
+from sharp.tasks.multilin.train import GEVecMixin, MaximiseSNR
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.util import compiled
 
 
-class SpatiotemporalConvolution(EnvelopeMaker):
+class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
 
-    num_delays = IntParameter()
+    output_dir = EnvelopeMaker.output_dir / "multilin"
     title = "Multi-channel linear filter"
 
     @property
@@ -23,14 +22,15 @@ class SpatiotemporalConvolution(EnvelopeMaker):
         return (self.trainer,) + super().requires()
 
     def output(self):
-        return SignalFile(self.output_dir, "GEVec")
+        return SignalFile(self.output_dir, self.filename)
 
     def run(self):
-        input_signal = self.input_signal_all.as_matrix()
+        input_signal = self.multichannel_full
         filter_weights = self.trainer.output().read()
-        delays = np.arange(self.num_delays)
-        filtered = convolve_spatiotemporal(input_signal, filter_weights, delays)
-        envelope = np.abs(filtered)
+        filter_output = convolve_spatiotemporal(
+            input_signal, filter_weights, self.delays
+        )
+        envelope = np.abs(filter_output)
         self.output().write(Signal(envelope, input_signal.fs))
 
 

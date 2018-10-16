@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from luigi import BoolParameter, Config, FloatParameter, IntParameter, Parameter
+from luigi import BoolParameter, Config, FloatParameter, Parameter
 
 
 class Data(Config):
@@ -16,8 +16,9 @@ class Data(Config):
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to where the code is run from).
 
-    probe_number = IntParameter()
-    electrode_number = IntParameter()
+    reference_channel = Parameter()
+    # Name of the NCS file (without extension) that will be used for
+    # single-channel filters and for defining reference SWR segments.
 
     train_fraction = FloatParameter(0.9)
     # Border between training and testing data, as a fraction of total signal
@@ -26,7 +27,7 @@ class Data(Config):
     # Whether the training data comes before the test data or not.
 
     # Useful for choosing split boundary: relative timestamps of Kloosterman
-    # Lab scientists labelling L2 data ('labelface'):
+    # Lab scientists labelling L2 data ('labelface' web app):
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 

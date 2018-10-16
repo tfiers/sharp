@@ -20,9 +20,9 @@ class ApplyOnlineBPF(EnvelopeMaker):
         return SignalFile(self.output_dir, filename="causal-BPF")
 
     def run(self):
-        fs = self.input_signal_all.fs
+        fs = self.reference_channel_full.fs
         b, a = get_SOTA_online_BPF(fs)
-        filtered = lfilter(b, a, self.input_signal_all.as_vector())
+        filtered = lfilter(b, a, self.reference_channel_full.as_vector())
         envelope = np.abs(filtered)
         self.output().write(Signal(envelope, fs))
 

@@ -83,18 +83,3 @@ class Neuralynx_NCS_Directory(ExternalTask):
     @staticmethod
     def sorting_key(file: Neuralynx_NCS_File) -> (int, int):
         return (file.probe_number, file.electrode_number)
-
-    @cached
-    def get_file(
-        self, probe_number: int, electrode_number: int
-    ) -> Neuralynx_NCS_File:
-        for file in self.output():
-            if (file.probe_number == probe_number) and (
-                file.electrode_number == electrode_number
-            ):
-                return file
-        else:
-            raise FileNotFoundError(
-                f"Could not find .ncs file of tetrode (or probe) {probe_number} "
-                f"and electrode {electrode_number} in {self.output_dir}."
-            )

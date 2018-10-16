@@ -13,9 +13,8 @@ from fklab.signals.filter import compute_envelope
 from sharp.data.files.config import output_root
 from sharp.data.files.numpy import SegmentsFile
 from sharp.data.types.signal import Signal
-from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.tasks.signal.downsample import DownsampleRecording
+from sharp.tasks.signal.downsample import Downsample
 from sharp.util import cached, ignore
 
 
@@ -27,7 +26,7 @@ class MakeReference(SharpTask):
     min_duration: float = FloatParameter(25E-3)
     min_separation: float = FloatParameter(10E-3)
 
-    downsampler = DownsampleRecording()
+    downsampler = Downsample()
 
     def requires(self):
         return self.downsampler
@@ -36,25 +35,9 @@ class MakeReference(SharpTask):
         return SegmentsFile(output_root, "autoref-segments")
 
     @property
-    def reference_segs_train(self):
-        return self._train_test_split.segments_train
-
-    @property
-    def reference_segs_test(self):
-        return self._train_test_split.segments_test
-
-    @property
-    def _train_test_split(self):
-        return TrainTestSplit(self.input_signal, self.reference_segs)
-
-    @property
     @cached
-    def reference_segs(self):
-        return self.output().read()
-
-    @property
-    def input_signal(self) -> Signal:
-        return self.downsampler.output().read()
+    def _input_channel(self) -> Signal:
+        return self.downsampler.get_reference_channel()
 
     def run(self):
         segs = self.calc_segments()
@@ -67,13 +50,13 @@ class MakeReference(SharpTask):
         # FutureWarning will be fixed in SciPy 1.2, due nov 9 2018
         with ignore(FutureWarning):
             envelope = compute_envelope(
-                self.input_signal,
+                self._input_channel,
                 self.band,
-                fs=self.input_signal.fs,
+                fs=self._input_channel.fs,
                 filter_options=dict(transition_width="10%", attenuation=40),
                 smooth_options=dict(kernel="gaussian", bandwidth=7.5E-3),
             )
-        return Signal(envelope, self.input_signal.fs)
+        return Signal(envelope, self._input_channel.fs)
 
     @property
     def envelope_center(self):
