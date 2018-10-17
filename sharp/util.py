@@ -1,4 +1,3 @@
-import numba
 from contextlib import contextmanager
 from datetime import date
 from functools import lru_cache
@@ -8,12 +7,13 @@ from shutil import rmtree
 from typing import Iterable, Type, Union
 from warnings import catch_warnings, simplefilter
 
-from luigi import Task, WrapperTask
+import numba
+from luigi import Task
 from luigi.interface import core
 from luigi.task import flatten
 
 from sharp.data.files.base import FileTarget
-from sharp.data.files.config import output_root, data_config
+from sharp.data.files.config import data_config, output_root
 
 log = getLogger(__name__)
 
@@ -28,10 +28,10 @@ def clear_all_output():
 
 def clear_output(task: Task):
     """
-    Recursively expands WrapperTasks until it finds tasks that output one or
-    more FileTargets. Then deletes these FileTargets.
+    Recursively expands tasks without outputs until it finds tasks that output
+    one or more FileTargets. Then deletes these FileTargets.
     """
-    if isinstance(task, WrapperTask):
+    if not task.output():
         for dependency in flatten(task.requires()):
             clear_output(dependency)
     else:
