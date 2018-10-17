@@ -89,7 +89,7 @@ class PlotPR(MultiEnvelopeSummary):
         return self.margin * (1 - self.start_proportion)
 
     def mark_selected_recall_line(self, ax: Axes):
-        for sweep in self.threshold_sweeps:
+        for sweep, color in zip(self.threshold_sweeps, self.colors):
             recall = sweep.best.recall
             precision = sweep.best.precision
             ax.plot(
@@ -97,6 +97,7 @@ class PlotPR(MultiEnvelopeSummary):
                 1 - precision,
                 ".",
                 ms=18,
+                c=color,
                 markeredgecolor="black",
                 zorder=4,
             )

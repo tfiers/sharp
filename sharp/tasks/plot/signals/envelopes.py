@@ -5,6 +5,7 @@ from sharp.data.types.aliases import Axes
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.signals.base import TimeRange, TimeRangesPlotter
+from sharp.tasks.plot.style import red, green
 from sharp.tasks.plot.util.annotations import add_events
 
 
@@ -48,5 +49,5 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
                 clip_on=False,
                 linestyles="dashed"
             )
-            add_events(ax, sweep.best.correct_detections, color="C2")
-            add_events(ax, sweep.best.incorrect_detections, color="C1")
+            add_events(ax, sweep.best.correct_detections, color=green)
+            add_events(ax, sweep.best.incorrect_detections, color=red)

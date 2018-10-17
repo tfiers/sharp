@@ -36,7 +36,7 @@ seaborn_colours = color_palette('muted')
 blue, orange, green, red, purple, brown, pink, *others = seaborn_colours
 
 colourful = {
-    'axes.prop_cycle': cycler('color', [blue, red]),
+    'axes.prop_cycle': cycler('color', seaborn_colours),
 }
 
 symposium = {**readable, **griddy, **colourful}
