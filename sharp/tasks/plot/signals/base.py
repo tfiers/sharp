@@ -3,6 +3,7 @@ from typing import Iterable, Sequence, Tuple
 
 from luigi import FloatParameter
 from matplotlib import pyplot as plt
+from numpy import ones
 from numpy.core.umath import ceil
 
 from sharp.data.files.config import output_root
@@ -52,7 +53,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
         num_ranges = int(
-            ceil(self.reference_channel_test.duration / self.window_size)
+            ceil(self.multichannel_test.duration / self.window_size)
         )
         split = TrainTestSplit(self.reference_channel_full)
         eval_start, eval_stop = split.time_range_test
@@ -65,13 +66,19 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
             start = stop
 
     def include(self, time_range: TimeRange) -> bool:
-        """ Whether to plot the given time range. """
+        """ Whether to plot the given time range, or to skip it. """
         return True
 
     def make_figure(self, time_range):
         nrows = 1 + len(self.extra_signals)
+        num_channels = self.multichannel_test.num_channels
+        axheights = ones(nrows)
+        axheights[0] = 1 + num_channels / 6
         fig, axes = plt.subplots(
-            nrows=nrows, sharex=True, figsize=(5, 1 + nrows)
+            nrows=nrows,
+            sharex=True,
+            figsize=(5, 1 + sum(axheights)),
+            gridspec_kw=dict(height_ratios=axheights),
         )  # type: Figure, Sequence[Axes]
         input_ax = axes[0]
         extra_axes = axes[1:]
@@ -86,9 +93,8 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         return fig
 
     def plot_input_signal(self, time_range: TimeRange, ax: Axes):
-        plot_clean_sig(self.reference_channel_test, time_range, ax)
-        add_voltage_scalebar(ax, 1, "mV", pos_along=0, pos_across=0)
-        ax.set_ylim(self.reference_channel_test.range)
+        plot_clean_sig(self.multichannel_test, time_range, ax)
+        add_voltage_scalebar(ax, 1, "mV", pos_along=0.1, pos_across=0)
 
     def plot_other_signals(self, time_range: TimeRange, axes: Sequence[Axes]):
         for ax, signal in zip(axes, self.extra_signals):
@@ -130,4 +136,4 @@ def plot_clean_sig(signal: Signal, time_range: TimeRange, ax: Axes):
     # Add some padding in the beginning:
     start, end = time_range
     time_span = end - start
-    ax.set_xlim(start - 0.015 * time_span, end)
+    ax.set_xlim(start - 0.03 * time_span, end)
