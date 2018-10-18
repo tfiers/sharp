@@ -16,12 +16,12 @@ readable = {
     'ytick.labelsize': 15,
 
     'axes.titlepad': 30,
-    'axes.labelpad': 18,
+    'axes.labelpad': 22,
 }
 
 griddy = {
     'axes.grid': True,
-    'grid.color': 'C0C0C0',
+    'grid.color': 'D0D0D0',
 
     'xtick.bottom': False,
     'ytick.left': False,
@@ -37,9 +37,9 @@ blue, orange, green, red, purple, brown, pink, *others = seaborn_colours
 
 colourful = {
     'axes.prop_cycle': cycler('color', seaborn_colours),
-    'axes.labelcolor': '606060',
-    'xtick.color': 'A0A0A0',
-    'ytick.color': 'A0A0A0',
+    'axes.labelcolor': '202020',
+    'xtick.color': '909090',
+    'ytick.color': '909090',
 }
 
 symposium = {**readable, **griddy, **colourful}

@@ -4,7 +4,7 @@ from luigi import DictParameter, FloatParameter
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
 from matplotlib.ticker import PercentFormatter
-from numpy import argmax, median, percentile, array
+from numpy import argmax, array, median, percentile
 from seaborn import set_hls_values
 
 from sharp.data.files.figure import FigureTarget
@@ -36,7 +36,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         fig, axes = subplots(
             nrows=2,
             ncols=2,
-            figsize=1.1 * array([9.5, 9]),
+            figsize=1.1 * array([9.8, 9]),
             gridspec_kw=dict(width_ratios=[1.63, 1], height_ratios=[1, 1.63]),
         )  # type: Figure, Sequence[Axes]
         ax_PR = axes[1, 0]
@@ -47,6 +47,8 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         self.plot_PR_curves(ax_PR)
         self.shade_under_PR_curves(ax_PR)
         self.plot_delays(ax_delay_P, ax_delay_R)
+        self.mark_cutoffs(ax_PR, ax_delay_P, ax_delay_R)
+        fig.legend()
         fig.tight_layout()
         self.output().write(fig)
 
@@ -73,16 +75,30 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
             center = [median(rd) for rd in rds]
             low = [percentile(rd, 25) for rd in rds]
             high = [percentile(rd, 75) for rd in rds]
-            b = argmax(sweep.recall > sweep.precision)  # Boundary
+            d = PR_divider(sweep)
             kwargs = dict(color=color, lw=2)
-            ax_delay_P.plot(center[b:], sweep.precision[b:], **kwargs)
+            ax_delay_P.plot(center[d:], sweep.precision[d:], **kwargs)
             ax_delay_P.fill_betweenx(
-                sweep.precision[b:], low[b:], high[b:], color=color, alpha=0.3
+                sweep.precision[d:], low[d:], high[d:], color=color, alpha=0.3
             )
-            ax_delay_R.plot(sweep.recall[:b], center[:b], **kwargs)
+            dr = d + 1
+            ax_delay_R.plot(sweep.recall[:dr], center[:dr], **kwargs)
             ax_delay_R.fill_between(
-                sweep.recall[:b], low[:b], high[:b], color=color, alpha=0.3
+                sweep.recall[:dr], low[:dr], high[:dr], color=color, alpha=0.3
             )
+
+    def mark_cutoffs(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
+        for sweep, color in zip(self.threshold_sweeps, self.colors):
+            kwargs = dict(
+                marker=".", ms=18, color=color, markeredgecolor="black"
+            )
+            center_delay = [
+                median(te.rel_delays) for te in sweep.threshold_evaluations
+            ]
+            d = PR_divider(sweep)
+            ax_PR.plot(sweep.recall[d], sweep.precision[d], **kwargs)
+            ax_delay_P.plot(center_delay[d], sweep.precision[d], **kwargs)
+            ax_delay_R.plot(sweep.recall[d], center_delay[d], **kwargs)
 
     def setup_axes(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
         lims = (self.zoom_from - self.lim_offset, 1 + self.lim_offset)
@@ -90,6 +106,8 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         ax_PR.set_xlim(lims)
         ax_PR.set_ylim(lims)
         # ax_PR.set_aspect("equal")
+        # This unsynchs the axes widths.
+        # Make sure aspect ratio is approximately equal using figsize.
         ax_PR.xaxis.set_major_formatter(percentages)
         ax_PR.yaxis.set_major_formatter(percentages)
         ax_PR.xaxis.tick_top()
@@ -116,3 +134,8 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
 
 def rank_higher_AUC_lower(sweep: ThresholdSweep) -> float:
     return -sweep.AUC
+
+
+def PR_divider(sweep: ThresholdSweep) -> int:
+    """ Index of the first threshold where recall is higher than precision. """
+    return argmax(sweep.recall > sweep.precision)
