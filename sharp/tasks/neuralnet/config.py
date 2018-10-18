@@ -23,7 +23,7 @@ class NeuralNet(Config):
     # training step. Should improve generalisation performance. Only relevant
     # for num_layers > 1.
 
-    num_epochs: int = IntParameter()
+    num_epochs: int = IntParameter(10)
     # How many times to pass over the training data when training an RNN.
 
     valid_fraction: float = FloatParameter(0.22)

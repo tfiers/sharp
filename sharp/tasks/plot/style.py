@@ -1,19 +1,19 @@
 from matplotlib import style, cycler
-
-# fmt: off
 from seaborn import color_palette
 
+
+# fmt: off
 readable = {
     'figure.figsize': (7, 5),
-    'figure.dpi': 300,
+    'figure.dpi': 80,
     'savefig.dpi': 300,
 
-    'font.size': 16,
-    'axes.labelsize': 20,
-    'axes.titlesize': 20,
-    'legend.fontsize': 16,
-    'xtick.labelsize': 16,
-    'ytick.labelsize': 16,
+    'font.size': 15,
+    'axes.labelsize': 22,
+    'axes.titlesize': 22,
+    'legend.fontsize': 15,
+    'xtick.labelsize': 15,
+    'ytick.labelsize': 15,
 
     'axes.titlepad': 30,
     'axes.labelpad': 18,
@@ -37,8 +37,10 @@ blue, orange, green, red, purple, brown, pink, *others = seaborn_colours
 
 colourful = {
     'axes.prop_cycle': cycler('color', seaborn_colours),
+    'axes.labelcolor': '606060',
+    'xtick.color': 'A0A0A0',
+    'ytick.color': 'A0A0A0',
 }
 
 symposium = {**readable, **griddy, **colourful}
-
 style.use(symposium)
