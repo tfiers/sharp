@@ -230,15 +230,18 @@ class ThresholdSweep:
         elif len(self.thresholds) == 1:
             return min(threshold_range)
         else:
-            R_gap = np.abs(np.diff(self.recall))
-            P_gap = np.abs(np.diff(self.precision))
-            index_largest_R_gap = np.argmax(R_gap)
-            index_largest_P_gap = np.argmax(P_gap)
-            largest_R_gap = R_gap[index_largest_R_gap]
-            largest_P_gap = P_gap[index_largest_P_gap]
-            if largest_R_gap > largest_P_gap:
-                index = index_largest_R_gap
+            tes = self.threshold_evaluations
+            cd = [len(te.correct_detections) for te in tes]
+            drs = [len(te.detected_reference_segs) for te in tes]
+            cd_gap = np.abs(np.diff(cd))
+            drs_gap = np.abs(np.diff(drs))
+            index_largest_cd_gap = np.argmax(cd_gap)
+            index_largest_drs_gap = np.argmax(drs_gap)
+            largest_cd_gap = cd_gap[index_largest_cd_gap]
+            largest_drs_gap = drs_gap[index_largest_drs_gap]
+            if largest_cd_gap > largest_drs_gap:
+                index = index_largest_cd_gap
             else:
-                index = index_largest_P_gap
+                index = index_largest_drs_gap
             surrounding_thresholds = self.thresholds[index : index + 2]
             return np.mean(surrounding_thresholds)
