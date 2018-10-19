@@ -21,10 +21,10 @@ from sharp.util import cached, ignore
 class MakeReference(SharpTask):
 
     band: Tuple[float, float] = TupleParameter((100, 250))
-    mult_detect: float = FloatParameter(13)
-    mult_support: float = FloatParameter(7)
-    min_duration: float = FloatParameter(25E-3)
-    min_separation: float = FloatParameter(10E-3)
+    mult_detect: float = FloatParameter(12.7)
+    mult_support: float = FloatParameter(6.5)
+    min_duration: float = FloatParameter(25e-3)
+    min_separation: float = FloatParameter(10e-3)
 
     downsampler = Downsample()
 
@@ -54,7 +54,7 @@ class MakeReference(SharpTask):
                 self.band,
                 fs=self._input_channel.fs,
                 filter_options=dict(transition_width="10%", attenuation=40),
-                smooth_options=dict(kernel="gaussian", bandwidth=7.5E-3),
+                smooth_options=dict(kernel="gaussian", bandwidth=7.5e-3),
             )
         return Signal(envelope, self._input_channel.fs)
 

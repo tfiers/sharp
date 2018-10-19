@@ -24,8 +24,18 @@ class GEVecMixin:
         return arange(self.num_delays + 1)
 
     @property
+    def num_delays_str(self) -> str:
+        n = self.num_delays
+        if n == 0:
+            return "no delays"
+        elif n == 1:
+            return "1 delay"
+        else:
+            return f"{n} delays"
+
+    @property
     def filename(self):
-        return f"{self.num_delays}-delays"
+        return self.num_delays_str.replace(" ", "-")
 
 
 class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):

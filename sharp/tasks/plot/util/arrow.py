@@ -1,6 +1,7 @@
 import numpy as np
+from matplotlib.axes import Axes
+
 import sharp.tasks.plot.util.sizing as util
-from sharp.data.types.aliases import Axes
 
 
 def add_arrow(ax: Axes, x, y, rot=60, length=20, coords="axes"):

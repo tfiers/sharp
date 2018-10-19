@@ -9,9 +9,6 @@ import matplotlib.figure
 import numpy
 import torch
 
-Figure = matplotlib.figure.Figure
-Axes = matplotlib.axes.Axes
-
 TorchArray = torch.Tensor
 NeuralModel = torch.nn.Module
 

@@ -152,7 +152,7 @@ def vectorized_property(name: str):
 
     def vectorize_attribute(self: "ThresholdSweep") -> ndarray:
         """
-        Gathers a scalar measure from different threshold evaluations.
+        Gather a scalar measure from different threshold evaluations.
         """
         values = [
             getattr(threshold_evaluation, name)
@@ -222,7 +222,8 @@ class ThresholdSweep:
     def get_next_threshold(self, threshold_range: Tuple[float, float]) -> float:
         """
         Succesive calls yield a sequence of thresholds within `threshold_range`
-        that cover the [0, 1] domains of `recall` and `precision` well.
+        that cover the [0, 1] domains of `recall` and `precision` well. Assumes
+        a reasonably smooth PR-curve.
         """
         if len(self.thresholds) == 0:
             return max(threshold_range)

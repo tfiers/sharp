@@ -12,7 +12,10 @@ from sharp.util import compiled
 class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
 
     output_dir = EnvelopeMaker.output_dir / "multilin"
-    title = "Multi-channel linear filter"
+
+    @property
+    def title(self):
+        return f"GEVEC, {self.num_delays_str}"
 
     @property
     def trainer(self):

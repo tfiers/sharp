@@ -11,7 +11,7 @@ readable = {
     'font.size': 15,
     'axes.labelsize': 22,
     'axes.titlesize': 22,
-    'legend.fontsize': 15,
+    'legend.fontsize': 18,
     'xtick.labelsize': 15,
     'ytick.labelsize': 15,
 

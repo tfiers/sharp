@@ -13,7 +13,7 @@ log = getLogger(__name__)
 
 class ApplyOnlineBPF(EnvelopeMaker):
 
-    title = "Online band-pass filter"
+    title = "Single-channel BPF"
 
     def output(self):
         self.output_dir

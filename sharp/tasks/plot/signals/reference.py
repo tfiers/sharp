@@ -15,6 +15,8 @@ class PlotReferenceMaker(TimeRangesPlotter):
     def requires(self):
         return (self.reference_maker,) + super().requires()
 
+    colors = ["black"]
+
     @property
     def extra_signals(self):
         return [self.reference_maker.envelope]

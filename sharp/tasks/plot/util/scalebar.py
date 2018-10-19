@@ -1,9 +1,9 @@
 # coding: utf8
 
 import numpy as np
+from matplotlib.axes import Axes
 from matplotlib.text import Text
 
-from sharp.data.types.aliases import Axes
 from sharp.tasks.plot.util.sizing import get_fontsize, pixels_to_coords
 
 

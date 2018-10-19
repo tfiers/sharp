@@ -2,8 +2,10 @@ from typing import Optional, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
-from sharp.data.types.aliases import Axes, Figure, IndexList
+from sharp.data.types.aliases import IndexList
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.util import time_to_index
 

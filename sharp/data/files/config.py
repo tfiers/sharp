@@ -16,6 +16,9 @@ class Data(Config):
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to where the code is run from).
 
+    bitmap_versions = BoolParameter(False)
+    # If True, save bitmap copies of figures, next to the PDF versions.
+
     reference_channel = Parameter()
     # Name of the NCS file (without extension) that will be used for
     # single-channel filters and for defining reference SWR segments.

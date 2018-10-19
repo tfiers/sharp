@@ -23,13 +23,15 @@ class PlotLatencyScatter(MultiEnvelopeSummary):
             for sweep, title in zip(self.threshold_sweeps, self.titles)
         )
         df: DataFrame = concat(DataFrame(dic) for dic in df_dicts)
-        grid = JointGrid(x=swr_duration, y=delay, data=df, height=5)
+        grid = JointGrid(x=swr_duration, y=delay, data=df, height=8)
         kde_kwargs = dict(legend=False, lw=3)
-
-        for _, data in df.groupby(algo):
+        for title in self.titles:
+            data = df[getattr(df, algo) == title]
             kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
             kdeplot(data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs)
-            grid.ax_joint.plot(data[swr_duration], data[delay], ".", ms=8)
+            grid.ax_joint.plot(
+                data[swr_duration], data[delay], ".", ms=11, alpha=0.6
+            )
         fig = grid.fig
         fig.tight_layout()
         self.output().write(fig)

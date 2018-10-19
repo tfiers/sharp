@@ -26,8 +26,6 @@ train_fraction = 0.7
 
 [ThresholdSweeper]
 num_thresholds = 6
-recall_best = 0.90
-eval_seg = "[0, 0.4]"
 
 
 [NeuralNet]

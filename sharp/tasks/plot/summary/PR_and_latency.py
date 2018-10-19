@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from luigi import DictParameter, FloatParameter
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
 from matplotlib.ticker import PercentFormatter
@@ -8,7 +9,6 @@ from numpy import argmax, array, median, percentile
 from seaborn import set_hls_values
 
 from sharp.data.files.figure import FigureTarget
-from sharp.data.types.aliases import Axes
 from sharp.data.types.evaluation import ThresholdSweep
 from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
 
@@ -26,7 +26,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
     # Precision and recall will be plotted in the ranges [zoom_from, 1].
     margin: float = FloatParameter(0.05)
     # Margin around the axes, as a percentage of (1 - zoom_from)
-    line_kwargs: dict = DictParameter(DISCRETE)
+    line_kwargs: dict = DictParameter(CONTINUOUS)
 
     def output(self):
         filename = f"PR-and-latency--{self.zoom_from}"
@@ -48,15 +48,13 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         self.shade_under_PR_curves(ax_PR)
         self.plot_delays(ax_delay_P, ax_delay_R)
         self.mark_cutoffs(ax_PR, ax_delay_P, ax_delay_R)
-        fig.legend()
+        self.make_legend(fig)
         fig.tight_layout()
         self.output().write(fig)
 
     def plot_PR_curves(self, ax: Axes):
-        for sweep, title in zip(self.threshold_sweeps, self.titles):
-            ax.plot(
-                sweep.recall, sweep.precision, label=title, **self.line_kwargs
-            )
+        for sweep, color in zip(self.threshold_sweeps, self.colors):
+            ax.plot(sweep.recall, sweep.precision, c=color, **self.line_kwargs)
 
     def shade_under_PR_curves(self, ax: Axes):
         """
@@ -126,6 +124,11 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         ax_delay_R.set_xlim(lims)
         ax_delay_R.set_xlabel("Recall")
         ax_delay_R.set_ylabel("Detection latency")
+
+    def make_legend(self, fig):
+        legend = fig.legend(self.titles, handlelength=0, labelspacing=0.8)
+        for text, color in zip(legend.get_texts(), self.colors):
+            text.set_color(color)
 
     @property
     def lim_offset(self):

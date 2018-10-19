@@ -3,12 +3,13 @@ from typing import Iterable, Sequence, Tuple
 
 from luigi import FloatParameter
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from numpy import ones
 from numpy.core.umath import ceil
 
 from sharp.data.files.config import output_root
 from sharp.data.files.figure import FigureTarget
-from sharp.data.types.aliases import Axes, Figure
 from sharp.data.types.signal import Signal
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.plot.base import FigureMaker
@@ -77,7 +78,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         fig, axes = plt.subplots(
             nrows=nrows,
             sharex=True,
-            figsize=(5, 1 + sum(axheights)),
+            figsize=[5, 1 + sum(axheights)],
             gridspec_kw=dict(height_ratios=axheights),
         )  # type: Figure, Sequence[Axes]
         input_ax = axes[0]
@@ -97,8 +98,8 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         add_voltage_scalebar(ax, 1, "mV", pos_along=0.1, pos_across=0)
 
     def plot_other_signals(self, time_range: TimeRange, axes: Sequence[Axes]):
-        for ax, signal in zip(axes, self.extra_signals):
-            plot_clean_sig(signal, time_range, ax)
+        for ax, signal, color in zip(axes, self.extra_signals, self.colors):
+            plot_clean_sig(signal, time_range, ax, color=color)
             ax.set_ylim(signal.range)
             add_scalebar(
                 ax,
@@ -123,7 +124,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         return []
 
 
-def plot_clean_sig(signal: Signal, time_range: TimeRange, ax: Axes):
+def plot_clean_sig(signal: Signal, time_range: TimeRange, ax: Axes, **kwargs):
     plot_signal(
         signal,
         time_range,
@@ -132,6 +133,7 @@ def plot_clean_sig(signal: Signal, time_range: TimeRange, ax: Axes):
         y_grid=False,
         lw=1.2,
         clip_on=False,
+        **kwargs,
     )
     # Add some padding in the beginning:
     start, end = time_range
