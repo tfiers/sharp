@@ -64,7 +64,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         tups = zip(self.threshold_sweeps, self.colors)
         tups = sorted(tups, key=lambda tup: rank_higher_AUC_lower(tup[0]))
         for sweep, color in tups:
-            fc = set_hls_values(color, l=0.9)
+            fc = set_hls_values(color, l=0.95)
             ax.fill_between(sweep.recall, sweep.precision, color=fc)
 
     def plot_delays(self, ax_delay_P, ax_delay_R):
@@ -74,7 +74,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
             low = [percentile(rd, 25) for rd in rds]
             high = [percentile(rd, 75) for rd in rds]
             d = PR_divider(sweep)
-            kwargs = dict(color=color, lw=2)
+            kwargs = dict(color=color, lw=self.line_kwargs["lw"])
             ax_delay_P.plot(center[d:], sweep.precision[d:], **kwargs)
             ax_delay_P.fill_betweenx(
                 sweep.precision[d:], low[d:], high[d:], color=color, alpha=0.3

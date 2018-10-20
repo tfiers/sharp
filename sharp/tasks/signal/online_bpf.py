@@ -4,8 +4,11 @@ import numpy as np
 from numpy.core.multiarray import ndarray
 from scipy.signal import cheb2ord, cheby2, lfilter
 
+from sharp.data.files.config import output_root
+from sharp.data.files.stdlib import DictFile
 from sharp.data.types.signal import Signal
 from sharp.data.files.numpy import SignalFile
+from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.base import EnvelopeMaker
 
 log = getLogger(__name__)
@@ -17,14 +20,44 @@ class ApplyOnlineBPF(EnvelopeMaker):
 
     def output(self):
         self.output_dir
-        return SignalFile(self.output_dir, filename="causal-BPF")
+        return SignalFile(self.output_dir, filename="online-BPF")
 
     def run(self):
-        fs = self.reference_channel_full.fs
-        b, a = get_SOTA_online_BPF(fs)
-        filtered = lfilter(b, a, self.reference_channel_full.as_vector())
+        filtered = lfilter(*self.coeffs, self.input_signal)
         envelope = np.abs(filtered)
-        self.output().write(Signal(envelope, fs))
+        envelope_sig = Signal(envelope, self.input_signal.fs)
+        self.output().write(envelope_sig)
+
+    @property
+    def coeffs(self) -> (ndarray, ndarray):
+        """ Returns IIR (numer, denom), ie. (b, a) """
+        return get_SOTA_online_BPF(self.input_signal.fs)
+
+    @property
+    def input_signal(self):
+        return self.reference_channel_full.as_vector()
+
+
+class SaveBPFinfo(SharpTask):
+
+    filtertask = ApplyOnlineBPF()
+
+    def requires(self):
+        return self.filtertask
+
+    def output(self):
+        return DictFile(output_root / "info", "online-BPF")
+
+    def run(self):
+        b, a = self.filtertask.coeffs
+        self.output().write(
+            {
+                "fs": self.filtertask.input_signal.fs,
+                "numerator-b": b,
+                "denominator-a": a,
+                "order": len(a),
+            }
+        )
 
 
 def get_SOTA_online_BPF(
@@ -59,6 +92,5 @@ def get_SOTA_online_BPF(
     order, critical_freqs = cheb2ord(wp, ws, passband_ripple, attenuation)
     b, a = cheby2(order, attenuation, critical_freqs, "bandpass")
     log.info(f"Online BPF filter order: {order}")
-    log.info(f"b: {b}")
-    log.info(f"a: {a}")
+    # len(a) == 2 * order + 1
     return b, a

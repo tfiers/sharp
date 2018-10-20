@@ -1,6 +1,7 @@
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
+from matplotlib.ticker import StrMethodFormatter
 from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
@@ -18,6 +19,14 @@ class PlotWeights(MultiEnvelopeSummary):
         ]
 
     @property
+    def colors(self):
+        return [
+            color
+            for color, em in zip(super().colors, self.envelope_makers)
+            if isinstance(em, SpatiotemporalConvolution)
+        ]
+
+    @property
     def trainers(self):
         return [c.trainer for c in self.convolvers]
 
@@ -28,7 +37,8 @@ class PlotWeights(MultiEnvelopeSummary):
         ]
 
     def run(self):
-        for trainer, filetarget in zip(self.trainers, self.output()):
+        tups = zip(self.trainers, self.convolvers, self.colors, self.output())
+        for trainer, convolver, color, filetarget in tups:
             fig, ax = subplots(figsize=(4, 5))  # type: Figure, Axes
             GEVec = trainer.output().read()
             num_channels = trainer.multichannel_train.num_channels
@@ -40,9 +50,11 @@ class PlotWeights(MultiEnvelopeSummary):
             cbar = fig.colorbar(cax)
             cbar.set_label("Weight")
             ax.set_xticks(trainer.delays)
+            ax.yaxis.set_major_formatter(StrMethodFormatter("{x:.0f}"))
             ax.set_xlim(ax.get_xlim()[::-1])
-            ax.set_xlabel("Delay")
+            ax.set_xlabel("Delay (ms)")  # Only at 1000 Hz..
             ax.set_ylabel("Channel")
+            ax.set_title(convolver.title, color=color)
             ax.grid(False)
             fig.tight_layout()
             filetarget.write(fig)

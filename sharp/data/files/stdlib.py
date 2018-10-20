@@ -4,6 +4,8 @@ Standard Python types, stored on disk.
 
 import pickle
 
+import toml
+
 from sharp.data.files.base import FileTarget
 from sharp.util import cached
 
@@ -43,3 +45,18 @@ class PickleFile(FileTarget):
     def write(self, obj):
         with open(self, "wb") as f:
             pickle.dump(obj, f)
+
+
+class DictFile(FileTarget):
+    """
+    A dictionary serialised to be human readable.
+    """
+
+    extension = ".toml"
+
+    def read(self) -> dict:
+        return toml.load(self.path_string)
+
+    def write(self, obj: dict):
+        with open(self, "w") as f:
+            toml.dump(obj, f)

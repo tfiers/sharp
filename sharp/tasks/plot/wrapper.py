@@ -13,9 +13,9 @@ class PlotEvaluations(MultiEnvelopeFigureMaker):
             combi_ID=self.combi_ID, envelope_makers=self.envelope_makers
         )
         return (
-            PlotWeights(**kwargs)
+            PlotWeights(**kwargs),
             # PlotEnvelopes(**kwargs),
-            # PlotLatencyScatter(**kwargs),
-            # PlotLatencyAndPR(**kwargs),
-            # PlotLatencyAndPR(zoom_from=0.65, line_kwargs=DISCRETE, **kwargs),
+            PlotLatencyScatter(**kwargs),
+            PlotLatencyAndPR(**kwargs),
+            PlotLatencyAndPR(zoom_from=0.65, line_kwargs=DISCRETE, **kwargs),
         )
