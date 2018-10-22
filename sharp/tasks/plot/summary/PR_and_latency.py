@@ -11,6 +11,7 @@ from seaborn import set_hls_values
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.evaluation import ThresholdSweep
 from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
+from sharp.tasks.plot.util.legend import add_colored_legend
 
 DISCRETE = dict(lw=2, marker=".", ms=10)
 CONTINUOUS = dict(lw=4)
@@ -48,7 +49,13 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         self.shade_under_PR_curves(ax_PR)
         self.plot_delays(ax_delay_P, ax_delay_R)
         self.mark_cutoffs(ax_PR, ax_delay_P, ax_delay_R)
-        self.make_legend(fig)
+        add_colored_legend(
+            fig,
+            self.titles,
+            self.colors,
+            loc="upper right",
+            bbox_to_anchor=(0.965, 0.965),
+        )
         fig.tight_layout()
         self.output().write(fig)
 
@@ -74,15 +81,15 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
             low = [percentile(rd, 25) for rd in rds]
             high = [percentile(rd, 75) for rd in rds]
             d = PR_divider(sweep)
-            kwargs = dict(color=color, lw=self.line_kwargs["lw"])
-            ax_delay_P.plot(center[d:], sweep.precision[d:], **kwargs)
+            line_kwargs = dict(c=color, **self.line_kwargs)
+            ax_delay_P.plot(center[d:], sweep.precision[d:], **line_kwargs)
             ax_delay_P.fill_betweenx(
                 sweep.precision[d:], low[d:], high[d:], color=color, alpha=0.3
             )
-            dr = d + 1
-            ax_delay_R.plot(sweep.recall[:dr], center[:dr], **kwargs)
+            dp = d + 1
+            ax_delay_R.plot(sweep.recall[:dp], center[:dp], **line_kwargs)
             ax_delay_R.fill_between(
-                sweep.recall[:dr], low[:dr], high[:dr], color=color, alpha=0.3
+                sweep.recall[:dp], low[:dp], high[:dp], color=color, alpha=0.3
             )
 
     def mark_cutoffs(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
@@ -105,7 +112,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         ax_PR.set_ylim(lims)
         # ax_PR.set_aspect("equal")
         # This unsynchs the axes widths.
-        # Make sure aspect ratio is approximately equal using figsize.
+        # Manually make sure aspect ratio is approximately equal using figsize.
         ax_PR.xaxis.set_major_formatter(percentages)
         ax_PR.yaxis.set_major_formatter(percentages)
         ax_PR.xaxis.tick_top()
@@ -124,11 +131,6 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         ax_delay_R.set_xlim(lims)
         ax_delay_R.set_xlabel("Recall")
         ax_delay_R.set_ylabel("Detection latency")
-
-    def make_legend(self, fig):
-        legend = fig.legend(self.titles, handlelength=0, labelspacing=0.8)
-        for text, color in zip(legend.get_texts(), self.colors):
-            text.set_color(color)
 
     @property
     def lim_offset(self):
