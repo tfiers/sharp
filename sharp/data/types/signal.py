@@ -14,6 +14,9 @@ class Signal(np.ndarray):
     #
     # Subclassing alias NumpyArray makes PyCharm not show numpy properties.
 
+    time_axis = 0
+    channel_axis = 1
+
     def __new__(cls, input_array: ArrayLike, fs: float):
         """
         fs: signal sampling frequency, in hertz.
@@ -31,14 +34,18 @@ class Signal(np.ndarray):
 
     @property
     def num_samples(self) -> int:
-        return self.shape[0]
+        return self.shape[self.time_axis]
 
     @property
     def num_channels(self) -> int:
         if self.ndim > 1:
-            return self.shape[1]
+            return self.shape[self.channel_axis]
         else:
             return 1
+
+    def to_channel_label(self, channel_index: int) -> str:
+        """ Channel labels are a simple 1-based integer list, for now """
+        return f"{channel_index + 1:.0f}"
 
     @classmethod
     def from_channels(cls, channels: Sequence["Signal"]):

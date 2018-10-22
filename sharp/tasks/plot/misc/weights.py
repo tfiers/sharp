@@ -1,7 +1,7 @@
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
-from matplotlib.ticker import StrMethodFormatter
+from matplotlib.ticker import FuncFormatter
 from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
@@ -41,7 +41,9 @@ class PlotWeights(MultiEnvelopeSummary):
         for trainer, convolver, color, filetarget in tups:
             fig, ax = subplots(figsize=(4, 5))  # type: Figure, Axes
             GEVec = trainer.output().read()
-            num_channels = trainer.multichannel_train.num_channels
+
+            signal = trainer.multichannel_train
+            num_channels = signal.num_channels
             weights = shape_GEVec(GEVec, num_channels)
             wmax = max(abs(weights))
             cax = ax.imshow(
@@ -50,7 +52,8 @@ class PlotWeights(MultiEnvelopeSummary):
             cbar = fig.colorbar(cax)
             cbar.set_label("Weight")
             ax.set_xticks(trainer.delays)
-            ax.yaxis.set_major_formatter(StrMethodFormatter("{x:.0f}"))
+            formatter = FuncFormatter(lambda x, pos: signal.to_channel_label(x))
+            ax.yaxis.set_major_formatter(formatter)
             ax.set_xlim(ax.get_xlim()[::-1])
             ax.set_xlabel("Delay (ms)")  # Only at 1000 Hz..
             ax.set_ylabel("Channel")

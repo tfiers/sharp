@@ -17,16 +17,17 @@ class Data(Config):
     # figures. (Absolute path, or path relative to where the code is run from).
 
     bitmap_versions = BoolParameter(False)
-    # If True, save bitmap copies of figures, next to the PDF versions.
+    # If True, save PNG versions of figures, in addition to the PDF versions.
 
     reference_channel = Parameter()
     # Name of the NCS file (without extension) that will be used for
-    # single-channel filters and for defining reference SWR segments.
+    # single-channel detection algorithms and for defining reference SWR
+    # segments.
 
-    train_fraction = FloatParameter(0.9)
+    train_fraction = FloatParameter(0.6)
     # Border between training and testing data, as a fraction of total signal
     # duration.
-    train_first = BoolParameter(False)
+    train_first = BoolParameter(True)
     # Whether the training data comes before the test data or not.
 
     # Useful for choosing split boundary: relative timestamps of Kloosterman

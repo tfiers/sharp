@@ -18,7 +18,7 @@ from sharp.util import clear_all_output, clear_output, init_log
 @option(
     "--clear-last",
     default=False,
-    help="Remove the output of the final tasks.",
+    help="Remove the output of the final tasks. Only works reliably if they exist.",
     is_flag=True,
 )
 @option(

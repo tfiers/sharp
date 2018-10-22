@@ -22,12 +22,11 @@ class FigureMaker(SharpTask):
 
 class MultiEnvelopeFigureMaker(FigureMaker):
 
-    combi_ID: str = Parameter()
     envelope_makers: Sequence[EnvelopeMaker] = TaskListParameter()
 
     @property
     def output_dir(self):
-        return super().output_dir / self.combi_ID
+        return super().output_dir / "output-plots"
 
     def requires(self):
         return self.threshold_sweepers

@@ -53,15 +53,13 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
 
     @property
     def time_ranges(self) -> Iterable[TimeRange]:
-        num_ranges = int(
-            ceil(self.multichannel_test.duration / self.window_size)
-        )
+        duration = self.multichannel_test.duration
+        num_ranges = int(ceil(duration / self.window_size))
         split = TrainTestSplit(self.reference_channel_full)
-        eval_start, eval_stop = split.time_range_test
-        start = eval_start
+        start = 0
         for i in range(num_ranges):
             stop = start + self.window_size
-            time_range = (start, min(stop, eval_stop))
+            time_range = (start, min(stop, duration))
             if self.include(time_range):
                 yield time_range
             start = stop

@@ -15,7 +15,7 @@ class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
 
     @property
     def title(self):
-        return f"GEVEC, {self.num_delays_str}"
+        return f"GEVec, {self.num_delays_str}"
 
     @property
     def trainer(self):

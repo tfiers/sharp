@@ -21,7 +21,6 @@ config_id = "test"
 output_dir = "data/processed"
 raw_data_dir = "data/raw"
 reference_channel = "L2 - E13_extract"
-train_fraction = 0.7
 
 
 [ThresholdSweeper]

@@ -8,7 +8,7 @@ readable = {
     'figure.dpi': 80,
     'savefig.dpi': 300,
 
-    'font.size': 15,
+    'font.size': 22,
     'axes.labelsize': 22,
     'axes.titlesize': 22,
     'legend.fontsize': 18,
@@ -17,6 +17,9 @@ readable = {
 
     'axes.titlepad': 30,
     'axes.labelpad': 22,
+
+    'lines.linewidth': 3,
+    'lines.solid_capstyle': 'round',
 }
 
 griddy = {

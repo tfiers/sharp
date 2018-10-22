@@ -1,33 +1,32 @@
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-from sharp.tasks.neuralnet.apply import ApplyRNN
-from sharp.tasks.plot.signals.reference import PlotReferenceMaker
-from sharp.tasks.plot.wrapper import PlotEvaluations
+from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
+from sharp.tasks.plot.misc.weights import PlotWeights
+from sharp.tasks.plot.summary.PR_and_latency import PlotLatencyAndPR
+from sharp.tasks.plot.summary.latency_scatter import PlotLatencyScatter
+from sharp.tasks.plot.summary.recording import PlotRecordingSummaries
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
 
-# fmt: off
-poster_CNSN = PlotEvaluations(
-    combi_ID="CNSN-poster",
-    envelope_makers=(
-        ApplyOnlineBPF(),
-        ApplyRNN(),
-    )
-)
-
-chapter_multi_lin = PlotEvaluations(
-    combi_ID="chapter-multi-lin",
+em_kwargs = dict(
     envelope_makers=(
         ApplyOnlineBPF(),
         SpatiotemporalConvolution(num_delays=0),
         SpatiotemporalConvolution(num_delays=1),
-        # SpatiotemporalConvolution(num_delays=2),
-        # SpatiotemporalConvolution(num_delays=10),
-    ),
+    )
 )
 
-TASKS_TO_RUN = (
-    # PlotReferenceMaker(),
-    # PlotValidLoss(),
-    SaveBPFinfo(),
-    chapter_multi_lin,
+multi_envelope_plotters = (
+    PlotWeights(**em_kwargs),
+    # PlotEnvelopes(**em_kwargs),
+    PlotLatencyScatter(**em_kwargs),
+    PlotLatencyAndPR(**em_kwargs),
+    PlotLatencyAndPR(zoom_from=0.65, **em_kwargs),
 )
-# fmt: on
+
+
+TASKS_TO_RUN = (
+    PlotGEVecPrinciple(),
+    # PlotReferenceMaker(),
+    # PlotRecordingSummaries(),
+    # SaveBPFinfo(),
+    # *multi_envelope_plotters,
+)

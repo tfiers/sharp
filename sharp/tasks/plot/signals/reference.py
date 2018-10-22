@@ -1,3 +1,4 @@
+from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.plot.signals.base import TimeRangesPlotter
 from sharp.tasks.signal.reference import MakeReference
 
@@ -19,7 +20,9 @@ class PlotReferenceMaker(TimeRangesPlotter):
 
     @property
     def extra_signals(self):
-        return [self.reference_maker.envelope]
+        envelope = self.reference_maker.envelope
+        envelope_test = TrainTestSplit(envelope).signal_test
+        return [envelope_test]
 
     def post_plot(self, time_range, input_ax, extra_axes):
         ax = extra_axes[0]

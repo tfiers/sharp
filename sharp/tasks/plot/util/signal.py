@@ -13,7 +13,7 @@ from sharp.tasks.signal.util import time_to_index
 def plot_signal(
     signal: Signal,
     time_range: Tuple[float, float],
-    spacing: float = 500,
+    y_scale: float = 500,
     height: float = 0.5,
     channels: Optional[IndexList] = None,
     bottom_first: bool = True,
@@ -31,8 +31,8 @@ def plot_signal(
     scale.
 
     :param time_range:  Time slice to plot. In seconds.
-    :param spacing:  Vertical spacing between the zero lines of channels, in
-                data units.
+    :param y_scale:  How much data-y-units the visual vertical spacing between
+                channels represents.
     :param height:  Height of each channel, in inches.
     :param channels:  Which channels to plot. Plots all channels by default.
     :param bottom_first:  If True (default), the first channel will be
@@ -71,16 +71,16 @@ def plot_signal(
     y: Signal = signal[slice(*ix), channels]
     t = y.get_time_vector(t0=time_range[0])
     if bottom_first:
-        y_offsets = spacing * np.arange(0, signal.num_channels)
+        y_offsets = y_scale * np.arange(0, signal.num_channels)
     else:
-        y_offsets = spacing * np.arange(0, -signal.num_channels, -1)
+        y_offsets = y_scale * np.arange(0, -signal.num_channels, -1)
     y_separated = y + y_offsets
     if zero_lines:
         ax.hlines(y_offsets, *time_range, colors="grey", lw=1)
     ax.plot(t, y_separated, **kwargs)
     ax.set_xlim(time_range)
     if not tight_ylims:
-        ax.set_ylim(_get_global_ylims(signal, spacing))
+        ax.set_ylim(_get_global_ylims(signal, y_scale))
     if time_grid:
         ax.set_xlabel("Time (s)")
     else:

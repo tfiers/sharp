@@ -42,7 +42,8 @@ class Downsample(SharpTask):
             out_file.write(Signal(downsampled_data, fs))
 
     def get_multichannel(self):
-        return Signal.from_channels([file.read() for file in self.output()])
+        channels = [file.read() for file in self.output()]
+        return Signal.from_channels(channels)
 
     def get_reference_channel(self) -> Signal:
         for file in self.output():

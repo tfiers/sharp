@@ -46,7 +46,7 @@ class SaveBPFinfo(SharpTask):
         return self.filtertask
 
     def output(self):
-        return DictFile(output_root / "info", "online-BPF")
+        return DictFile(output_root, "online-BPF")
 
     def run(self):
         b, a = self.filtertask.coeffs
