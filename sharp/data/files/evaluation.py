@@ -1,4 +1,4 @@
-from sharp.data.types.evaluation import ThresholdSweep
+from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.data.files.stdlib import PickleFile
 
 

@@ -4,8 +4,8 @@ from numpy.linalg import svd
 from numpy.random import normal
 from pandas import DataFrame, concat
 from scipy.linalg import eigh
-from seaborn import stripplot
 
+from seaborn import stripplot
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.tasks.base import SharpTask
@@ -41,6 +41,7 @@ GEVals = real_if_close(GEVals)
 output_dir = FigureMaker.output_dir / "GEVec-principle"
 
 colors = {"GEVec": green, "PCA": red, "Signal": blue, "Noise": orange}
+fontsize = 22
 
 
 class PlotGEVecPrinciple(SharpTask):
@@ -65,8 +66,8 @@ class ScatterPlot(FigureMaker):
         lims = 11
         ax.set_xlim(-lims, lims)
         ax.set_ylim(-lims, lims)
-        for s, loc in (["Signal", (0.55, 0.26)], ["Noise", (0.7, 0.44)]):
-            fig.text(*loc, s, color=colors[s])
+        for s, loc in (["Signal", (0.52, 0.26)], ["Noise", (0.7, 0.46)]):
+            fig.text(*loc, s, color=colors[s], fontsize=fontsize)
         ax.set_xlabel("Electrode 3")
         ax.set_ylabel("Electrode 12")
         ax.grid(False)
@@ -122,7 +123,7 @@ class StripPlot(FigureMaker):
         ax.set_xticks([])
         ax.set_xlabel("Projection on 1st eigenvector")
         ax.set_ylabel("")
-        ax.yaxis.set_tick_params(labelcolor="black", labelsize="large", pad=20)
+        ax.yaxis.set_tick_params(labelcolor="black", labelsize=fontsize, pad=16)
         for label in ax.get_yticklabels():
             label: Text
             label.set_color(colors[label.get_text()])

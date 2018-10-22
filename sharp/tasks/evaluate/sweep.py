@@ -5,7 +5,7 @@ from luigi import FloatParameter, IntParameter
 
 from sharp.data.files.config import output_root
 from sharp.data.files.evaluation import ThresholdSweepFile
-from sharp.data.types.evaluation import ThresholdSweep
+from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.tasks.base import SharpTask, TaskParameter
 from sharp.tasks.evaluate.threshold import evaluate_threshold
 from sharp.tasks.signal.base import EnvelopeMaker, InputDataMixin
@@ -22,7 +22,7 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
     envelope_maker: EnvelopeMaker = TaskParameter()
 
     num_thresholds = IntParameter()
-    recall_best = FloatParameter(0.90)
+    recall_best = FloatParameter(None)
     lockout_percentile = FloatParameter(25)
 
     def requires(self):

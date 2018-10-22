@@ -1,10 +1,9 @@
 from typing import Sequence
 
-from luigi.task import Parameter
 from matplotlib import style
 
 from sharp.data.files.config import output_root
-from sharp.data.types.evaluation import ThresholdSweep
+from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask, TaskListParameter
 from sharp.tasks.evaluate.sweep import ThresholdSweeper

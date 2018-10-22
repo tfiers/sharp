@@ -5,11 +5,11 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
 from matplotlib.ticker import PercentFormatter
-from numpy import argmax, array, median, percentile
-from seaborn import set_hls_values
+from numpy import argmax, array
 
+from seaborn import set_hls_values
 from sharp.data.files.figure import FigureTarget
-from sharp.data.types.evaluation import ThresholdSweep
+from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
 from sharp.tasks.plot.util.legend import add_colored_legend
 
@@ -76,10 +76,9 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
 
     def plot_delays(self, ax_delay_P, ax_delay_R):
         for sweep, color in zip(self.threshold_sweeps, self.colors):
-            rds = [te.rel_delays for te in sweep.threshold_evaluations]
-            center = [median(rd) for rd in rds]
-            low = [percentile(rd, 25) for rd in rds]
-            high = [percentile(rd, 75) for rd in rds]
+            center = sweep.rel_delays_median
+            low = sweep.rel_delays_Q1
+            high = sweep.rel_delays_Q3
             d = PR_divider(sweep)
             line_kwargs = dict(c=color, **self.line_kwargs)
             ax_delay_P.plot(center[d:], sweep.precision[d:], **line_kwargs)
@@ -97,13 +96,14 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
             kwargs = dict(
                 marker=".", ms=18, color=color, markeredgecolor="black"
             )
-            center_delay = [
-                median(te.rel_delays) for te in sweep.threshold_evaluations
-            ]
             d = PR_divider(sweep)
             ax_PR.plot(sweep.recall[d], sweep.precision[d], **kwargs)
-            ax_delay_P.plot(center_delay[d], sweep.precision[d], **kwargs)
-            ax_delay_R.plot(sweep.recall[d], center_delay[d], **kwargs)
+            ax_delay_P.plot(
+                sweep.rel_delays_median[d], sweep.precision[d], **kwargs
+            )
+            ax_delay_R.plot(
+                sweep.recall[d], sweep.rel_delays_median[d], **kwargs
+            )
 
     def setup_axes(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
         lims = (self.zoom_from - self.lim_offset, 1 + self.lim_offset)
@@ -111,7 +111,7 @@ class PlotLatencyAndPR(MultiEnvelopeSummary):
         ax_PR.set_xlim(lims)
         ax_PR.set_ylim(lims)
         # ax_PR.set_aspect("equal")
-        # This unsynchs the axes widths.
+        # ^This unsynchs the axes widths.
         # Manually make sure aspect ratio is approximately equal using figsize.
         ax_PR.xaxis.set_major_formatter(percentages)
         ax_PR.yaxis.set_major_formatter(percentages)

@@ -8,7 +8,7 @@ readable = {
     'figure.dpi': 80,
     'savefig.dpi': 300,
 
-    'font.size': 22,
+    'font.size': 15,
     'axes.labelsize': 22,
     'axes.titlesize': 22,
     'legend.fontsize': 18,
