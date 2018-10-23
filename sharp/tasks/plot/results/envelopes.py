@@ -18,6 +18,11 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
     times of all algorithms.
     """
 
+    def requires(self):
+        d1 = super(MultiEnvelopeFigureMaker, self).requires()
+        d2 = super(TimeRangesPlotter, self).requires()
+        return tuple(d1) + tuple(d2)
+
     @property
     def output_dir(self):
         return super().output_dir / "envelopes"
