@@ -4,7 +4,7 @@ from typing import Sequence
 from luigi import FloatParameter
 
 from fklab.signals.multirate import downsample
-from sharp.data.files.config import data_config, output_root
+from sharp.data.files.config import data_config, intermediate_output_dir
 from sharp.data.files.neuralynx import Neuralynx_NCS_Directory
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
@@ -20,7 +20,7 @@ class Downsample(SharpTask):
     """
 
     raw_data_dir = Neuralynx_NCS_Directory()
-    output_dir = output_root / "downsampled-recording"
+    output_dir = intermediate_output_dir / "downsampled-recording"
 
     fs_target = FloatParameter(default=1000)
     # Target sampling rate after downsampling (see `fklab..downsample()`). In

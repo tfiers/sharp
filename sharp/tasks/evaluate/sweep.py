@@ -3,7 +3,7 @@ from logging import getLogger
 import numpy as np
 from luigi import FloatParameter, IntParameter
 
-from sharp.data.files.config import output_root
+from sharp.data.files.config import intermediate_output_dir
 from sharp.data.files.evaluation import ThresholdSweepFile
 from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.tasks.base import SharpTask, TaskParameter
@@ -22,7 +22,7 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
     envelope_maker: EnvelopeMaker = TaskParameter()
 
     num_thresholds = IntParameter()
-    recall_best = FloatParameter(None)
+    recall_best = FloatParameter(0.8)
     lockout_percentile = FloatParameter(25)
 
     def requires(self):
@@ -30,7 +30,7 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
 
     def output(self) -> ThresholdSweepFile:
         filename = self.envelope_maker.output().stem
-        return ThresholdSweepFile(output_root / "threshold-sweeps", filename)
+        return ThresholdSweepFile(intermediate_output_dir / "threshold-sweeps", filename)
 
     @property
     def lockout_time(self) -> float:

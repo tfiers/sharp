@@ -2,7 +2,7 @@ from typing import Sequence
 
 from matplotlib import style
 
-from sharp.data.files.config import output_root
+from sharp.data.files.config import final_output_dir
 from sharp.data.types.threshold.sweep import ThresholdSweep
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask, TaskListParameter
@@ -12,7 +12,7 @@ from sharp.tasks.signal.base import EnvelopeMaker
 
 
 class FigureMaker(SharpTask):
-    output_dir = output_root / "figures"
+    output_dir = final_output_dir
 
     def __init__(self, *args, **kwargs):
         style.use(symposium)

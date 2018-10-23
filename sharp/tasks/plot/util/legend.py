@@ -16,6 +16,7 @@ def add_colored_legend(
     legend = artist.legend(
         labels=labels,
         handlelength=0,
+        handleheight=0,
         handletextpad=0,
         markerscale=0,
         labelspacing=0.9,

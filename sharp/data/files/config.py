@@ -39,3 +39,5 @@ class Data(Config):
 # Global config objects, for use in any Task.
 data_config = Data()
 output_root = Path(data_config.output_dir).absolute()
+intermediate_output_dir = output_root / "intermediate"
+final_output_dir = output_root / "final"

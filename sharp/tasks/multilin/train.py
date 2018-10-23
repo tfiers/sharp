@@ -4,7 +4,7 @@ from numpy import arange, argmax, cov
 from numpy.core.multiarray import concatenate, ndarray
 from scipy.linalg import eigh
 
-from sharp.data.files.config import output_root
+from sharp.data.files.config import intermediate_output_dir
 from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
@@ -42,7 +42,7 @@ class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
     def requires(self):
         return self.input_data_makers
 
-    output_dir = output_root / "GEVecs"
+    output_dir = intermediate_output_dir / "GEVecs"
 
     def output(self):
         return NumpyArrayFile(self.output_dir, self.filename)

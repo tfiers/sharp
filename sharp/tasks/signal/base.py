@@ -1,4 +1,4 @@
-from sharp.data.files.config import output_root
+from sharp.data.files.config import intermediate_output_dir
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
@@ -71,7 +71,7 @@ class InputDataMixin:
 
 class EnvelopeMaker(SharpTask, InputDataMixin):
 
-    output_dir = output_root / "output-envelopes"
+    output_dir = intermediate_output_dir / "output-envelopes"
     title: str = ...
 
     def requires(self):

@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from fklab.segments import Segment
-from sharp.data.files.config import output_root
+from sharp.data.files.config import intermediate_output_dir
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
@@ -48,7 +48,7 @@ class NeuralNetTask(EnvelopeMaker):
 
     @property
     def output_dir(self):
-        return output_root / "trained-networks"
+        return intermediate_output_dir / "trained-networks"
 
     @property
     def model(self) -> RNN:
