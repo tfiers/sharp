@@ -4,14 +4,14 @@ them.
 """
 
 import numpy as np
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
-from sharp.data.types.aliases import ArrayLike, IndexList
+from sharp.data.types.aliases import ArrayLike
 
 
 def time_to_index(
     t: ArrayLike, fs: float, arr_size: int = np.inf, clip: bool = False
-) -> IndexList:
+) -> ndarray:
     """
     Convert times to array indices.
 

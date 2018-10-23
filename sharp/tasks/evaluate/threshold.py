@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import numpy as np
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
 from fklab.segments import Segment
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation

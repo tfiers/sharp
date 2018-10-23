@@ -1,7 +1,7 @@
 from logging import getLogger
 
 import numpy as np
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 from scipy.signal import cheb2ord, cheby2, lfilter
 
 from sharp.data.files.config import final_output_dir

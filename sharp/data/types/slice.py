@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from numpy.core.multiarray import ndarray, array
+from numpy import ndarray, array
 
 from fklab.segments import Segment
 from sharp.data.types.signal import Signal

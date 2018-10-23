@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 
 from numpy import median, percentile
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import BooleanArray, EventList
 from sharp.data.types.intersection import SegmentEventIntersection
 
 
@@ -23,7 +22,7 @@ class ThresholdEvaluation:
     # Inputs
     # ------
 
-    detections: EventList
+    detections: ndarray
     # When the SWR detector fired, in seconds.
 
     reference_segs: Segment
@@ -42,15 +41,15 @@ class ThresholdEvaluation:
     # ------
 
     @property
-    def _reference_seg_is_detected(self) -> BooleanArray:
+    def _reference_seg_is_detected(self) -> ndarray:
         return self.intersection.num_events_in_seg > 0
 
     @property
-    def detected_reference_segs(self) -> EventList:
+    def detected_reference_segs(self) -> ndarray:
         return self.reference_segs[self._reference_seg_is_detected]
 
     @property
-    def undetected_reference_segs(self) -> EventList:
+    def undetected_reference_segs(self) -> ndarray:
         return self.reference_segs[~self._reference_seg_is_detected]
 
     @property
@@ -63,16 +62,16 @@ class ThresholdEvaluation:
     # ---------
 
     @property
-    def _detection_is_correct(self) -> BooleanArray:
+    def _detection_is_correct(self) -> ndarray:
         return self.intersection.event_is_in_seg
 
     @property
-    def correct_detections(self) -> EventList:
+    def correct_detections(self) -> ndarray:
         """ Detection events that hit a reference segment. """
         return self.detections[self._detection_is_correct]
 
     @property
-    def incorrect_detections(self) -> EventList:
+    def incorrect_detections(self) -> ndarray:
         """ False positive detections. """
         return self.detections[~self._detection_is_correct]
 
@@ -119,7 +118,7 @@ class ThresholdEvaluation:
     # ----------------
 
     @property
-    def first_detections(self) -> EventList:
+    def first_detections(self) -> ndarray:
         """
         For each detected reference segment, the time of the first `detection`
         that caught it.

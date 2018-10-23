@@ -1,15 +1,14 @@
 from typing import Sequence
 
-import numpy as np
-from numpy.core.multiarray import ndarray
+from numpy import array, asarray, diff, linspace, ndarray, stack
 
 from fklab.segments import Segment
 from sharp.data.types.aliases import ArrayLike
 from sharp.tasks.signal.util import time_to_index
 
 
-class Signal(np.ndarray):
-    # How to subclass np.ndarray:
+class Signal(ndarray):
+    # How to subclass ndarray:
     # https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
     #
     # Subclassing alias NumpyArray makes PyCharm not show numpy properties.
@@ -21,7 +20,7 @@ class Signal(np.ndarray):
         """
         fs: signal sampling frequency, in hertz.
         """
-        instance = np.asarray(input_array).view(cls)
+        instance = asarray(input_array).view(cls)
         instance.fs = fs
         return instance
 
@@ -49,7 +48,7 @@ class Signal(np.ndarray):
 
     @classmethod
     def from_channels(cls, channels: Sequence["Signal"]):
-        data = np.stack([ch.as_vector() for ch in channels], axis=1)
+        data = stack([ch.as_vector() for ch in channels], axis=1)
         return cls(data, channels[0].fs)
 
     @property
@@ -85,12 +84,12 @@ class Signal(np.ndarray):
     @property
     def range(self) -> ndarray:
         """ (min, max) of signal values. """
-        return np.array([self.min(), self.max()])
+        return array([self.min(), self.max()])
 
     @property
     def span(self) -> float:
         """ Difference between maximal and minimal signal value. """
-        return np.diff(self.range)
+        return diff(self.range)
 
     @property
     def time(self) -> ndarray:
@@ -99,7 +98,7 @@ class Signal(np.ndarray):
 
     def get_time_vector(self, t0: float) -> ndarray:
         """ A time vector for this signal, starting at t0. In seconds. """
-        time = np.linspace(
+        time = linspace(
             t0, t0 + self.duration, self.num_samples, endpoint=False
         )
         return time

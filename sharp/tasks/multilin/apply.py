@@ -1,6 +1,6 @@
 import numpy as np
 from numba import prange
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal

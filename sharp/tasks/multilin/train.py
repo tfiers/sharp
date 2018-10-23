@@ -1,7 +1,7 @@
 import numpy as np
 from luigi import IntParameter
 from numpy import arange, argmax, cov
-from numpy.core.multiarray import concatenate, ndarray
+from numpy import concatenate, ndarray
 from scipy.linalg import eigh
 
 from sharp.data.files.config import intermediate_output_dir

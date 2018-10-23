@@ -1,8 +1,7 @@
 import numpy as np
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.aliases import EventList, BooleanArray
 
 
 class SegmentEventIntersection:
@@ -10,14 +9,14 @@ class SegmentEventIntersection:
     Named & typed wrapper for fklab's Segment.contains():
     """
 
-    def __init__(self, segs: Segment, events: EventList):
+    def __init__(self, segs: Segment, events: ndarray):
         """ Segments are assumed sorted. """
         self._isinseg, self._ninseg, self._contains = segs.contains(events)
         # self._contains: An N x 2 array, with for each segment 1..N, the start
         # and end indices of events that are contained within that segment.
 
     @property
-    def event_is_in_seg(self) -> BooleanArray:
+    def event_is_in_seg(self) -> ndarray:
         """ True for each event that is contained within any segment."""
         return self._isinseg
 

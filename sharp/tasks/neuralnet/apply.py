@@ -1,5 +1,5 @@
 import torch
-from numpy.core.multiarray import ndarray
+from numpy import ndarray
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.aliases import TorchArray

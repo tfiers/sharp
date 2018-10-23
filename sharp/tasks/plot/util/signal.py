@@ -1,11 +1,10 @@
 from typing import Optional, Tuple
 
-import numpy as np
-from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from numpy import arange, ndarray
 
-from sharp.data.types.aliases import IndexList
+from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.util import time_to_index
 
@@ -15,7 +14,7 @@ def plot_signal(
     time_range: Tuple[float, float],
     y_scale: float = 500,
     height: float = 0.5,
-    channels: Optional[IndexList] = None,
+    channels: Optional[ndarray] = None,
     bottom_first: bool = True,
     tight_ylims: bool = False,
     zero_lines: bool = True,
@@ -53,7 +52,7 @@ def plot_signal(
     """
     signal = signal.as_matrix()
     if ax is None:
-        fig, ax = plt.subplots(figsize=(12, height * signal.num_channels))
+        fig, ax = subplots(figsize=(12, height * signal.num_channels))
     else:
         fig = ax.get_figure()
     if y_grid is None:
@@ -62,7 +61,7 @@ def plot_signal(
         else:
             y_grid = False
     if channels is None:
-        channels = np.arange(signal.num_channels)
+        channels = arange(signal.num_channels)
     if ("color" not in kwargs) and ("c" not in kwargs):
         kwargs["color"] = "black"
     ix = time_to_index(
@@ -71,9 +70,9 @@ def plot_signal(
     y: Signal = signal[slice(*ix), channels]
     t = y.get_time_vector(t0=time_range[0])
     if bottom_first:
-        y_offsets = y_scale * np.arange(0, signal.num_channels)
+        y_offsets = y_scale * arange(0, signal.num_channels)
     else:
-        y_offsets = y_scale * np.arange(0, -signal.num_channels, -1)
+        y_offsets = y_scale * arange(0, -signal.num_channels, -1)
     y_separated = y + y_offsets
     if zero_lines:
         ax.hlines(y_offsets, *time_range, colors="grey", lw=1)

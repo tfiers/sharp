@@ -1,7 +1,6 @@
 from typing import List, Optional, Tuple
 
-from numpy import abs, argmax, argmin, diff, mean, min, trapz
-from numpy.core.multiarray import array, ndarray
+from numpy import abs, argmax, argmin, array, diff, mean, min, ndarray, trapz
 
 from sharp.data.files.config import data_config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
