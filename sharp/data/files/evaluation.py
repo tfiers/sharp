@@ -11,31 +11,33 @@ class ThresholdSweepFile(DictFile):
     extension = ".eval" + DictFile.extension
 
     def write(self, sweep: ThresholdSweep):
-        data_dicts = [
+        te_dicts = [
             {
                 "threshold": float(te.threshold),
                 "detections": te.detections.tolist(),
-                "reference_segs": te.reference_segs._data.tolist(),
             }
             for te in sweep.threshold_evaluations
         ]
-        # TOML cannot have a list as root object.
-        obj = {"threshold_evaluations": data_dicts}
+        # reference_segs are the same for each ThresholdEvaluation
+        obj = {
+            "reference_segs": sweep.best().reference_segs._data.tolist(),
+            "threshold_evaluations": te_dicts,
+        }
         super().write(obj)
 
     def read(self) -> ThresholdSweep:
         sweep = ThresholdSweep()
         obj = super().read()
-        for data_dict in obj["threshold_evaluations"]:
-            detections = array(data_dict["detections"])
-            reference_segs = Segment(data_dict["reference_segs"])
+        reference_segs = Segment(obj["reference_segs"])
+        for te_dict in obj["threshold_evaluations"]:
+            detections = array(te_dict["detections"])
             te = ThresholdEvaluation(
                 detections=detections,
                 reference_segs=reference_segs,
                 intersection=SegmentEventIntersection(
                     reference_segs, detections
                 ),
-                threshold=data_dict["threshold"],
+                threshold=te_dict["threshold"],
             )
             sweep.add_threshold_evaluation(te)
         return sweep
