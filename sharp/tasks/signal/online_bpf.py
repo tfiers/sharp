@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import Tuple
 
 import numpy as np
 from numpy import ndarray
@@ -29,7 +30,7 @@ class ApplyOnlineBPF(EnvelopeMaker):
         self.output().write(envelope_sig)
 
     @property
-    def coeffs(self) -> (ndarray, ndarray):
+    def coeffs(self) -> Tuple[ndarray, ndarray]:
         """ Returns IIR (numer, denom), ie. (b, a) """
         return get_SOTA_online_BPF(self.input_signal.fs)
 
@@ -53,8 +54,8 @@ class SaveBPFinfo(SharpTask):
         self.output().write(
             {
                 "fs": self.filtertask.input_signal.fs,
-                "numerator-b": b,
-                "denominator-a": a,
+                "numerator-b": b.tolist(),
+                "denominator-a": a.tolist(),
                 "order": len(a),
             }
         )
