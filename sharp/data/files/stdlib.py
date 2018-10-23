@@ -2,31 +2,40 @@
 Standard Python types, stored on disk.
 """
 
-import pickle
-
 import toml
 
 from sharp.data.files.base import FileTarget
 from sharp.util import cached
 
 
-class FloatFile(FileTarget):
+class TextFile(FileTarget):
+    extension = ".txt"
+
+    @cached
+    def read(self) -> str:
+        with open(self) as f:
+            value = f.read()
+        return value
+
+    def write(self, value: str):
+        # 'w' clears file.
+        with open(self, "w") as f:
+            f.write(value)
+
+
+class FloatFile(TextFile):
     """
     A file containing only a scalar number.
     """
 
-    extension = ".float"
+    extension = ".float" + TextFile.extension
 
     @cached
     def read(self) -> float:
-        with open(self) as f:
-            value = f.read()
-        return float(value)
+        return float(super().read())
 
     def write(self, value: float):
-        # 'w' clears file.
-        with open(self, "w") as f:
-            f.write(str(value))
+        super().write(str(value))
 
 
 class DictFile(FileTarget):
