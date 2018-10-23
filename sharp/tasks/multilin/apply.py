@@ -10,9 +10,6 @@ from sharp.util import compiled
 
 
 class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
-
-    output_dir = EnvelopeMaker.output_dir / "multilin"
-
     @property
     def title(self):
         return f"GEVec, {self.num_delays_str}"
