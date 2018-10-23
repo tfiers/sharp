@@ -110,8 +110,8 @@ class ThresholdSweep:
             largest_nc_gap = num_correct_gap[index_largest_nc_gap]
             largest_nd_gap = num_detected_gap[index_largest_nd_gap]
             if largest_nc_gap > largest_nd_gap:
-                index = index_largest_nc_gap
+                gap_index = index_largest_nc_gap
             else:
-                index = index_largest_nd_gap
-            surrounding_thresholds = self.thresholds[index : index + 2]
-            return mean(surrounding_thresholds)
+                gap_index = index_largest_nd_gap
+            gap_thresholds = self.thresholds[gap_index : gap_index + 2]
+            return mean(gap_thresholds)
