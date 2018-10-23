@@ -52,7 +52,8 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
                 sweep.best().threshold,
                 *time_range,
                 clip_on=False,
-                linestyles="dashed"
+                linestyles="dashed",
+                linewidth=1,
             )
             add_event_arrows(ax, sweep.best().correct_detections, color="green")
             add_event_arrows(ax, sweep.best().incorrect_detections, color="red")
