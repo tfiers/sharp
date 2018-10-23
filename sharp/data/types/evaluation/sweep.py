@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 from numpy import abs, argmax, argmin, diff, mean, min, trapz
 from numpy.core.multiarray import array, ndarray
 
+from sharp.data.files.config import data_config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 
 
@@ -33,10 +34,11 @@ class ThresholdSweep:
     threshold_evaluations: List[ThresholdEvaluation]
     # Always ordered from highest to lowest threshold.
 
-    recall_best: Optional[float] = None
-    # At which approximate recall value the `best` threshold should be chosen.
-    # If not specified or `None`, chooses the threshold with maximal F1-score.
+    def __init__(self):
+        self.threshold_evaluations = []
 
+    # `dataclass` does not recognize the following as proper properties,
+    # and takes them as init args.
     threshold: ndarray = vectorizing_property("threshold")
     recall: ndarray = vectorizing_property("recall")
     precision: ndarray = vectorizing_property("precision")
@@ -51,9 +53,6 @@ class ThresholdSweep:
     thresholds: ndarray = threshold
     # Alias, for readability.
 
-    def __init__(self):
-        self.threshold_evaluations = []
-
     @property
     def AUC(self) -> float:
         """ Area under precision-recall curve. """
@@ -62,17 +61,20 @@ class ThresholdSweep:
         else:
             return 0
 
-    @property
-    def best(self) -> ThresholdEvaluation:
+    def best(
+        self, recall_best: Optional[float] = data_config.recall_best
+    ) -> ThresholdEvaluation:
         """
-        Return the `best` threshold evaluation, according to the `recall_best`
-        parameter.
+        :return:  The `best` threshold evaluation.
+        :param recall_best:  At which approximate recall value the best
+                    threshold should be chosen. If `None`, chooses the
+                    threshold with maximal F1-score.
         """
         if len(self.threshold_evaluations) > 0:
-            if self.recall_best is None:
+            if recall_best is None:
                 best_index = argmax(self.F1)
             else:
-                best_index = argmax(self.recall > self.recall_best)
+                best_index = argmax(self.recall > recall_best)
             return self.threshold_evaluations[best_index]
 
     def add_threshold_evaluation(self, new: ThresholdEvaluation):

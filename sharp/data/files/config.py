@@ -35,6 +35,9 @@ class Data(Config):
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 
+    recall_best = FloatParameter(0.8)
+    # See ThresholdSweep.best()
+
 
 # Global config objects, for use in any Task.
 data_config = Data()

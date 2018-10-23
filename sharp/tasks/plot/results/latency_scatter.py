@@ -19,8 +19,8 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
         df_dicts = (
             {
                 swr_duration: 1000
-                * sweep.best.detected_reference_segs.duration,
-                delay: 1000 * sweep.best.abs_delays,
+                * sweep.best().detected_reference_segs.duration,
+                delay: 1000 * sweep.best().abs_delays,
                 algo: title,
             }
             for sweep, title in zip(self.threshold_sweeps, self.titles)
@@ -35,7 +35,9 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
             data = df[getattr(df, algo) == title]
             with ignore(FutureWarning):
                 kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
-                kdeplot(data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs)
+                kdeplot(
+                    data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs
+                )
             grid.ax_joint.plot(
                 data[swr_duration], data[delay], **scatter_kwargs
             )

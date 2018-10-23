@@ -22,7 +22,6 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
     envelope_maker: EnvelopeMaker = TaskParameter()
 
     num_thresholds = IntParameter()
-    recall_best = FloatParameter(0.8)
     lockout_percentile = FloatParameter(25)
 
     def requires(self):
@@ -30,7 +29,9 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
 
     def output(self) -> ThresholdSweepFile:
         filename = self.envelope_maker.output().stem
-        return ThresholdSweepFile(intermediate_output_dir / "threshold-sweeps", filename)
+        return ThresholdSweepFile(
+            intermediate_output_dir / "threshold-sweeps", filename
+        )
 
     @property
     def lockout_time(self) -> float:
@@ -52,5 +53,4 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
             )
             sweep.add_threshold_evaluation(new_threshold_evaluation)
 
-        sweep.recall_best = self.recall_best
         self.output().write(sweep)

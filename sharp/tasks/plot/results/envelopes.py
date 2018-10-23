@@ -32,7 +32,7 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
     def contains_detection(self, time_range: TimeRange) -> bool:
         return any(
             SegmentEventIntersection(
-                Segment(time_range), sweep.best.detections
+                Segment(time_range), sweep.best().detections
             ).num_events_in_seg
             > 0
             for sweep in self.threshold_sweeps
@@ -44,11 +44,11 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
         tups = zip(self.threshold_sweeps, extra_axes, self.titles, self.colors)
         for sweep, ax, title, color in tups:
             ax.hlines(
-                sweep.best.threshold,
+                sweep.best().threshold,
                 *time_range,
                 clip_on=False,
                 linestyles="dashed"
             )
-            add_event_arrows(ax, sweep.best.correct_detections, color="green")
-            add_event_arrows(ax, sweep.best.incorrect_detections, color="red")
+            add_event_arrows(ax, sweep.best().correct_detections, color="green")
+            add_event_arrows(ax, sweep.best().incorrect_detections, color="red")
             ax.text(0.05, 0.91, title, color=color, transform=ax.transAxes)
