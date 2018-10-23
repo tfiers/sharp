@@ -5,7 +5,7 @@ from luigi import FloatParameter, IntParameter
 
 from sharp.data.files.config import intermediate_output_dir
 from sharp.data.files.evaluation import ThresholdSweepFile
-from sharp.data.types.threshold.sweep import ThresholdSweep
+from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.base import SharpTask, TaskParameter
 from sharp.tasks.evaluate.threshold import evaluate_threshold
 from sharp.tasks.signal.base import EnvelopeMaker, InputDataMixin

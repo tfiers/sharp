@@ -4,7 +4,7 @@ import numpy as np
 from numpy.core.multiarray import ndarray
 
 from fklab.segments import Segment
-from sharp.data.types.threshold.evaluation import ThresholdEvaluation
+from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.util import time_to_index

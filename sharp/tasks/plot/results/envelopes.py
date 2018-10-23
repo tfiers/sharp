@@ -4,8 +4,8 @@ from matplotlib.axes import Axes
 
 from fklab.segments import Segment
 from sharp.data.types.intersection import SegmentEventIntersection
-from sharp.tasks.plot.base import MultiEnvelopeFigureMaker
-from sharp.tasks.plot.signals.base import TimeRange, TimeRangesPlotter
+from sharp.tasks.plot.base import TimeRange, TimeRangesPlotter
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.annotations import add_event_arrows
 
 

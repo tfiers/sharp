@@ -1,13 +1,14 @@
 from matplotlib.figure import Figure
 from pandas import DataFrame, concat
+
 from seaborn import JointGrid, kdeplot
-
 from sharp.data.files.figure import FigureTarget
-from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend
+from sharp.util import ignore
 
 
-class PlotLatencyScatter(MultiEnvelopeSummary):
+class PlotLatencyScatter(MultiEnvelopeFigureMaker):
     def output(self):
         return FigureTarget(self.output_dir, "latency-scatter")
 
@@ -32,8 +33,9 @@ class PlotLatencyScatter(MultiEnvelopeSummary):
         )
         for title in self.titles:
             data = df[getattr(df, algo) == title]
-            kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
-            kdeplot(data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs)
+            with ignore(FutureWarning):
+                kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
+                kdeplot(data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs)
             grid.ax_joint.plot(
                 data[swr_duration], data[delay], **scatter_kwargs
             )

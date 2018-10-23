@@ -9,15 +9,15 @@ from numpy import argmax, array
 
 from seaborn import set_hls_values
 from sharp.data.files.figure import FigureTarget
-from sharp.data.types.threshold.sweep import ThresholdSweep
-from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
+from sharp.data.types.evaluation.sweep import ThresholdSweep
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend
 
 DISCRETE = dict(lw=2, marker=".", ms=10)
 CONTINUOUS = dict(lw=4)
 
 
-class PlotLatencyAndPR(MultiEnvelopeSummary):
+class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
     """
     Draws curves of precision-recall points, one point for each threshold, and
     one curve for each algorithm.

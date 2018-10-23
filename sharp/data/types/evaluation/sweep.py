@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from numpy import abs, argmax, argmin, diff, mean, min, trapz
 from numpy.core.multiarray import array, ndarray
 
-from sharp.data.types.threshold.evaluation import ThresholdEvaluation
+from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 
 
 def vectorizing_property(name: str):
@@ -25,6 +25,10 @@ def vectorizing_property(name: str):
 
 
 class ThresholdSweep:
+    """
+    Evaluates an algorithm output envelope, for a range of different detection
+    thresholds.
+    """
 
     threshold_evaluations: List[ThresholdEvaluation]
     # Always ordered from highest to lowest threshold.
@@ -96,17 +100,17 @@ class ThresholdSweep:
             return min(threshold_range)
         else:
             tes = self.threshold_evaluations
-            cd = [len(te.correct_detections) for te in tes]
-            drs = [len(te.detected_reference_segs) for te in tes]
-            cd_gap = abs(diff(cd))
-            drs_gap = abs(diff(drs))
-            index_largest_cd_gap = argmax(cd_gap)
-            index_largest_drs_gap = argmax(drs_gap)
-            largest_cd_gap = cd_gap[index_largest_cd_gap]
-            largest_drs_gap = drs_gap[index_largest_drs_gap]
-            if largest_cd_gap > largest_drs_gap:
-                index = index_largest_cd_gap
+            num_correct = [len(te.correct_detections) for te in tes]
+            num_detected = [len(te.detected_reference_segs) for te in tes]
+            num_correct_gap = abs(diff(num_correct))
+            num_detected_gap = abs(diff(num_detected))
+            index_largest_nc_gap = argmax(num_correct_gap)
+            index_largest_nd_gap = argmax(num_detected_gap)
+            largest_nc_gap = num_correct_gap[index_largest_nc_gap]
+            largest_nd_gap = num_detected_gap[index_largest_nd_gap]
+            if largest_nc_gap > largest_nd_gap:
+                index = index_largest_nc_gap
             else:
-                index = index_largest_drs_gap
+                index = index_largest_nd_gap
             surrounding_thresholds = self.thresholds[index : index + 2]
             return mean(surrounding_thresholds)

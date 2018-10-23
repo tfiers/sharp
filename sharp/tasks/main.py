@@ -1,11 +1,11 @@
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
-from sharp.tasks.plot.misc.weights import PlotWeights
-from sharp.tasks.plot.signals.envelopes import PlotEnvelopes
-from sharp.tasks.plot.signals.reference import PlotReferenceMaker
-from sharp.tasks.plot.summary.PR_and_latency import PlotLatencyAndPR
-from sharp.tasks.plot.summary.latency_scatter import PlotLatencyScatter
-from sharp.tasks.plot.summary.recording import PlotRecordingSummaries
+from sharp.tasks.plot.results.weights import PlotWeights
+from sharp.tasks.plot.results.envelopes import PlotEnvelopes
+from sharp.tasks.plot.misc.reference import PlotReferenceMaker
+from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
+from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
+from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
 
 em_kwargs = dict(

@@ -1,12 +1,10 @@
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.pyplot import subplots
 from matplotlib.ticker import FuncFormatter
 from numpy import arange, exp, linspace, log10, ndarray
 from sklearn.neighbors import KernelDensity
 
 from raincloud import distplot
 from sharp.data.files.figure import FigureTarget
+from sharp.data.types.aliases import subplots
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker
 from sharp.tasks.plot.style import seaborn_colours
@@ -31,7 +29,7 @@ class PlotSWRDurations(RecordingSummary):
         return FigureTarget(self.output_dir, "SWR-durations")
 
     def run(self):
-        fig, ax = subplots(figsize=(8, 4))  # type: Figure, Axes
+        fig, ax = subplots(figsize=(8, 4))
         durations = self.reference_segs_all.duration
         distplot(1e3 * durations, ax=ax, palette=seaborn_colours)
         ax.set_xlabel("SWR duration (ms)")
@@ -45,7 +43,7 @@ class PlotInterSWRIntervals(RecordingSummary):
 
     def run(self):
         intervals = self.reference_segs_all.intervals
-        fig, ax = subplots(figsize=(8, 4))  # type: Figure, Axes
+        fig, ax = subplots(figsize=(8, 4))
         distplot(log10(intervals), ax=ax)
         ax.set_xticks(arange(-2, 3, dtype=float))
         ax.xaxis.set_major_formatter(
@@ -65,7 +63,7 @@ class PlotSWRLocations(RecordingSummary):
         sig_length = self.reference_channel_full.duration
         kde = KernelDensity(bandwidth=0.2)
         kde.fit(as_data_matrix(pos))
-        fig, ax = subplots(figsize=(14, 2.5))  # type: Figure, Axes
+        fig, ax = subplots(figsize=(14, 2.5))
         t = linspace(0, sig_length, num=4000)
         log_density = kde.score_samples(as_data_matrix(t))
         density = exp(log_density)

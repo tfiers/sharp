@@ -6,10 +6,10 @@ from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-from sharp.tasks.plot.summary.base import MultiEnvelopeSummary
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 
 
-class PlotWeights(MultiEnvelopeSummary):
+class PlotWeights(MultiEnvelopeFigureMaker):
     @property
     def convolvers(self):
         return [

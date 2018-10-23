@@ -1,5 +1,5 @@
 from sharp.data.types.split import TrainTestSplit
-from sharp.tasks.plot.signals.base import TimeRangesPlotter
+from sharp.tasks.plot.base import TimeRangesPlotter
 from sharp.tasks.signal.reference import MakeReference
 
 
