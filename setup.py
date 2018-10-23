@@ -15,10 +15,12 @@ setup(
         "torch",
         "toml",
         "click",
-        "seaborn==0.9.0+tomas",
-        "python-daemon==2.1.2",  # For luigi install on Windows.
+        # Version pin necessary to make luigi install work on Windows:
+        "python-daemon==2.1.2",
         "luigi[toml]",
         "scikit-learn",
+        # All from requirements.txt:
+        "seaborn==0.9.0+tomas",
         "raincloud",
         "fklab-python-core",
     ),
