@@ -42,7 +42,10 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
     def run(self):
         sweep = ThresholdSweep()
         threshold_range = self.envelope_maker.envelope_test.range
-        log.info(f"Evaluating {self.num_thresholds} thresholds")
+        log.info(
+            f"Evaluating {self.num_thresholds} thresholds, "
+            f"with a lockout time of {1000 * self.lockout_time:.3g} ms."
+        )
         while len(sweep.thresholds) < self.num_thresholds:
             threshold = sweep.get_next_threshold(threshold_range)
             new_threshold_evaluation = evaluate_threshold(

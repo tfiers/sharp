@@ -1,7 +1,6 @@
 from logging import getLogger
 
-import numpy as np
-from numpy import ndarray
+from numpy import empty, int32, ndarray
 
 from fklab.segments import Segment
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
@@ -28,10 +27,7 @@ def evaluate_threshold(
     Detections are the events where `envelope` crosses `threshold` (with a
     minimum distance of `lockout_time` between detections).
     """
-    log.info(
-        f"Evaluating threshold {threshold:.3g} "
-        f"with a lockout time of {1000 * lockout_time:.3g} ms."
-    )
+    log.info(f"Evaluating threshold {threshold:.3g}")
     lockout_samples = time_to_index(lockout_time, envelope.fs)
     detection_ix = calc_detection_indices(
         envelope.astype(float), float(threshold), lockout_samples.astype(int)
@@ -49,7 +45,7 @@ def calc_detection_indices(
 ) -> ndarray:
     N = signal.size
     max_detections = N // lockout_samples
-    detection_indices = np.empty(max_detections, dtype=np.int32)
+    detection_indices = empty(max_detections, dtype=int32)
     i = 0  # Sample nr.
     j = 0  # Detection nr.
     while i < N:

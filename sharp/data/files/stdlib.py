@@ -29,24 +29,6 @@ class FloatFile(FileTarget):
             f.write(str(value))
 
 
-class PickleFile(FileTarget):
-    """
-    Serialization of (near) arbitrarily complex Python objects.
-    """
-
-    extension = ".pickle"
-
-    @cached
-    def read(self):
-        with open(self, "rb") as f:
-            value = pickle.load(f)
-        return value
-
-    def write(self, obj):
-        with open(self, "wb") as f:
-            pickle.dump(obj, f)
-
-
 class DictFile(FileTarget):
     """
     A dictionary serialised to be human readable.

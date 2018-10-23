@@ -10,8 +10,6 @@ from sharp.tasks.signal.util import time_to_index
 class Signal(ndarray):
     # How to subclass ndarray:
     # https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
-    #
-    # Subclassing alias NumpyArray makes PyCharm not show numpy properties.
 
     time_axis = 0
     channel_axis = 1
