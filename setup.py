@@ -14,6 +14,7 @@ setup(
     install_requires=(
         "torch",
         "toml",
+        "h5py",
         "click",
         # Version pin necessary to make luigi install work on Windows:
         "python-daemon==2.1.2",
