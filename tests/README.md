@@ -16,7 +16,7 @@ pytest
 
 Go to the correct working directory (containing a `luigi.toml` file):
 ```
-cd integration/
+cd system/
 ```
 
 Run system test:
