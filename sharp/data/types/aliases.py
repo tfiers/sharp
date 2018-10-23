@@ -19,3 +19,6 @@ ArrayLike = Union[numpy.ndarray, list, tuple, Scalar]
 
 def subplots(*args, **kwargs) -> Tuple[Figure, Union[Axes, Sequence[Axes]]]:
     return plt.subplots(*args, **kwargs)
+
+
+subplots.__doc__ = plt.subplots.__doc__
