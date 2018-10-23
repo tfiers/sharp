@@ -1,5 +1,6 @@
 # These are custom packages. Other dependencies are in setup.py
 
+git+https://github.com/tfiers/seaborn#seaborn
 git+https://github.com/tfiers/raincloud#raincloud
 
 # Closed source for now - download and install manually

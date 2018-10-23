@@ -15,6 +15,7 @@ setup(
         "torch",
         "toml",
         "click",
+        "seaborn==0.9.0+tomas",
         "python-daemon==2.1.2",  # For luigi install on Windows.
         "luigi[toml]",
         "scikit-learn",
