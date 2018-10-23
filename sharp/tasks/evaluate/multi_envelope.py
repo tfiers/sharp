@@ -5,6 +5,7 @@ from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask, TaskListParameter
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.signal.base import EnvelopeMaker
+from sharp.util import cached
 
 
 class MultiEnvelopeEvaluator(SharpTask):
@@ -21,6 +22,7 @@ class MultiEnvelopeEvaluator(SharpTask):
         ]
 
     @property
+    @cached
     def threshold_sweeps(self) -> Sequence[ThresholdSweep]:
         return [sweeper.output().read() for sweeper in self.threshold_sweepers]
 

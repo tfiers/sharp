@@ -19,9 +19,9 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
     """
 
     def requires(self):
-        d1 = super(MultiEnvelopeFigureMaker, self).requires()
-        d2 = super(TimeRangesPlotter, self).requires()
-        return tuple(d1) + tuple(d2)
+        r1 = MultiEnvelopeFigureMaker.requires(self)
+        r2 = TimeRangesPlotter.requires(self)
+        return tuple(r1) + tuple(r2)
 
     @property
     def output_dir(self):

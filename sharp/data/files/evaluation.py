@@ -5,6 +5,7 @@ from sharp.data.files.stdlib import DictFile
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
+from sharp.util import cached
 
 
 class ThresholdSweepFile(DictFile):
@@ -25,6 +26,7 @@ class ThresholdSweepFile(DictFile):
         }
         super().write(obj)
 
+    @cached
     def read(self) -> ThresholdSweep:
         sweep = ThresholdSweep()
         obj = super().read()
