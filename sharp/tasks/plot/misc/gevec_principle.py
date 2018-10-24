@@ -100,10 +100,10 @@ class StripPlot(FigureMaker):
                  DataFrame(dict(proj=N.T @ -SVecs[:, 0],
                                 method='PCA',
                                 src='Noise')),
-                 DataFrame(dict(proj=S.T @ -GEVecs[:, -1],
+                 DataFrame(dict(proj=S.T @ GEVecs[:, -1],
                                 method='GEVec',
                                 src='Signal')),
-                 DataFrame(dict(proj=N.T @ -GEVecs[:, -1],
+                 DataFrame(dict(proj=N.T @ GEVecs[:, -1],
                                 method='GEVec',
                                 src='Noise')),
         ))
