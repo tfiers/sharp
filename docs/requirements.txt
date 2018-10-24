@@ -1,0 +1,3 @@
+sphinx
+sphinx_rtd_theme
+git+https://github.com/sphinx-contrib/apidoc#sphinxcontrib.apidoc
