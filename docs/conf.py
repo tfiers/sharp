@@ -12,9 +12,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+from pathlib import Path
+
+# Assuming sphinx is run from the docs/ dir.
+root = Path('.').absolute().parent
+sys.path.insert(0, str(root))
+os.environ['LUIGI_CONFIG_PATH'] = str(root / 'tests/system/luigi.toml')
 
 
 # -- Project information -----------------------------------------------------
@@ -40,6 +45,7 @@ release = '1.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
 ]
@@ -71,6 +77,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+autodoc_default_flags = ['members', 'undoc-members']
+autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 

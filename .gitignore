@@ -1,6 +1,7 @@
 tests/system/data/processed/
 *.log
 _build/
+docstring-stubs/
 
 *.egg-info
 __pycache__/
