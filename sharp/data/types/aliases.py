@@ -17,8 +17,19 @@ Scalar = Union[complex, float, int, bool]
 ArrayLike = Union[numpy.ndarray, list, tuple, Scalar]
 
 
-def subplots(*args, **kwargs) -> Tuple[Figure, Union[Axes, Sequence[Axes]]]:
-    return plt.subplots(*args, **kwargs)
+def subplots(
+    nrows=1,
+    ncols=1,
+    sharex=False,
+    sharey=False,
+    squeeze=True,
+    subplot_kw=None,
+    gridspec_kw=None,
+    **fig_kw
+) -> Tuple[Figure, Union[Axes, Sequence[Axes]]]:
+    return plt.subplots(
+        nrows, ncols, sharex, sharey, squeeze, subplot_kw, gridspec_kw, **fig_kw
+    )
 
 
 subplots.__doc__ = plt.subplots.__doc__

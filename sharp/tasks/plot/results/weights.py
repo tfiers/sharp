@@ -1,4 +1,3 @@
-from matplotlib.ticker import FuncFormatter
 from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
@@ -37,26 +36,24 @@ class PlotWeights(MultiEnvelopeFigureMaker):
     def run(self):
         tups = zip(self.trainers, self.convolvers, self.colors, self.output())
         for trainer, convolver, color, filetarget in tups:
-            fig, ax = subplots(figsize=(4, 5))
+            fig, ax = subplots(figsize=(5 + convolver.num_delays / 3, 5))
             GEVec = trainer.output().read()
-
             signal = trainer.multichannel_train
             num_channels = signal.num_channels
             weights = shape_GEVec(GEVec, num_channels)
             wmax = max(abs(weights))
-            cax = ax.imshow(
+            image = ax.imshow(
                 weights, origin="lower", cmap="PiYG", vmin=-wmax, vmax=wmax
             )
-            cbar = fig.colorbar(cax)
+            cbar = fig.colorbar(image, ax=ax, shrink=0.6)
             cbar.set_label("Weight")
-            ax.set_xticks(trainer.delays)
-            # Label channels as a simple one-based list of numbers.
-            formatter = FuncFormatter(lambda x, pos: f"{x + 1:.0f}")
-            ax.yaxis.set_major_formatter(formatter)
+            ax.set_xticks(convolver.delays)
+            ax.set_yticks(convolver.channels)
             ax.set_xlim(ax.get_xlim()[::-1])
             ax.set_xlabel("Delay (ms)")  # Only at 1000 Hz..
             ax.set_ylabel("Channel")
-            ax.set_title(convolver.title, color=color)
+            title = f"GEVec\n({convolver.filename})"
+            ax.set_title(title, color=color)
             ax.grid(False)
             fig.tight_layout()
             filetarget.write(fig)

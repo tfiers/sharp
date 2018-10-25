@@ -11,6 +11,7 @@ class SharpConfig(SharpConfigBase):
     # [Main]
     config_id = "test"
     num_thresholds = 6
+    channel_combinations = {"all": (0, 1, 2)}
 
     # [NeuralNet]
     num_layers = 1
