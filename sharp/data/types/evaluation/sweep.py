@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 from numpy import abs, argmax, argmin, array, diff, mean, min, ndarray, trapz
 
-from sharp.config.params import main_config
+from sharp.config.load import config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 
 
@@ -61,7 +61,7 @@ class ThresholdSweep:
             return 0
 
     def best(
-        self, recall_best: Optional[float] = main_config.recall_best
+        self, recall_best: Optional[float] = config.recall_best
     ) -> ThresholdEvaluation:
         """
         :return:  The `best` threshold evaluation.

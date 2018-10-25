@@ -10,7 +10,7 @@ from sharp.data.files.stdlib import FloatFile
 from sharp.data.types.neuralnet import RNN
 from sharp.tasks.base import SharpTask
 from sharp.tasks.neuralnet.base import NeuralNetMixin
-from sharp.config.params import neural_net_config
+from sharp.config.load import config
 from sharp.tasks.neuralnet.train import TrainRNN
 
 log = getLogger(__name__)
@@ -53,7 +53,7 @@ class CalcValidLoss(SharpTask, NeuralNetMixin):
 
 class GatherValidLosses(SharpTask, NeuralNetMixin):
     def requires(self) -> Iterable[CalcValidLoss]:
-        for epoch in range(neural_net_config.num_epochs):
+        for epoch in range(config.num_epochs):
             yield CalcValidLoss(epoch=epoch)
 
     def output(self):

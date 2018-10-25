@@ -1,7 +1,7 @@
 from matplotlib.figure import Figure
 
 from sharp.data.files.base import OutputFileTarget
-from sharp.config.params import data_config
+from sharp.config.load import config
 
 
 class MatplotlibFigureFile(OutputFileTarget):
@@ -23,19 +23,19 @@ class FigureTarget(OutputFileTarget):
     """
 
     def exists(self):
-        if data_config.bitmap_versions:
+        if config.bitmap_versions:
             return self.vector_version.exists() and self.bitmap_version.exists()
         else:
             return self.vector_version.exists()
 
     def write(self, fig: Figure):
         self.vector_version.write(fig)
-        if data_config.bitmap_versions:
+        if config.bitmap_versions:
             self.bitmap_version.write(fig)
 
     def delete(self):
         self.vector_version.delete()
-        if data_config.bitmap_versions:
+        if config.bitmap_versions:
             self.bitmap_version.delete()
 
     @property

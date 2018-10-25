@@ -6,12 +6,11 @@ Usage:
     $ python -m sharp
     $ python -m sharp --help
 """
+from os import environ
 
 from click import command, option
-from luigi import build
 
-from sharp.config.tasks import TASKS_TO_RUN
-from sharp.util import clear_all_output, clear_output, init_log
+from sharp.config.load import config, config_dir
 
 
 @command()
@@ -35,21 +34,34 @@ from sharp.util import clear_all_output, clear_output, init_log
 )
 def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
-    Run the tasks specified in `config/tasks.py`, by starting a luigi worker
-    process. Optionally force tasks to re-run, even if they have been completed
-    previously, by deleting their output files before starting luigi.
+    Run the tasks specified in `config.SharpConfig.tasks_to_run`, by starting a
+    luigi worker process. Optionally force tasks to re-run, even if they have
+    been completed previously, by deleting their output files before starting
+    luigi.
 
     Note: we do not start more than one luigi worker (like e.g.  `luigi
     --workers 2`) in this command, as this yields multiprocessing bugs in luigi
     / PyTorch / Python. See the ReadMe for how to run tasks in parallel.
     """
+    environ["LUIGI_CONFIG_PARSER"] = "toml"
+    environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
+    # Import luigi for the first time, reading in `luigi.toml`:
+
+    import luigi
+
+    # Only now may we import from sharp.util (as this module imports from
+    # luigi).
+
+    from sharp.util import clear_all_output, clear_output, init_log
+
     init_log()
     if clear_all:
         clear_all_output()
+    tasks_to_run = config.get_tasks_to_run()
     if clear_last:
-        for task in TASKS_TO_RUN:
+        for task in tasks_to_run:
             clear_output(task)
-    build(TASKS_TO_RUN, local_scheduler=local_scheduler)
+    luigi.build(tasks_to_run, local_scheduler=local_scheduler)
 
 
 if __name__ == "__main__":

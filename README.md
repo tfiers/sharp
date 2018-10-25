@@ -72,10 +72,6 @@ import sharp
 
 ## Usage
 
-Set the following environment variable:
-```sh
-$ export LUIGI_CONFIG_PARSER=toml
-```
 
 Create a new directory to store run configuration, logs, and (optionally) output
 files:
@@ -83,14 +79,23 @@ files:
 $ mkdir ~/sharp-run
 ```
 
-In this directory, create a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html),
-named `luigi.toml`.
+Optionally store this directory path to an environment variable named
+`SHARP_CONFIG_DIR`:
+```sh
+$ export SHARP_CONFIG_DIR=~/sharp-run
+```
+(This is not necessary if you will always run `sharp` from within this new
+directory.)
 
-The options that can be configured in this TOML file are defined in
-[`sharp/config/params.py`](sharp/config/params.py).
+In the new directory, create a file named `config.py`, containing a class named
+`SharpConfig` that subclasses `SharpConfigBase` from [`sharp.config.spec`](sharp/config/spec.py).
+Change some or all of the parent attributes to suit your needs.
 
-See [test `luigi.toml` file](tests/system/luigi.toml) from this repository for
-an example configuration.
+(You may also optionally place a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html)
+named `luigi.toml` in this directory.)
+
+See the test [`config.py`](tests/system/luigi.toml) and [`luigi.toml`](tests/system/luigi.toml)
+files from this repository for examples.
 
 > On Windows, make sure to either use forward slashes in paths, or to escape
 backslashes. Examples:
@@ -100,8 +105,8 @@ output_dir = "subdir/of/current/working/directory"
 logging_conf_file = "D:\\code\\sharp\\logging.cfg"
 ```
 
-When the `luigi.toml` config file is tailored to your needs, process the raw
-data and generate figures by running:
+When the `config.py` file is ready, process the raw data and generate figures
+and other output by running:
 ```sh
 ~/sharp-run$  python -m sharp --local-scheduler
 ```
@@ -117,10 +122,5 @@ To run subtasks in parallel, a central Luigi task scheduler should be used
 instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
 for instructions.
 
-When the central scheduler is running, simply start multiple `python -m sharp` 
-processes from the directory containing the `luigi.toml` configuration file.
-
-You can also run multiple configurations in parallel (each with their own run
-directory and `luigi.toml` file). To do this, make sure the
-`Main.config_id` setting has a unique value in each `luigi.toml` file.
-Then simply start Python processes from the respective run directories.
+When the central scheduler is running, simply start multiple `python -m sharp`
+processes.

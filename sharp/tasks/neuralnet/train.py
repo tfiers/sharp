@@ -11,7 +11,7 @@ from luigi import IntParameter
 from sharp.data.files.neuralnet import NeuralModelFile
 from sharp.tasks.base import SharpTask
 from sharp.tasks.neuralnet.base import IOTuple, NeuralNetMixin
-from sharp.config.params import neural_net_config
+from sharp.config.load import config
 from sharp.tasks.signal.util import time_to_index
 from sharp.util import cached
 
@@ -123,7 +123,7 @@ class TrainRNN(SharpTask, NeuralNetMixin):
     def chunk_size(self) -> int:
         """ Number of samples per chunk. """
         size = time_to_index(
-            neural_net_config.chunk_duration, self.reference_channel_full.fs
+            config.chunk_duration, self.reference_channel_full.fs
         )
         return int(size)
 

@@ -4,7 +4,7 @@ from typing import Sequence
 from luigi import FloatParameter
 
 from fklab.signals.multirate import downsample
-from sharp.config.params import data_config, intermediate_output_dir
+from sharp.config.load import config, intermediate_output_dir
 from sharp.data.files.neuralynx import Neuralynx_NCS_Directory
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
@@ -47,9 +47,9 @@ class Downsample(SharpTask):
 
     def get_reference_channel(self) -> Signal:
         for file in self.output():
-            if file.stem == data_config.reference_channel:
+            if file.stem == config.reference_channel:
                 return file.read()
         else:
             raise ValueError(
-                f"Cannot find recording channel {data_config.reference_channel}"
+                f"Cannot find recording channel {config.reference_channel}"
             )

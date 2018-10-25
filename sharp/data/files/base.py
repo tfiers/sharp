@@ -6,7 +6,7 @@ from typing import TypeVar, Union
 
 from luigi import Target
 from sharp.data.files.util import mkdir
-from sharp.config.params import output_root
+from sharp.config.load import output_root
 
 log = getLogger(__name__)
 

@@ -12,8 +12,8 @@ from luigi import Task
 from luigi.interface import core
 from luigi.task import flatten
 
+from sharp.config.load import config_dir, output_root
 from sharp.data.files.base import FileTarget
-from sharp.config.params import data_config, output_root
 
 log = getLogger(__name__)
 
@@ -52,11 +52,16 @@ def _clear(target: Union[FileTarget, Iterable[FileTarget]]):
 def init_log():
     # Luigi hasn't initalised logging yet when this is called in __main__.py,
     # so we apply the config file ourselves.
-    fileConfig(core().logging_conf_file, disable_existing_loggers=False)
+    try:
+        fileConfig(core().logging_conf_file, disable_existing_loggers=False)
+    except Exception as err:
+        raise Exception(
+            "`logging_conf_file` may be incorrect in your `luigi.toml` file."
+        ) from err
     log = getLogger("sharp")
     log.info(f"Hello, it's {date.today():%b %d, %Y}.")
+    log.info(f"Config directory: {config_dir}")
     log.info(f"Output root directory: {output_root}")
-    log.info(f"Data config: {data_config}")
 
 
 @contextmanager

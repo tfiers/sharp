@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fklab.segments import Segment
-from sharp.config.params import data_config
+from sharp.config.load import config
 from sharp.data.types.signal import Signal
 from sharp.data.types.slice import Slice
 
@@ -29,10 +29,10 @@ class DataSplit:
 class TrainTestSplit(DataSplit):
     @property
     def split_fraction(self):
-        if data_config.train_first:
-            return data_config.train_fraction
+        if config.train_first:
+            return config.train_fraction
         else:
-            return 1 - data_config.train_fraction
+            return 1 - config.train_fraction
 
     @property
     def signal_train(self):
@@ -60,14 +60,14 @@ class TrainTestSplit(DataSplit):
 
     @property
     def _train_slice(self) -> Slice:
-        if data_config.train_first:
+        if config.train_first:
             return self._left_slice
         else:
             return self._right_slice
 
     @property
     def _test_slice(self) -> Slice:
-        if data_config.train_first:
+        if config.train_first:
             return self._right_slice
         else:
             return self._left_slice

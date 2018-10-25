@@ -22,7 +22,7 @@ def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
     )
 
 
-TASKS_TO_RUN = (
+tasks_to_run = (
     PlotGEVecPrinciple(),
     PlotReferenceMaker(),
     PlotRecordingSummaries(),

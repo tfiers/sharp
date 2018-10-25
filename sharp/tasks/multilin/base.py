@@ -1,7 +1,7 @@
 from luigi import IntParameter, Parameter
 from numpy.core.multiarray import arange
 
-from sharp.config.channels import CHANNEL_COMBINATIONS
+from sharp.config.load import config
 
 
 class GEVecMixin:
@@ -19,7 +19,7 @@ class GEVecMixin:
 
     @property
     def channels(self):
-        return CHANNEL_COMBINATIONS[self.channel_combo_name]
+        return config.channel_combinations[self.channel_combo_name]
 
     @property
     def num_channels(self):

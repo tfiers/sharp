@@ -9,7 +9,7 @@ from typing import Sequence, Union
 from fklab.io.common.binary import _DataProxy_MemoryMap
 from fklab.io.neuralynx import NlxFileCSC, NlxOpen
 from sharp.data.files.base import InputFileTarget
-from sharp.config.params import data_config
+from sharp.config.load import config
 from sharp.tasks.base import ExternalTask
 from sharp.util import cached
 
@@ -78,7 +78,7 @@ class Neuralynx_NCS_Directory(ExternalTask):
 
     @property
     def output_dir(self):
-        return Path(data_config.raw_data_dir)
+        return Path(config.raw_data_dir)
 
     @staticmethod
     def sorting_key(file: Neuralynx_NCS_File) -> (int, int):

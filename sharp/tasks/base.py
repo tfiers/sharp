@@ -3,7 +3,7 @@ from typing import List
 from luigi import Target, Task
 from luigi.task import Parameter, flatten
 
-from sharp.config.params import main_config
+from sharp.config.load import config
 
 
 class SharpTask(Task):
@@ -14,7 +14,7 @@ class SharpTask(Task):
     dependencies specified in `requires()` have been completed.
     """
 
-    config_id = Parameter(default=main_config.config_id)
+    config_id = Parameter(default=config.config_id)
     # (This `default` trick is an ugly but necessary luigi hack).
 
     def complete(self) -> bool:

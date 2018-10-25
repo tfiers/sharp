@@ -1,9 +1,5 @@
-# Configure the following environment variables:
-# - LUIGI_CONFIG_PARSER = toml
-
 [core]
 logging_conf_file = "../../logging.cfg"
-
 
 [worker]
 task_process_context = ""  # Luigi bugfix.
@@ -11,20 +7,3 @@ keep_alive = false
 
 [execution_summary]
 summary_length = 0  # Display _all_ ran tasks.
-
-
-[Main]
-config_id = "test"
-num_thresholds = 6
-
-
-[Data]
-output_dir = "data/processed"
-raw_data_dir = "data/raw"
-reference_channel = "L2 - E13_extract"
-
-
-[NeuralNet]
-num_layers = 1
-num_units_per_layer = 25
-num_epochs = 2

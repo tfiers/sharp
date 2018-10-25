@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from fklab.segments import Segment
-from sharp.config.params import intermediate_output_dir, neural_net_config
+from sharp.config.load import intermediate_output_dir, config
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
@@ -25,7 +25,7 @@ log.info(f"Using {device} device.")
 
 
 class TrainValidSplit(DataSplit):
-    split_fraction = 1 - neural_net_config.valid_fraction
+    split_fraction = 1 - config.valid_fraction
 
     @property
     def train_proper_slice(self):
@@ -61,9 +61,9 @@ class NeuralNetMixin(InputDataMixin):
         """
         model = RNN(
             num_input_channels=1,
-            num_layers=neural_net_config.num_layers,
-            num_units_per_layer=neural_net_config.num_units_per_layer,
-            p_dropout=neural_net_config.p_dropout,
+            num_layers=config.num_layers,
+            num_units_per_layer=config.num_units_per_layer,
+            p_dropout=config.p_dropout,
         )
         # Module.to() is in place (Tensor.to() is not).
         model.to(device)
@@ -86,7 +86,7 @@ class NeuralNetMixin(InputDataMixin):
     def target_signal(self) -> BinarySignal:
         """ Binary target, or training signal, as a one-column matrix. """
         segs = self.reference_segs_train.scale(
-            1 + neural_net_config.reference_seg_extension, reference=1
+            1 + config.reference_seg_extension, reference=1
         )
         return self.to_binary_signal(segs)
 

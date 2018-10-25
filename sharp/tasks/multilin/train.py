@@ -2,7 +2,7 @@ import numpy as np
 from numpy import argmax, concatenate, cov, ndarray
 from scipy.linalg import eigh
 
-from sharp.config.params import intermediate_output_dir
+from sharp.config.load import intermediate_output_dir
 from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
