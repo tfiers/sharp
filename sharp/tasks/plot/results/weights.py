@@ -1,3 +1,5 @@
+from warnings import warn
+
 from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
@@ -50,7 +52,9 @@ class PlotWeights(MultiEnvelopeFigureMaker):
             ax.set_xticks(convolver.delays)
             ax.set_yticks(convolver.channels)
             ax.set_xlim(ax.get_xlim()[::-1])
-            ax.set_xlabel("Delay (ms)")  # Only at 1000 Hz..
+            if signal.fs != 1000:
+                warn('Delay axis scale "(ms)" in GEVec plot is not correct.')
+            ax.set_xlabel("Delay (ms)")
             ax.set_ylabel("Channel")
             title = f"GEVec\n({convolver.filename})"
             ax.set_title(title, color=color)
