@@ -2,17 +2,18 @@ from logging import getLogger
 from typing import Iterable, Sequence, Tuple
 
 from luigi import FloatParameter
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, style
 from matplotlib.axes import Axes
+from matplotlib.pyplot import close
 from numpy import ones
 from numpy.core.umath import ceil
-
-from sharp.config.load import output_root, final_output_dir
+from sharp.config.load import final_output_dir, output_root
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
+from sharp.tasks.plot.style import symposium
 from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
     add_scalebar,
@@ -25,9 +26,13 @@ from sharp.tasks.signal.base import InputDataMixin
 log = getLogger(__name__)
 
 
-
 class FigureMaker(SharpTask):
     output_dir = final_output_dir
+
+    def __init__(self, *args, **kwargs):
+        close("all")
+        style.use(symposium)
+        super().__init__(*args, **kwargs)
 
 
 TimeRange = Tuple[float, float]

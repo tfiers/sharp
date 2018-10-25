@@ -5,7 +5,3 @@ x-limits. This confines interactive exploration (e.g. in Jupyter Notebooks with
 figure creation however, which is useful for the long-duration signals that we
 deal with in this thesis.
 """
-from matplotlib.style import use
-from sharp.tasks.plot.style import symposium
-
-use(symposium)
