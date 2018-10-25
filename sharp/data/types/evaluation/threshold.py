@@ -45,11 +45,11 @@ class ThresholdEvaluation:
         return self.intersection.num_events_in_seg > 0
 
     @property
-    def detected_reference_segs(self) -> ndarray:
+    def detected_reference_segs(self) -> Segment:
         return self.reference_segs[self._reference_seg_is_detected]
 
     @property
-    def undetected_reference_segs(self) -> ndarray:
+    def undetected_reference_segs(self) -> Segment:
         return self.reference_segs[~self._reference_seg_is_detected]
 
     @property

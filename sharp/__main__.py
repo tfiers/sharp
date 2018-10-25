@@ -10,7 +10,14 @@ from os import environ
 
 from click import command, option
 
-from sharp.config.load import config, config_dir
+try:
+    from sharp.config.load import config, config_dir
+except ImportError as err:
+    raise UserWarning(
+        "Possible circular import. Make sure the Tasks you want to run are "
+        "imported *inside* the `get_tasks` method of your config.py > "
+        "SharpConfig class (and not at the top of the file)."
+    ) from err
 
 
 @command()
@@ -34,7 +41,7 @@ from sharp.config.load import config, config_dir
 )
 def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
-    Run the tasks specified in `config.SharpConfig.tasks_to_run`, by starting a
+    Run the tasks specified in `config.SharpConfig.get_tasks`, by starting a
     luigi worker process. Optionally force tasks to re-run, even if they have
     been completed previously, by deleting their output files before starting
     luigi.
@@ -57,7 +64,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     init_log()
     if clear_all:
         clear_all_output()
-    tasks_to_run = config.get_tasks_to_run()
+    tasks_to_run = config.get_tasks()
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)
