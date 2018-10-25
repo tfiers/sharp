@@ -8,14 +8,15 @@ from sharp.data.files.neuralnet import NeuralModelFile
 from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.files.stdlib import FloatFile
 from sharp.data.types.neuralnet import RNN
-from sharp.tasks.neuralnet.base import NeuralNetTask
+from sharp.tasks.base import SharpTask
+from sharp.tasks.neuralnet.base import NeuralNetMixin
 from sharp.config.params import neural_net_config
 from sharp.tasks.neuralnet.train import TrainRNN
 
 log = getLogger(__name__)
 
 
-class CalcValidLoss(NeuralNetTask):
+class CalcValidLoss(SharpTask, NeuralNetMixin):
     """
     Run network on (held out) validation data, and evaluate cost function.
     """
@@ -50,7 +51,7 @@ class CalcValidLoss(NeuralNetTask):
             log.info(f"Validation loss at epoch {self.epoch}: {loss:.4g}")
 
 
-class GatherValidLosses(NeuralNetTask):
+class GatherValidLosses(SharpTask, NeuralNetMixin):
     def requires(self) -> Iterable[CalcValidLoss]:
         for epoch in range(neural_net_config.num_epochs):
             yield CalcValidLoss(epoch=epoch)
@@ -66,7 +67,7 @@ class GatherValidLosses(NeuralNetTask):
         self.output().write(validation_losses)
 
 
-class SelectBestRNN(NeuralNetTask):
+class SelectBestRNN(SharpTask, NeuralNetMixin):
     """
     Selects the trained RNN with the best generalization performance.
     Generalization performance is estimated by running each trained network

@@ -8,7 +8,6 @@ from scipy.signal import cheb2ord, cheby2, lfilter
 from sharp.config.params import final_output_dir
 from sharp.data.files.stdlib import DictFile
 from sharp.data.types.signal import Signal
-from sharp.data.files.numpy import SignalFile
 from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.base import EnvelopeMaker
 
@@ -18,10 +17,7 @@ log = getLogger(__name__)
 class ApplyOnlineBPF(EnvelopeMaker):
 
     title = "Single-channel BPF"
-
-    def output(self):
-        self.output_dir
-        return SignalFile(self.output_dir, filename="online-BPF")
+    output_filename = "online-BPF"
 
     def run(self):
         filtered = lfilter(*self.coeffs, self.input_signal)

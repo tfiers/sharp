@@ -1,6 +1,8 @@
 from luigi import IntParameter, Parameter
 from numpy.core.multiarray import arange
 
+from sharp.config.channels import CHANNEL_COMBINATIONS
+
 
 class GEVecMixin:
 
@@ -8,7 +10,7 @@ class GEVecMixin:
     # Set to zero to use only the current sample.
     # (number of temporal samples used = num_delays + 1)
 
-    channels = Parameter(default="all")
+    channel_combo_name = Parameter(default="all")
 
     @property
     def delays(self):
@@ -16,15 +18,29 @@ class GEVecMixin:
         return arange(self.num_delays + 1)
 
     @property
-    def num_delays_str(self) -> str:
-        n = self.num_delays
-        if n == 0:
+    def channels(self):
+        return CHANNEL_COMBINATIONS[self.channel_combo_name]
+
+    @property
+    def num_channels(self):
+        return len(self.channels)
+
+    @property
+    def _num_delays_str(self) -> str:
+        if self.num_delays == 0:
             return "no delays"
-        elif n == 1:
+        elif self.num_delays == 1:
             return "1 delay"
         else:
-            return f"{n} delays"
+            return f"{self.num_delays} delays"
+
+    @property
+    def _channels_str(self):
+        if self.num_channels == 1:
+            return f"{self.channel_combo_name} channel"
+        else:
+            return f"{self.channel_combo_name} channels"
 
     @property
     def filename(self):
-        return self.num_delays_str.replace(" ", "-")
+        return f"{self._num_delays_str}, {self._channels_str}"

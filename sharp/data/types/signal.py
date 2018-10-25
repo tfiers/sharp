@@ -40,10 +40,6 @@ class Signal(ndarray):
         else:
             return 1
 
-    def to_channel_label(self, channel_index: int) -> str:
-        """ Channel labels are a simple 1-based integer list, for now """
-        return f"{channel_index + 1:.0f}"
-
     @classmethod
     def from_channels(cls, channels: Sequence["Signal"]):
         data = stack([ch.as_vector() for ch in channels], axis=1)

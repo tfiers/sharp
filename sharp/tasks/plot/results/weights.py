@@ -1,10 +1,8 @@
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.pyplot import subplots
 from matplotlib.ticker import FuncFormatter
 from numpy import abs, max
 
 from sharp.data.files.figure import FigureTarget
+from sharp.data.types.aliases import subplots
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 
@@ -39,7 +37,7 @@ class PlotWeights(MultiEnvelopeFigureMaker):
     def run(self):
         tups = zip(self.trainers, self.convolvers, self.colors, self.output())
         for trainer, convolver, color, filetarget in tups:
-            fig, ax = subplots(figsize=(4, 5))  # type: Figure, Axes
+            fig, ax = subplots(figsize=(4, 5))
             GEVec = trainer.output().read()
 
             signal = trainer.multichannel_train
@@ -52,7 +50,8 @@ class PlotWeights(MultiEnvelopeFigureMaker):
             cbar = fig.colorbar(cax)
             cbar.set_label("Weight")
             ax.set_xticks(trainer.delays)
-            formatter = FuncFormatter(lambda x, pos: signal.to_channel_label(x))
+            # Label channels as a simple one-based list of numbers.
+            formatter = FuncFormatter(lambda x, pos: f"{x + 1:.0f}")
             ax.yaxis.set_major_formatter(formatter)
             ax.set_xlim(ax.get_xlim()[::-1])
             ax.set_xlabel("Delay (ms)")  # Only at 1000 Hz..

@@ -71,14 +71,19 @@ class InputDataMixin:
 
 class EnvelopeMaker(SharpTask, InputDataMixin):
 
-    output_dir = intermediate_output_dir / "output-envelopes"
+    output_subdir: str = ""
+    output_filename: str = ...
     title: str = ...
 
     def requires(self):
         return self.input_data_makers
 
-    def output(self) -> SignalFile:
-        """ Implement me """
+    @property
+    def output_dir(self):
+        return intermediate_output_dir / "output-envelopes" / self.output_subdir
+
+    def output(self):
+        return SignalFile(self.output_dir, self.output_filename)
 
     @property
     @cached

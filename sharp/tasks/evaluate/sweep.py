@@ -1,7 +1,6 @@
 from logging import getLogger
 
 import numpy as np
-from luigi import FloatParameter, IntParameter
 
 from sharp.config.params import intermediate_output_dir, main_config
 from sharp.data.files.evaluation import ThresholdSweepFile
@@ -19,15 +18,17 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
     different detection thresholds.
     """
 
+    output_root = intermediate_output_dir / "threshold-sweeps"
+
     envelope_maker: EnvelopeMaker = TaskParameter()
 
     def requires(self):
         return self.input_data_makers + (self.envelope_maker,)
 
     def output(self) -> ThresholdSweepFile:
-        filename = self.envelope_maker.output().stem
         return ThresholdSweepFile(
-            intermediate_output_dir / "threshold-sweeps", filename
+            directory=self.output_root / self.envelope_maker.output_subdir,
+            filename=self.envelope_maker.output_filename,
         )
 
     @property

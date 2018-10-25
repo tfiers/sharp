@@ -1,24 +1,23 @@
 import torch
 from numpy import ndarray
 
-from sharp.data.files.numpy import SignalFile
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import Signal
-from sharp.tasks.neuralnet.base import NeuralNetTask
+from sharp.tasks.neuralnet.base import NeuralNetMixin
 from sharp.tasks.neuralnet.select import SelectBestRNN
 from sharp.tasks.signal.base import EnvelopeMaker
 
 
-class ApplyRNN(NeuralNetTask):
+class ApplyRNN(EnvelopeMaker, NeuralNetMixin):
+
+    title = "Recurrent neural network"
+    filename = "neural-net"
 
     model_selector = SelectBestRNN()
 
     def requires(self):
         return super().requires() + (self.model_selector,)
-
-    def output(self):
-        return SignalFile(EnvelopeMaker.output_dir, "neural-net")
 
     def run(self):
         with torch.no_grad():

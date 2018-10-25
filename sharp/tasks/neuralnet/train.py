@@ -9,7 +9,8 @@ import torch
 from luigi import IntParameter
 
 from sharp.data.files.neuralnet import NeuralModelFile
-from sharp.tasks.neuralnet.base import IOTuple, NeuralNetTask
+from sharp.tasks.base import SharpTask
+from sharp.tasks.neuralnet.base import IOTuple, NeuralNetMixin
 from sharp.config.params import neural_net_config
 from sharp.tasks.signal.util import time_to_index
 from sharp.util import cached
@@ -17,7 +18,7 @@ from sharp.util import cached
 log = getLogger(__name__)
 
 
-class TrainRNN(NeuralNetTask):
+class TrainRNN(SharpTask, NeuralNetMixin):
     """
     Tunes the weights of a recurrent neural network for one epoch, where an
     epoch is defined as one full pass over the training data set.

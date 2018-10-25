@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from logging import getLogger
-from pathlib import PosixPath, WindowsPath
+from pathlib import PosixPath, WindowsPath, Path
 from typing import TypeVar, Union
 
 from luigi import Target
@@ -14,15 +14,15 @@ log = getLogger(__name__)
 # We cannot directly subclass pathlib.Path (and we therefore have to detect OS
 # manually).
 if os.name == "nt":
-    Path = WindowsPath
+    OSPath = WindowsPath
 else:
-    Path = PosixPath
+    OSPath = PosixPath
 
 
 T = TypeVar("T")
 
 
-class FileTarget(Path, Target, ABC):
+class FileTarget(OSPath, Target, ABC):
     """
     A file that is an output of one of the batch jobs in `../tasks`.
 
@@ -45,7 +45,7 @@ class FileTarget(Path, Target, ABC):
     def __new__(cls, directory: Union[Path, str], filename: str):
         dirr = mkdir(directory)
         path = dirr / (filename + cls.extension)
-        return Path.__new__(cls, path)
+        return OSPath.__new__(cls, path)
 
     @property
     def path_string(self) -> str:

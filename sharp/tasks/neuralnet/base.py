@@ -11,7 +11,7 @@ from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
 from sharp.data.types.split import DataSplit
 from sharp.tasks.neuralnet.util import numpy_to_torch, to_batch
-from sharp.tasks.signal.base import EnvelopeMaker
+from sharp.tasks.signal.base import InputDataMixin
 from sharp.tasks.signal.util import time_to_index
 
 log = getLogger(__name__)
@@ -36,18 +36,14 @@ class TrainValidSplit(DataSplit):
         return self._right_slice
 
 
-class NeuralNetTask(EnvelopeMaker):
+class NeuralNetMixin(InputDataMixin):
     """
     Base class for other neural network tasks.
     """
 
+    output_dir = intermediate_output_dir / "trained-networks"
+
     _model: RNN = None
-
-    title = "Recurrent neural network"
-
-    @property
-    def output_dir(self):
-        return intermediate_output_dir / "trained-networks"
 
     @property
     def model(self) -> RNN:
@@ -102,7 +98,9 @@ class NeuralNetTask(EnvelopeMaker):
         N = self.reference_channel_train.shape[0]
         sig = np.zeros(N)
         for seg in segs:
-            ix = time_to_index(seg, self.reference_channel_train.fs, N, clip=True)
+            ix = time_to_index(
+                seg, self.reference_channel_train.fs, N, clip=True
+            )
             sig[slice(*ix)] = 1
         return BinarySignal(sig, self.reference_channel_train.fs).as_matrix()
 

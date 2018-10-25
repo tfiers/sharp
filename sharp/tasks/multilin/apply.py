@@ -2,18 +2,24 @@ import numpy as np
 from numba import prange
 from numpy import ndarray
 
-from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
-from sharp.tasks.multilin.train import MaximiseSNR
 from sharp.tasks.multilin.base import GEVecMixin
+from sharp.tasks.multilin.train import MaximiseSNR
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.util import compiled
 
 
 class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
+
+    output_subdir = "GEVec"
+
+    @property
+    def output_filename(self):
+        return self.filename
+
     @property
     def title(self):
-        return f"GEVec, {self.num_delays_str}"
+        return f"GEVec, {self.filename}"
 
     @property
     def trainer(self):
@@ -21,9 +27,6 @@ class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
 
     def requires(self):
         return (self.trainer,) + super().requires()
-
-    def output(self):
-        return SignalFile(self.output_dir, self.filename)
 
     def run(self):
         input_signal = self.multichannel_full
