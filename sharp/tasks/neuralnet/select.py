@@ -28,7 +28,7 @@ class CalcValidLoss(SharpTask, NeuralNetMixin):
         return TrainRNN(epoch=self.epoch)
 
     def requires(self):
-        return super().requires() + (self.trainer,)
+        return self.trainer
 
     def output(self):
         model_file = self.trainer.output()

@@ -12,7 +12,7 @@ from sharp.tasks.signal.base import EnvelopeMaker
 class ApplyRNN(EnvelopeMaker, NeuralNetMixin):
 
     title = "Recurrent neural network"
-    filename = "neural-net"
+    output_filename = "neural-net"
 
     model_selector = SelectBestRNN()
 

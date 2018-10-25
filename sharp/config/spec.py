@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Sequence, Tuple, TypeVar
+from typing import Dict, Optional, Tuple, TypeVar
 
 from sharp.config.default.channels import L2_channel_combinations
 
@@ -9,7 +9,7 @@ LuigiTask = TypeVar("LuigiTask")
 
 
 class SharpConfigBase:
-    def get_tasks_to_run(self) -> Sequence[LuigiTask]:
+    def get_tasks(self) -> Tuple[LuigiTask, ...]:
         """
         Return instantiated tasks, which will be passed to luigi.build().
         The necessary import statements should be contained in this method's

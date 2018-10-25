@@ -14,6 +14,7 @@ class ConfigError(Exception):
     """
 
     def __init__(self, msg):
+        # Make an error message that fits nice & square in the terminal.
         prefix = "sharp.config.load.ConfigError: "
         message = fill(prefix + msg)
         super().__init__(message[len(prefix) :])
@@ -91,5 +92,5 @@ config.raw_data_dir = _as_absolute_Path(config.raw_data_dir)
 # -------------------------
 
 output_root: Path = config.output_dir
-intermediate_output_dir = output_root / "intermediate"
-final_output_dir = output_root / "final"
+intermediate_output_dir: Path = output_root / "intermediate"
+final_output_dir: Path = output_root / "final"
