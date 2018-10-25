@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fklab.segments import Segment
-from sharp.data.files.config import data_config
+from sharp.config.params import data_config
 from sharp.data.types.signal import Signal
 from sharp.data.types.slice import Slice
 

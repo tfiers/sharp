@@ -4,7 +4,8 @@ from numpy import ndarray
 
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
-from sharp.tasks.multilin.train import GEVecMixin, MaximiseSNR
+from sharp.tasks.multilin.train import MaximiseSNR
+from sharp.tasks.multilin.base import GEVecMixin
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.util import compiled
 

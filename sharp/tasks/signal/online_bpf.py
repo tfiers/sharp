@@ -5,7 +5,7 @@ import numpy as np
 from numpy import ndarray
 from scipy.signal import cheb2ord, cheby2, lfilter
 
-from sharp.data.files.config import final_output_dir
+from sharp.config.params import final_output_dir
 from sharp.data.files.stdlib import DictFile
 from sharp.data.types.signal import Signal
 from sharp.data.files.numpy import SignalFile

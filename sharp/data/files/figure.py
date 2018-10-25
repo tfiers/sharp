@@ -1,7 +1,7 @@
 from matplotlib.figure import Figure
 
 from sharp.data.files.base import OutputFileTarget
-from sharp.data.files.config import data_config
+from sharp.config.params import data_config
 
 
 class MatplotlibFigureFile(OutputFileTarget):

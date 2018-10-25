@@ -7,7 +7,7 @@ from matplotlib.axes import Axes
 from numpy import ones
 from numpy.core.umath import ceil
 
-from sharp.data.files.config import final_output_dir, output_root
+from sharp.config.params import output_root, final_output_dir
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal

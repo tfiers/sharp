@@ -4,7 +4,7 @@ from typing import Sequence
 from luigi import FloatParameter
 
 from fklab.signals.multirate import downsample
-from sharp.data.files.config import data_config, intermediate_output_dir
+from sharp.config.params import data_config, intermediate_output_dir
 from sharp.data.files.neuralynx import Neuralynx_NCS_Directory
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal

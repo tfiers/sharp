@@ -9,7 +9,7 @@ from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.files.stdlib import FloatFile
 from sharp.data.types.neuralnet import RNN
 from sharp.tasks.neuralnet.base import NeuralNetTask
-from sharp.tasks.neuralnet.config import neural_net_config
+from sharp.config.params import neural_net_config
 from sharp.tasks.neuralnet.train import TrainRNN
 
 log = getLogger(__name__)

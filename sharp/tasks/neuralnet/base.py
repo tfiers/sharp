@@ -5,12 +5,11 @@ import numpy as np
 import torch
 
 from fklab.segments import Segment
-from sharp.data.files.config import intermediate_output_dir
+from sharp.config.params import intermediate_output_dir, neural_net_config
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
 from sharp.data.types.split import DataSplit
-from sharp.tasks.neuralnet.config import neural_net_config
 from sharp.tasks.neuralnet.util import numpy_to_torch, to_batch
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.tasks.signal.util import time_to_index

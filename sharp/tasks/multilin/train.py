@@ -1,41 +1,14 @@
 import numpy as np
-from luigi import IntParameter
-from numpy import arange, argmax, cov
-from numpy import concatenate, ndarray
+from numpy import argmax, concatenate, cov, ndarray
 from scipy.linalg import eigh
 
-from sharp.data.files.config import intermediate_output_dir
+from sharp.config.params import intermediate_output_dir
 from sharp.data.files.numpy import NumpyArrayFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
+from sharp.tasks.multilin.base import GEVecMixin
 from sharp.tasks.signal.base import InputDataMixin
 from sharp.util import compiled
-
-
-class GEVecMixin:
-
-    num_delays = IntParameter()
-    # Set to zero to use only the current sample.
-    # (number of temporal samples used = num_delays + 1)
-
-    @property
-    def delays(self):
-        """ Includes the current time sample, as delay = 0. """
-        return arange(self.num_delays + 1)
-
-    @property
-    def num_delays_str(self) -> str:
-        n = self.num_delays
-        if n == 0:
-            return "no delays"
-        elif n == 1:
-            return "1 delay"
-        else:
-            return f"{n} delays"
-
-    @property
-    def filename(self):
-        return self.num_delays_str.replace(" ", "-")
 
 
 class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
@@ -50,18 +23,12 @@ class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
     def run(self):
         signal = self.multichannel_train
         segments = self.reference_segs_train
-        if signal.num_channels == 1 and self.num_delays == 0:
-            # Actually no, just convert cov output to matrix format.
-            raise ValueError(
-                "Need more than one channel, or at least one delay, to calc GEVec."
-            )
-        data = delay_stack(signal, self.delays)
-        data_signal = Signal(data, signal.fs)
-        reference = concatenate(data_signal.extract(segments))
-        background = concatenate(data_signal.extract(segments.invert()))
+        data = Signal(data=delay_stack(signal, self.delays), fs=signal.fs)
+        reference = concatenate(data.extract(segments))
+        background = concatenate(data.extract(segments.invert()))
         # Columns = channels = variables. Rows are (time) samples.
-        Rss = cov(reference, rowvar=False)
-        Rnn = cov(background, rowvar=False)
+        Rss = _as_matrix(cov(reference, rowvar=False))
+        Rnn = _as_matrix(cov(background, rowvar=False))
         GEVals, GEVecs = eigh(Rss, Rnn)
         first_GEVec = GEVecs[:, argmax(GEVals)]
         self.output().write(first_GEVec)
@@ -97,3 +64,14 @@ def delay_stack(signal: ndarray, delays: ndarray):
             col_end += num_channels
 
     return delay_stack
+
+
+def _as_matrix(array: ndarray):
+    """
+    :param array:  Either a scalar, or already a matrix
+    :return:  A matrix
+    """
+    if array.ndim == 0:
+        return array[None, None]
+    else:
+        return array

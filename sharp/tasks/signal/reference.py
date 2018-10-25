@@ -10,7 +10,7 @@ from luigi import FloatParameter, TupleParameter
 from fklab.segments import Segment
 from fklab.signals.core import detect_mountains
 from fklab.signals.filter import compute_envelope
-from sharp.data.files.config import intermediate_output_dir
+from sharp.config.params import intermediate_output_dir
 from sharp.data.files.numpy import SegmentsFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask

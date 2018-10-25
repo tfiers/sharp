@@ -13,7 +13,7 @@ from luigi.interface import core
 from luigi.task import flatten
 
 from sharp.data.files.base import FileTarget
-from sharp.data.files.config import data_config, output_root
+from sharp.config.params import data_config, output_root
 
 log = getLogger(__name__)
 

@@ -14,11 +14,11 @@ class Signal(ndarray):
     time_axis = 0
     channel_axis = 1
 
-    def __new__(cls, input_array: ArrayLike, fs: float):
+    def __new__(cls, data: ArrayLike, fs: float):
         """
         fs: signal sampling frequency, in hertz.
         """
-        instance = asarray(input_array).view(cls)
+        instance = asarray(data).view(cls)
         instance.fs = fs
         return instance
 

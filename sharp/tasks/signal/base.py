@@ -1,4 +1,4 @@
-from sharp.data.files.config import intermediate_output_dir
+from sharp.config.params import intermediate_output_dir
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask

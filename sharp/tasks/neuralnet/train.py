@@ -10,7 +10,7 @@ from luigi import IntParameter
 
 from sharp.data.files.neuralnet import NeuralModelFile
 from sharp.tasks.neuralnet.base import IOTuple, NeuralNetTask
-from sharp.tasks.neuralnet.config import neural_net_config
+from sharp.config.params import neural_net_config
 from sharp.tasks.signal.util import time_to_index
 from sharp.util import cached
 

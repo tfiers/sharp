@@ -9,7 +9,7 @@ from typing import Sequence, Union
 from fklab.io.common.binary import _DataProxy_MemoryMap
 from fklab.io.neuralynx import NlxFileCSC, NlxOpen
 from sharp.data.files.base import InputFileTarget
-from sharp.data.files.config import data_config
+from sharp.config.params import data_config
 from sharp.tasks.base import ExternalTask
 from sharp.util import cached
 

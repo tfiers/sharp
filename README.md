@@ -22,7 +22,8 @@ The software is written in Python 3.7, and requires recent installations of
 [SciPy](https://scipy.org/) and [PyTorch](https://pytorch.org/).
 These are most easily installed with the [(mini)conda package manager](https://conda.io/docs/index.html).
 
-Clone this repository to your computer:
+When these dependencies are installed, clone this repository to your computer
+(e.g. to a directory `~/code/sharp` as in this example):
 ```sh
 $ git clone git@github.com:tfiers/sharp.git ~/code/sharp
 ```
@@ -71,6 +72,11 @@ import sharp
 
 ## Usage
 
+Set the following environment variable:
+```sh
+$ export LUIGI_CONFIG_PARSER=toml
+```
+
 Create a new directory to store run configuration, logs, and (optionally) output
 files:
 ```sh
@@ -80,12 +86,11 @@ $ mkdir ~/sharp-run
 In this directory, create a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html),
 named `luigi.toml`.
 
-The [test `luigi.toml` file](https://github.com/tfiers/sharp/blob/master/tests/system/luigi.toml)
-from this repository can be used as a template:
-```sh
-$ cp ~/code/sharp/tests/system/luigi.toml ~/sharp-run
-$ vim ~/sharp-run/luigi.toml
-```
+The options that can be configured in this TOML file are defined in
+[`sharp/config/params.py`](sharp/config/params.py).
+
+See [test `luigi.toml` file](tests/system/luigi.toml) from this repository for
+an example configuration.
 
 > On Windows, make sure to either use forward slashes in paths, or to escape
 backslashes. Examples:
@@ -93,11 +98,6 @@ backslashes. Examples:
 raw_data_dir = "D:/data/probe/L2"
 output_dir = "subdir/of/current/working/directory"
 logging_conf_file = "D:\\code\\sharp\\logging.cfg"
-```
-
-Set the following environment variable:
-```sh
-$ export LUIGI_CONFIG_PARSER=toml
 ```
 
 When the `luigi.toml` config file is tailored to your needs, process the raw
@@ -122,5 +122,5 @@ processes from the directory containing the `luigi.toml` configuration file.
 
 You can also run multiple configurations in parallel (each with their own run
 directory and `luigi.toml` file). To do this, make sure the
-`Sharp.config_id` setting has a unique value in each `luigi.toml` file.
+`Main.config_id` setting has a unique value in each `luigi.toml` file.
 Then simply start Python processes from the respective run directories.
