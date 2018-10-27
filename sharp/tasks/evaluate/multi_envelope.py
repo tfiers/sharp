@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.data.types.signal import Signal
@@ -16,16 +16,18 @@ class MultiEnvelopeEvaluator(SharpTask):
         return self.threshold_sweepers
 
     @property
-    def threshold_sweepers(self) -> Sequence[ThresholdSweeper]:
-        return [
+    def threshold_sweepers(self) -> Tuple[ThresholdSweeper, ...]:
+        return tuple(
             ThresholdSweeper(envelope_maker=em) for em in self.envelope_makers
-        ]
+        )
 
     @property
     @cached
-    def threshold_sweeps(self) -> Sequence[ThresholdSweep]:
-        return [sweeper.output().read() for sweeper in self.threshold_sweepers]
+    def threshold_sweeps(self) -> Tuple[ThresholdSweep, ...]:
+        return tuple(
+            sweeper.output().read() for sweeper in self.threshold_sweepers
+        )
 
     @property
-    def test_envelopes(self) -> Sequence[Signal]:
-        return [em.envelope_test for em in self.envelope_makers]
+    def test_envelopes(self) -> Tuple[Signal, ...]:
+        return tuple(em.envelope_test for em in self.envelope_makers)

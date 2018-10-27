@@ -3,6 +3,7 @@ from typing import Sequence
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
+from sharp.tasks.plot.results.searchgrid import PlotSearchGrids
 from sharp.tasks.plot.results.weights import PlotWeights
 from sharp.tasks.plot.results.envelopes import PlotEnvelopes
 from sharp.tasks.plot.misc.reference import PlotReferenceMaker
@@ -23,28 +24,17 @@ def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
 
 
 tasks_to_run = (
-    PlotGEVecPrinciple(),
-    PlotReferenceMaker(),
-    PlotRecordingSummaries(),
-    SaveBPFinfo(),
-    *multi_envelope_plots(
-        subdir="LSM-main",
-        envelope_makers=(
-            ApplyOnlineBPF(),
-            SpatiotemporalConvolution(num_delays=0),
-            SpatiotemporalConvolution(num_delays=1),
-        ),
-    ),
-    *multi_envelope_plots(
-        subdir="space-time-comp",
-        envelope_makers=(
-            SpatiotemporalConvolution(num_delays=0),
-            SpatiotemporalConvolution(num_delays=1),
-            SpatiotemporalConvolution(num_delays=2),
-            SpatiotemporalConvolution(num_delays=3),
-            SpatiotemporalConvolution(num_delays=5),
-            SpatiotemporalConvolution(num_delays=10),
-            SpatiotemporalConvolution(num_delays=20),
-        ),
-    ),
+    # PlotGEVecPrinciple(),
+    # PlotReferenceMaker(),
+    # PlotRecordingSummaries(),
+    # SaveBPFinfo(),
+    # *multi_envelope_plots(
+    #     subdir="LSM-main",
+    #     envelope_makers=(
+    #         ApplyOnlineBPF(),
+    #         SpatiotemporalConvolution(num_delays=0),
+    #         SpatiotemporalConvolution(num_delays=1),
+    #     ),
+    # ),
+    PlotSearchGrids(),
 )

@@ -39,17 +39,20 @@ class ExternalTask(SharpTask):
     run = None
 
 
-class TaskParameter(Parameter):
-    """
-    An instantiated task (not like luigi.TaskParameter, which should actually
-    be a TaskTypeParameter).
-    Only to be used programatically (we do not implement the parse() method to
-    convert a string to an instance).
-    """
-
+class CustomParameter(Parameter):
     def _warn_on_wrong_param_type(self, param_name, param_value):
         """ Don't check param type. """
 
 
-class TaskListParameter(TaskParameter):
+class TaskParameter(CustomParameter):
+    """
+    An instantiated task. (Not like luigi.TaskParameter, which should really
+    be named "TaskTypeParameter").
+
+    Only to be used programatically. (We do not implement the parse() method to
+    convert a string to an instance).
+    """
+
+
+class TaskListParameter(CustomParameter):
     """ A sequence of instantiated tasks """

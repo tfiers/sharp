@@ -1,8 +1,7 @@
-from typing import Sequence
-
-from numpy import array, asarray, diff, linspace, ndarray, stack
+from typing import Iterable, Sequence
 
 from fklab.segments import Segment
+from numpy import array, asarray, diff, linspace, ndarray, stack
 from sharp.data.types.aliases import ArrayLike
 from sharp.tasks.signal.util import time_to_index
 
@@ -14,7 +13,7 @@ class Signal(ndarray):
     time_axis = 0
     channel_axis = 1
 
-    def __new__(cls, data: ArrayLike, fs: float):
+    def __new__(cls, data: ArrayLike, fs: float) -> "Signal":
         """
         fs: signal sampling frequency, in hertz.
         """
@@ -97,9 +96,10 @@ class Signal(ndarray):
         )
         return time
 
-    def extract(self, segments: Segment) -> Sequence["Signal"]:
+    def extract(self, segments: Segment) -> Iterable["Signal"]:
         """ Cut out segments from this signal. """
-        return [self.time_slice(*seg) for seg in segments]
+        for seg in segments:
+            yield self.time_slice(*seg)
 
     def time_slice(self, start: float, stop: float) -> "Signal":
         indices = time_to_index(

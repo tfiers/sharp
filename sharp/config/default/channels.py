@@ -42,6 +42,7 @@ L2_channel_combinations = {
     "all": sorted(tuple(ch.index for ch in L2_channels)),
     "pyr": (12,),
     "sr": (3,),
+    "sr-clust": (2, 3, 4, 5, 6),
     "pyr+sr": (3, 12),
     "tetr": (10, 11, 12, 13),
 }

@@ -94,7 +94,7 @@ Change some or all of the parent attributes to suit your needs.
 (You may also optionally place a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html)
 named `luigi.toml` in this directory.)
 
-See the test [`config.py`](tests/system/luigi.toml) and [`luigi.toml`](tests/system/luigi.toml)
+See the test [`config.py`](tests/system/config.py) and [`luigi.toml`](tests/system/luigi.toml)
 files from this repository for examples.
 
 > On Windows, make sure to either use forward slashes in paths, or to escape

@@ -23,13 +23,16 @@ class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
 
     @property
     def trainer(self):
-        return MaximiseSNR(num_delays=self.num_delays)
+        return MaximiseSNR(
+            num_delays=self.num_delays,
+            channel_combo_name=self.channel_combo_name,
+        )
 
     def requires(self):
         return (self.trainer,) + super().requires()
 
     def run(self):
-        input_signal = self.multichannel_full
+        input_signal = self.multichannel_full[:, self.channels]
         filter_weights = self.trainer.output().read()
         filter_output = convolve_spatiotemporal(
             input_signal, filter_weights, self.delays

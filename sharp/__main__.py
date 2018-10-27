@@ -52,13 +52,10 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
     environ["LUIGI_CONFIG_PARSER"] = "toml"
     environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
-    # Import luigi for the first time, reading in `luigi.toml`:
+    # Now we can import from luigi (and from sharp.util, which imports luigi
+    # itself).
 
-    import luigi
-
-    # Only now may we import from sharp.util (as this module imports from
-    # luigi).
-
+    from luigi import build
     from sharp.util import clear_all_output, clear_output, init_log
 
     init_log()
@@ -68,7 +65,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)
-    luigi.build(tasks_to_run, local_scheduler=local_scheduler)
+    build(tasks_to_run, local_scheduler=local_scheduler)
 
 
 if __name__ == "__main__":

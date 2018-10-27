@@ -1,3 +1,4 @@
+from textwrap import fill
 from typing import Dict, Optional, Tuple, TypeVar
 
 from sharp.config.default.channels import L2_channel_combinations
@@ -100,3 +101,18 @@ class SharpConfigBase:
     # How much of the training data to use for validation (estimation of
     # generalisation performance -- to choose net of epoch where this was
     # best). The rest of the data is used for training proper.
+
+
+class ConfigError(Exception):
+    """
+    Raised when the environment is not configured properly to run `sharp`
+    tasks.
+    """
+
+    def __init__(self, message: str):
+        # Make sure the complete error message fits nice & square in the
+        # terminal.
+        future_prefix = f"{self.__class__}: "
+        square = fill(future_prefix + message)
+        square_with_prefix_sized_hole = square[len(future_prefix) :]
+        super().__init__(square_with_prefix_sized_hole)

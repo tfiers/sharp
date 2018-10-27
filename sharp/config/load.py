@@ -1,23 +1,14 @@
+"""
+Importing from this module (e.g. the `config` object, or the
+`output_root` path) will attempt to load the user-defined `config.py` file.
+"""
+
 from os import environ
 from pathlib import Path
 from sys import path
-from textwrap import fill
 from warnings import warn
 
-from sharp.config.spec import SharpConfigBase
-
-
-class ConfigError(Exception):
-    """
-    Raised when the environment is not configured properly to run `sharp`
-    tasks.
-    """
-
-    def __init__(self, msg):
-        # Make an error message that fits nice & square in the terminal.
-        prefix = "sharp.config.load.ConfigError: "
-        message = fill(prefix + msg)
-        super().__init__(message[len(prefix) :])
+from sharp.config.spec import SharpConfigBase, ConfigError
 
 
 # Locate, load & initialize config object
@@ -39,10 +30,10 @@ except ModuleNotFoundError as err:
         )
     else:
         msg = (
-            "Could not find file `config.py` in the directory where the "
+            f"Could not find file `config.py` in the directory where the "
             f"`python` process is run from ({config_dir}). You can specify an "
-            "explicit directory to look for this file by setting the {ENV_VAR} "
-            "environment variable."
+            f"explicit directory to look for this file by setting the "
+            f"{ENV_VAR}  environment variable."
         )
     raise ConfigError(msg) from err
 
