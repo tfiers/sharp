@@ -1,22 +1,17 @@
 """
-Importing from this module (e.g. the `config` object, or the
+Locates, loads & initializes a global config object.
+
+Importing from this module (e.g. importing the `config` object, or the
 `output_root` path) will attempt to load the user-defined `config.py` file.
 """
 
 from os import environ
 from pathlib import Path
 from sys import path
-from warnings import warn
 
-from sharp.config.spec import SharpConfigBase, ConfigError
+from sharp.config.spec import ConfigError, ENV_VAR, SharpConfigBase, config_dir
 
 
-# Locate, load & initialize config object
-# ---------------------------------------
-
-ENV_VAR = "SHARP_CONFIG_DIR"
-
-config_dir = Path(environ.get(ENV_VAR, ".")).absolute()
 path.insert(0, str(config_dir))
 
 try:
@@ -43,44 +38,6 @@ try:
 except Exception as err:
     raise ConfigError("Could not initialise config.SharpConfig.") from err
 
-
-# Validate config
-# ---------------
-
-settings = dir(SharpConfigBase)
-for name in dir(config):
-    if name not in settings:
-        warn(f"SharpConfig attribute `{name}` is not a config setting.")
-    if name != "tasks_to_run":
-        # Should not get tasks_to_run value: this imports tasks too soon.
-        value = getattr(config, name)
-        if value == NotImplemented:
-            raise ConfigError(
-                f"The mandatory config setting `{name}` is not set."
-            )
-
-
-# Normalize config
-# ----------------
-
-if config.config_id is None:
-    config.config_id = str(config_dir)
-
-
-def _as_absolute_Path(path: str) -> Path:
-    ppath = Path(path)
-    if ppath.is_absolute():
-        return ppath
-    else:
-        return config_dir / ppath
-
-
-config.output_dir = _as_absolute_Path(config.output_dir)
-config.raw_data_dir = _as_absolute_Path(config.raw_data_dir)
-
-
-# Some global config values
-# -------------------------
 
 output_root: Path = config.output_dir
 intermediate_output_dir: Path = output_root / "intermediate"

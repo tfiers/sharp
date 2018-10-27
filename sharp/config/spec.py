@@ -1,16 +1,25 @@
+from os import environ
+from pathlib import Path
 from textwrap import fill
-from typing import Dict, Optional, Tuple, TypeVar
+from typing import Dict, Iterable, Optional, Tuple, TypeVar, Union
+from warnings import warn
 
 from sharp.config.default.channels import L2_channel_combinations
 
-MANDATORY_SETTING = NotImplemented
+ENV_VAR = "SHARP_CONFIG_DIR"
 
-# We may not import from luigi yet: we want to set its env vars later.
+config_dir = Path(environ.get(ENV_VAR, ".")).absolute()
+
+
+# We do not want to import from luigi yet, as it executes initalization code on
+# import. We want to control this initialization by setting env vars, later.
 LuigiTask = TypeVar("LuigiTask")
+
+MANDATORY_SETTING = NotImplemented
 
 
 class SharpConfigBase:
-    def get_tasks(self) -> Tuple[LuigiTask, ...]:
+    def get_tasks(self) -> Union[LuigiTask, Iterable[LuigiTask]]:
         """
         Return instantiated tasks, which will be passed to luigi.build().
         The necessary import statements should be contained in this method's
@@ -101,6 +110,48 @@ class SharpConfigBase:
     # How much of the training data to use for validation (estimation of
     # generalisation performance -- to choose net of epoch where this was
     # best). The rest of the data is used for training proper.
+
+    # Internals
+    # ---------
+    # (Not settings to be overridden)
+
+    def __init__(self) -> None:
+        self.validate()
+        self.normalize()
+
+    def validate(self):
+        settings = dir(SharpConfigBase)
+        for name in dir(self):
+            if name not in settings:
+                warn(f"SharpConfig attribute `{name}` is not a config setting.")
+            value = getattr(self, name)
+            if value == NotImplemented:
+                raise ConfigError(
+                    f"The mandatory config setting `{name}` is not set."
+                )
+
+    def normalize(self):
+        if self.config_id is None:
+            self.config_id = str(config_dir)
+
+        def _as_absolute_Path(path: str) -> Path:
+            ppath = Path(path)
+            if ppath.is_absolute():
+                return ppath
+            else:
+                return config_dir / ppath
+
+        self.output_dir = _as_absolute_Path(self.output_dir)
+        self.raw_data_dir = _as_absolute_Path(self.raw_data_dir)
+
+    @property
+    def tasks_to_run(self) -> Tuple[LuigiTask, ...]:
+        tasks = self.get_tasks()
+        try:
+            iter(tasks)
+            return tuple(tasks)
+        except TypeError:
+            return (tasks,)
 
 
 class ConfigError(Exception):

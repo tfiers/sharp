@@ -11,7 +11,8 @@ from os import environ
 from click import command, option
 
 try:
-    from sharp.config.load import config, config_dir
+    from sharp.config.load import config
+    from sharp.config.spec import config_dir
 except ImportError as err:
     raise UserWarning(
         "Possible circular import. Make sure the Tasks you want to run are "
@@ -53,7 +54,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     environ["LUIGI_CONFIG_PARSER"] = "toml"
     environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
     # Now we can import from luigi (and from sharp.util, which imports luigi
-    # itself).
+    # itself):
 
     from luigi import build
     from sharp.util import clear_all_output, clear_output, init_log
@@ -61,11 +62,10 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     init_log()
     if clear_all:
         clear_all_output()
-    tasks_to_run = config.get_tasks()
     if clear_last:
-        for task in tasks_to_run:
+        for task in config.tasks_to_run:
             clear_output(task)
-    build(tasks_to_run, local_scheduler=local_scheduler)
+    build(config.tasks_to_run, local_scheduler=local_scheduler)
 
 
 if __name__ == "__main__":
