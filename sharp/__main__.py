@@ -62,10 +62,11 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     init_log()
     if clear_all:
         clear_all_output()
+    tasks_to_run = config.get_tasks_tuple()
     if clear_last:
-        for task in config.tasks_to_run:
+        for task in tasks_to_run:
             clear_output(task)
-    build(config.tasks_to_run, local_scheduler=local_scheduler)
+    build(tasks_to_run, local_scheduler=local_scheduler)
 
 
 if __name__ == "__main__":

@@ -144,8 +144,7 @@ class SharpConfigBase:
         self.output_dir = _as_absolute_Path(self.output_dir)
         self.raw_data_dir = _as_absolute_Path(self.raw_data_dir)
 
-    @property
-    def tasks_to_run(self) -> Tuple[LuigiTask, ...]:
+    def get_tasks_tuple(self) -> Tuple[LuigiTask, ...]:
         tasks = self.get_tasks()
         try:
             iter(tasks)
