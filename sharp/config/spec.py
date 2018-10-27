@@ -25,11 +25,15 @@ class SharpConfigBase:
         The necessary import statements should be contained in this method's
         body (not at the top of the config.py file). This avoids circular
         imports, as Tasks in sharp use config data.
+        
+        Developer note: should not be called before the `sharp.config.load`
+        script has run (e.g. after an object from it is imported).
         """
         import sharp.config.default.tasks as default_tasks
 
         return default_tasks.tasks_to_run
 
+    #
     # Data settings
     # -------------
 
@@ -49,6 +53,7 @@ class SharpConfigBase:
     bitmap_versions: bool = False
     # If True, save PNG versions of figures, in addition to the PDF versions.
 
+    #
     # Main settings
     # -----------------
 
@@ -82,11 +87,13 @@ class SharpConfigBase:
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 
+    #
     # RNN architecture
     # ----------------
     num_layers: int = 2
     num_units_per_layer: int = 20
 
+    #
     # RNN training settings
     # -----------------
     reference_seg_extension: float = 0
@@ -111,15 +118,15 @@ class SharpConfigBase:
     # generalisation performance -- to choose net of epoch where this was
     # best). The rest of the data is used for training proper.
 
+    #
     # Internals
     # ---------
-    # (Not settings to be overridden)
 
     def __init__(self) -> None:
-        self.validate()
-        self.normalize()
+        self._validate()
+        self._normalize()
 
-    def validate(self):
+    def _validate(self):
         settings = dir(SharpConfigBase)
         for name in dir(self):
             if name not in settings:
@@ -130,7 +137,7 @@ class SharpConfigBase:
                     f"The mandatory config setting `{name}` is not set."
                 )
 
-    def normalize(self):
+    def _normalize(self):
         if self.config_id is None:
             self.config_id = str(config_dir)
 
