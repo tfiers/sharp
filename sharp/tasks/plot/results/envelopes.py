@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from matplotlib.axes import Axes
+from numpy import ndarray
 
 from fklab.segments import Segment
 from sharp.data.types.intersection import SegmentEventIntersection
@@ -32,16 +33,18 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
         return self.test_envelopes
 
     def include(self, time_range: TimeRange):
-        return self.contains_detection(time_range)
+        return self._contains_any_detection(time_range)
 
-    def contains_detection(self, time_range: TimeRange) -> bool:
-        return any(
-            SegmentEventIntersection(
-                Segment(time_range), sweep.best().detections
-            ).num_events_in_seg
-            > 0
-            for sweep in self.threshold_sweeps
-        )
+    def _contains_any_detection(self, time_range: TimeRange) -> bool:
+        for sweep in self.threshold_sweeps:
+            seg = Segment(time_range)
+            te = sweep.best()
+            if _contains_at_least_one(
+                seg, te.correct_detections
+            ) or _contains_at_least_one(seg, te.incorrect_detections):
+                return True
+        else:
+            return False
 
     def post_plot(
         self, time_range: TimeRange, input_ax: Axes, extra_axes: Sequence[Axes]
@@ -58,3 +61,7 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
             add_event_arrows(ax, sweep.best().correct_detections, color="green")
             add_event_arrows(ax, sweep.best().incorrect_detections, color="red")
             ax.text(0.05, 0.91, title, color=color, transform=ax.transAxes)
+
+
+def _contains_at_least_one(seg: Segment, events: ndarray):
+    return SegmentEventIntersection(seg, events).num_events_in_seg > 0

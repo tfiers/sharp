@@ -1,17 +1,15 @@
 from dataclasses import dataclass
 
-from numpy import median, percentile
-from numpy import ndarray
+from numpy import median, ndarray, percentile
 
 from fklab.segments import Segment
-from sharp.data.types.intersection import SegmentEventIntersection
 
 
 @dataclass
 class ThresholdEvaluation:
     """
-    Classifies detections into {correct, incorrect},
-    and reference segments into {detected, not_detected}.
+    Inputs are detections, classified into {correct, incorrect},
+    and reference segments, classified into {detected, not_detected}.
 
     Calculates detection delays and summarising performance measures based on
     these classifications.
@@ -22,18 +20,22 @@ class ThresholdEvaluation:
     # Inputs
     # ------
 
-    detections: ndarray
-    # When the SWR detector fired, in seconds.
-
-    reference_segs: Segment
-    # The (start, stop) tuples that indicate baseline "true" SWR segments. In
-    # seconds.
-
-    intersection: SegmentEventIntersection
-    # Pre-calculated comparison between `detections` and `reference_segs`.
-
     threshold: float
     # (For vectorization in ThresholdSweep).
+
+    correct_detections: ndarray
+    # Detection events that hit a reference segment.
+
+    incorrect_detections: ndarray
+    # False positive detections.
+
+    first_detections: ndarray
+    # For each detected reference segment, the time of the first `detection`
+    # that caught it.
+
+    detected_reference_segs: Segment
+
+    undetected_reference_segs: Segment
 
     #
     # ------
@@ -41,20 +43,16 @@ class ThresholdEvaluation:
     # ------
 
     @property
-    def _reference_seg_is_detected(self) -> ndarray:
-        return self.intersection.num_events_in_seg > 0
+    def num_detected(self):
+        return len(self.detected_reference_segs)
 
     @property
-    def detected_reference_segs(self) -> Segment:
-        return self.reference_segs[self._reference_seg_is_detected]
-
-    @property
-    def undetected_reference_segs(self) -> Segment:
-        return self.reference_segs[~self._reference_seg_is_detected]
+    def num_undetected(self):
+        return len(self.undetected_reference_segs)
 
     @property
     def recall(self) -> float:
-        return len(self.detected_reference_segs) / len(self.reference_segs)
+        return self.num_detected / (self.num_detected + self.num_undetected)
 
     #
     # ---------
@@ -62,32 +60,26 @@ class ThresholdEvaluation:
     # ---------
 
     @property
-    def _detection_is_correct(self) -> ndarray:
-        return self.intersection.event_is_in_seg
+    def num_correct(self):
+        return len(self.correct_detections)
 
     @property
-    def correct_detections(self) -> ndarray:
-        """ Detection events that hit a reference segment. """
-        return self.detections[self._detection_is_correct]
-
-    @property
-    def incorrect_detections(self) -> ndarray:
-        """ False positive detections. """
-        return self.detections[~self._detection_is_correct]
+    def num_incorrect(self):
+        return len(self.incorrect_detections)
 
     @property
     def precision(self) -> float:
-        return len(self.correct_detections) / len(self.detections)
-
-    @property
-    def FDR(self) -> float:
-        """ False discovery rate. """
-        return 1 - self.precision
+        return self.num_correct / (self.num_correct + self.num_incorrect)
 
     #
     # --------
     # F-scores
     # --------
+
+    @property
+    def FDR(self) -> float:
+        """ False discovery rate. """
+        return 1 - self.precision
 
     @property
     def F1(self):
@@ -116,14 +108,6 @@ class ThresholdEvaluation:
     # ----------------
     # Detection delays
     # ----------------
-
-    @property
-    def first_detections(self) -> ndarray:
-        """
-        For each detected reference segment, the time of the first `detection`
-        that caught it.
-        """
-        return self.detections[self.intersection.first_event_in_seg]
 
     @property
     def abs_delays(self) -> ndarray:

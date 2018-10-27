@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from numpy import empty, int32, ndarray
+from numpy import empty, int32, ndarray, array
 
 from fklab.segments import Segment
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
@@ -19,13 +19,21 @@ def evaluate_threshold(
     reference_segs: Segment,
 ) -> ThresholdEvaluation:
     """
-    Evaluate the output of a detector for a single threshold and lockout time.
+    Evaluate the output of a detector for some threshold and lockout time.
+    
+    Calculates detections. These are the events where `envelope` crosses
+    `threshold` (with a minimum distance of `lockout_time` between detections).
+    Classifies detections into {correct, incorrect}, and reference segments
+    into {detected, not_detected}. For each detected segment, finds the first
+    event that intersected with it.
 
-    lockout_time: Time after a detection during which no other detections
-        can be made. In seconds.
-
-    Detections are the events where `envelope` crosses `threshold` (with a
-    minimum distance of `lockout_time` between detections).
+    :param envelope:
+    :param threshold:
+    :param lockout_time: Duration after a detection during which no other
+                detections can be made. In seconds.
+    :param reference_segs:  The (start, stop) tuples that indicate baseline
+                "true" SWR segments. In seconds.
+    :return:  Initalized ThresholdEvaluation object.
     """
     log.info(f"Evaluating threshold {threshold:.3g}")
     lockout_samples = time_to_index(lockout_time, envelope.fs)
@@ -34,8 +42,19 @@ def evaluate_threshold(
     )
     detections = detection_ix / envelope.fs
     intersection = SegmentEventIntersection(reference_segs, detections)
+    detection_is_correct = intersection.event_is_in_seg
+    reference_seg_is_detected = intersection.num_events_in_seg > 0
+    if intersection.first_event_in_seg.size > 0:
+        first_detections = detections[intersection.first_event_in_seg]
+    else:
+        first_detections = array([])
     return ThresholdEvaluation(
-        detections, reference_segs, intersection, threshold
+        threshold=threshold,
+        first_detections=first_detections,
+        correct_detections=detections[detection_is_correct],
+        incorrect_detections=detections[~detection_is_correct],
+        detected_reference_segs=reference_segs[reference_seg_is_detected],
+        undetected_reference_segs=reference_segs[~reference_seg_is_detected],
     )
 
 

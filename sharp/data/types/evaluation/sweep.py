@@ -4,6 +4,7 @@ from numpy import abs, argmax, argmin, array, diff, mean, min, ndarray, trapz
 
 from sharp.config.load import config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
+from sharp.util import cached
 
 
 def vectorizing_property(name: str):
@@ -36,9 +37,14 @@ class ThresholdSweep:
     def __init__(self):
         self.threshold_evaluations = []
 
-    # `dataclass` does not recognize the following as proper properties,
-    # and takes them as init args.
+    # FYI: We do not make this a proper dataclass, as `dataclass` does not
+    # recognize the following calculated properties, and takes them as init
+    # args (which they should not be).
     threshold: ndarray = vectorizing_property("threshold")
+    num_detected: ndarray = vectorizing_property("num_detected")
+    num_undetected: ndarray = vectorizing_property("num_undetected")
+    num_correct: ndarray = vectorizing_property("num_correct")
+    num_incorrect: ndarray = vectorizing_property("num_incorrect")
     recall: ndarray = vectorizing_property("recall")
     precision: ndarray = vectorizing_property("precision")
     FDR: ndarray = vectorizing_property("FDR")
@@ -59,6 +65,11 @@ class ThresholdSweep:
             return trapz(self.precision, self.recall)
         else:
             return 0
+
+    @property
+    @cached
+    def max_F1(self):
+        return max(self.F1)
 
     def best(
         self, recall_best: Optional[float] = config.recall_best
@@ -100,18 +111,15 @@ class ThresholdSweep:
         elif len(self.thresholds) == 1:
             return min(threshold_range)
         else:
-            tes = self.threshold_evaluations
-            num_correct = [len(te.correct_detections) for te in tes]
-            num_detected = [len(te.detected_reference_segs) for te in tes]
-            num_correct_gap = abs(diff(num_correct))
-            num_detected_gap = abs(diff(num_detected))
+            num_correct_gap = abs(diff(self.num_correct))
+            num_detected_gap = abs(diff(self.num_detected))
             index_largest_nc_gap = argmax(num_correct_gap)
             index_largest_nd_gap = argmax(num_detected_gap)
             largest_nc_gap = num_correct_gap[index_largest_nc_gap]
             largest_nd_gap = num_detected_gap[index_largest_nd_gap]
             if largest_nc_gap > largest_nd_gap:
-                gap_index = index_largest_nc_gap
+                index_gap = index_largest_nc_gap
             else:
-                gap_index = index_largest_nd_gap
-            gap_thresholds = self.thresholds[gap_index : gap_index + 2]
-            return mean(gap_thresholds)
+                index_gap = index_largest_nd_gap
+            thresholds_gap = self.thresholds[index_gap : index_gap + 2]
+            return mean(thresholds_gap)
