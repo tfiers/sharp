@@ -1,4 +1,7 @@
+from logging import getLogger
+
 import numpy as np
+from fklab.segments import Segment
 from numpy import argmax, concatenate, cov, ndarray
 from scipy.linalg import eigh
 
@@ -9,6 +12,8 @@ from sharp.tasks.base import SharpTask
 from sharp.tasks.multilin.base import GEVecMixin
 from sharp.tasks.signal.base import InputDataMixin
 from sharp.util import compiled
+
+log = getLogger(__name__)
 
 
 class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
@@ -21,17 +26,41 @@ class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
         return NumpyArrayFile(self.output_dir, self.filename)
 
     def run(self):
-        signal = self.multichannel_train
+        signal = self.multichannel_train[:, self.channels]
         segments = self.reference_segs_train
         data = Signal(data=delay_stack(signal, self.delays), fs=signal.fs)
-        reference = concatenate(data.extract(segments))
-        background = concatenate(data.extract(segments.invert()))
+        reference = _concat_extracts(data, segments)
+        background = _concat_extracts(data, segments.invert())
+        log.info(f"Reference data length: {reference.duration} s")
+        log.info(f"Background data length: {background.duration} s")
         # Columns = channels = variables. Rows are (time) samples.
         Rss = _as_matrix(cov(reference, rowvar=False))
         Rnn = _as_matrix(cov(background, rowvar=False))
         GEVals, GEVecs = eigh(Rss, Rnn)
         first_GEVec = GEVecs[:, argmax(GEVals)]
         self.output().write(first_GEVec)
+
+
+def _concat_extracts(data: Signal, segs: Segment, max_duration=60) -> Signal:
+    """
+    :return: Concatenated array of `segs` extracted from `data`.
+
+    :param data:
+    :param segs:
+    :param max_duration:  Resulting array will be no longer than this.
+                (Goal: limit memory usage).
+    """
+    # Might wanna randomize segs order here.
+    duration = 0
+    extracts = []
+    for extract in data.extract(segs):
+        duration += extract.duration
+        if duration > max_duration:
+            break
+        else:
+            extracts.append(extract)
+    catena = concatenate(extracts)
+    return Signal(catena, data.fs)
 
 
 @compiled
