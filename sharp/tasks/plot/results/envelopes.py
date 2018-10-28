@@ -38,7 +38,7 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
     def _contains_any_detection(self, time_range: TimeRange) -> bool:
         for sweep in self.threshold_sweeps:
             seg = Segment(time_range)
-            te = sweep.best()
+            te = sweep.at_recall()
             if _contains_at_least_one(
                 seg, te.correct_detections
             ) or _contains_at_least_one(seg, te.incorrect_detections):
@@ -52,14 +52,14 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
         tups = zip(self.threshold_sweeps, extra_axes, self.titles, self.colors)
         for sweep, ax, title, color in tups:
             ax.hlines(
-                sweep.best().threshold,
+                sweep.at_recall().threshold,
                 *time_range,
                 clip_on=False,
                 linestyles="dashed",
                 linewidth=1,
             )
-            add_event_arrows(ax, sweep.best().correct_detections, color="green")
-            add_event_arrows(ax, sweep.best().incorrect_detections, color="red")
+            add_event_arrows(ax, sweep.at_recall().correct_detections, color="green")
+            add_event_arrows(ax, sweep.at_recall().incorrect_detections, color="red")
             ax.text(0.05, 0.91, title, color=color, transform=ax.transAxes)
 
 

@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from numpy import abs, argmax, argmin, array, diff, mean, min, ndarray, trapz
 
@@ -71,21 +71,15 @@ class ThresholdSweep:
     def max_F1(self):
         return max(self.F1)
 
-    def best(
-        self, recall_best: Optional[float] = config.recall_best
+    def at_recall(
+        self, recall: float = config.selected_recall
     ) -> ThresholdEvaluation:
-        """
-        :return:  The `best` threshold evaluation.
-        :param recall_best:  At which approximate recall value the best
-                    threshold should be chosen. If `None`, chooses the
-                    threshold with maximal F1-score.
-        """
         if len(self.threshold_evaluations) > 0:
-            if recall_best is None:
-                best_index = argmax(self.F1)
-            else:
-                best_index = argmax(self.recall > recall_best)
-            return self.threshold_evaluations[best_index]
+            return self.threshold_evaluations[argmax(self.recall > recall)]
+
+    def at_max_F1(self) -> ThresholdEvaluation:
+        if len(self.threshold_evaluations) > 0:
+            return self.threshold_evaluations[argmax(self.F1)]
 
     def add_threshold_evaluation(self, new: ThresholdEvaluation):
         """

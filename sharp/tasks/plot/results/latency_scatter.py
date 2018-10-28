@@ -19,8 +19,8 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
         df_dicts = (
             {
                 swr_duration: 1000
-                * sweep.best().detected_reference_segs.duration,
-                delay: 1000 * sweep.best().abs_delays,
+                * sweep.at_recall().detected_reference_segs.duration,
+                delay: 1000 * sweep.at_recall().abs_delays,
                 algo: title,
             }
             for sweep, title in zip(self.threshold_sweeps, self.titles)

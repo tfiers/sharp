@@ -1,10 +1,22 @@
 from os import environ
 from pathlib import Path
 from textwrap import fill
-from typing import Dict, Iterable, Optional, Tuple, TypeVar, Union
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 from warnings import warn
 
-from sharp.config.default.channels import L2_channel_combinations
+from matplotlib.axes import Axes
+
+from sharp.config.default.channels import L2_channel_combinations, draw_L_probe
+
 
 ENV_VAR = "SHARP_CONFIG_DIR"
 
@@ -32,6 +44,11 @@ class SharpConfigBase:
         import sharp.config.default.tasks as default_tasks
 
         return default_tasks.tasks_to_run
+
+    draw_channelmap: Optional[
+        Callable[[Axes, Optional[Sequence[int]], float], None]
+    ] = draw_L_probe
+    # Make sure to annotate this method as a `@staticmethod`.
 
     #
     # Data settings
@@ -73,8 +90,8 @@ class SharpConfigBase:
 
     num_thresholds: int = 64
 
-    recall_best: float = 0.8
-    # See ThresholdSweep.best()
+    selected_recall: float = 0.8
+    # See ThresholdSweep.at_recall()
 
     train_fraction: float = 0.6
     # Border between training and testing data, as a fraction of total signal
@@ -116,7 +133,7 @@ class SharpConfigBase:
     valid_fraction: float = 0.22
     # How much of the training data to use for validation (estimation of
     # generalisation performance -- to choose net of epoch where this was
-    # best). The rest of the data is used for training proper.
+    # at_recall). The rest of the data is used for training proper.
 
     #
     # Internals

@@ -1,5 +1,8 @@
 from typing import Sequence
 
+from sharp.data.files.figure import FigureTarget
+from sharp.data.types.aliases import subplots
+from sharp.tasks.base import SharpTask
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
