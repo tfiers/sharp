@@ -109,7 +109,10 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         )
         self.plot_grid_cells(axes)
         self.plot_channelmaps(axes)
-        # self.add_legend(axes)
+        self.add_legend(axes)
+        # add_colored_legend(
+        #     fig, ("Online BPF", "GEVec"), (self.sota_color, self.GEVec_color)
+        # )
         fig.tight_layout(w_pad=self.col_pad)
         self.output_grid.write(fig)
 
@@ -176,35 +179,22 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         fig.tight_layout()
         self.output_colorbar.write(fig)
 
-    # def add_legend(self, axes):
-    #     ax: Axes = axes[0, -1]
-    #     ax
-
-    def plot_legend(self):
-        figsize = 1.13 * array([2.8, 1.4 * self.rowheight])
-        fig, ax = subplots(figsize=figsize)
-        self.plot_in_cell(ax, sweep=None)
-        ax.set_xlabel(self.xlabel)
-        ax.set_ylabel(self.ylabel)
+    def add_legend(self, axes):
+        ax: Axes = axes[0, -1]
         ax.xaxis.set_major_formatter(fraction_formatter)
         ax.yaxis.set_major_formatter(fraction_formatter)
         ax.set_xticks(ax.get_xlim())
         ax.set_yticks(ax.get_ylim())
         ax.grid(False)
-        ax.spines["bottom"].set_visible(True)
-        ax.spines["left"].set_visible(True)
-        t = self.plot_cell_summary(ax, self.summary_measure(self.sota_sweep))
-        if self.legend_text is None:
-            self.legend_text = self.colorbar_label
-        t.set_text(self.legend_text)
-        self.plot_legend_hook(fig, ax)
-        add_colored_legend(
-            fig, ("Online BPF", "GEVec"), (self.sota_color, self.GEVec_color)
-        )
-        fig.tight_layout()
-        self.output_legend.write(fig)
+        ax.xaxis.tick_top()
+        ax.yaxis.tick_right()
+        ax.xaxis.set_label_position("top")
+        ax.yaxis.set_label_position("right")
+        ax.set_xlabel(self.xlabel)
+        ax.set_ylabel(self.ylabel)
+        self.add_legend_hook(ax)
 
-    def plot_legend_hook(self, fig: Figure, ax: Axes):
+    def add_legend_hook(self, ax: Axes):
         pass
 
     @property
