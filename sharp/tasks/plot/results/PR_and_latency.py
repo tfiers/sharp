@@ -4,13 +4,14 @@ from luigi import DictParameter, FloatParameter
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
-from matplotlib.ticker import PercentFormatter
 from numpy import argmax, array
-
 from seaborn import set_hls_values
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.evaluation.sweep import ThresholdSweep
-from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
+from sharp.tasks.plot.results.base import (
+    MultiEnvelopeFigureMaker,
+    fraction_formatter,
+)
 from sharp.tasks.plot.util.legend import add_colored_legend
 
 DISCRETE = dict(lw=2, marker=".", ms=10)
@@ -107,25 +108,24 @@ class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
 
     def setup_axes(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
         lims = (self.zoom_from - self.lim_offset, 1 + self.lim_offset)
-        percentages = PercentFormatter(xmax=1, decimals=0)
         ax_PR.set_xlim(lims)
         ax_PR.set_ylim(lims)
         # ax_PR.set_aspect("equal")
         # ^This unsynchs the axes widths.
         # Manually make sure aspect ratio is approximately equal using figsize.
-        ax_PR.xaxis.set_major_formatter(percentages)
-        ax_PR.yaxis.set_major_formatter(percentages)
+        ax_PR.xaxis.set_major_formatter(fraction_formatter)
+        ax_PR.yaxis.set_major_formatter(fraction_formatter)
         ax_PR.xaxis.tick_top()
         ax_PR.yaxis.tick_right()
-        ax_delay_P.yaxis.set_major_formatter(percentages)
-        ax_delay_P.xaxis.set_major_formatter(percentages)
+        ax_delay_P.yaxis.set_major_formatter(fraction_formatter)
+        ax_delay_P.xaxis.set_major_formatter(fraction_formatter)
         ax_delay_P.xaxis.set_label_position("top")
         ax_delay_P.xaxis.tick_top()
         ax_delay_P.set_ylim(lims)
         ax_delay_P.set_ylabel("Precision")
         ax_delay_P.set_xlabel("Detection latency")
-        ax_delay_R.xaxis.set_major_formatter(percentages)
-        ax_delay_R.yaxis.set_major_formatter(percentages)
+        ax_delay_R.xaxis.set_major_formatter(fraction_formatter)
+        ax_delay_R.yaxis.set_major_formatter(fraction_formatter)
         ax_delay_R.yaxis.set_label_position("right")
         ax_delay_R.yaxis.tick_right()
         ax_delay_R.set_xlim(lims)

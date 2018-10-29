@@ -70,7 +70,7 @@ class SharpConfigBase:
     # a different `config_id`. By default, takes the value of the
     # "sharp config dir" env var.
 
-    channel_combinations: Dict[str, Tuple[int, ...]] = L2_channel_combinations
+    channel_combinations: Dict[str, Sequence[int]] = L2_channel_combinations
 
     probe_outline: Sequence[Tuple[float, float]] = L_probe_outline
     electrodes_x: Sequence[float] = [ch.x for ch in L2_channels]

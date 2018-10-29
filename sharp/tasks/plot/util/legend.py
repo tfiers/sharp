@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 
 
 def add_colored_legend(
-    artist: Union[Figure, Axes],
+    parent: Union[Figure, Axes],
     labels: Sequence[str] = None,
     colors: Sequence[str] = None,
     **legend_kwargs,
@@ -13,7 +13,7 @@ def add_colored_legend(
     """
     Add a figure legend with colored labels, and without example artists.
     """
-    legend = artist.legend(
+    legend = parent.legend(
         labels=labels,
         handlelength=0,
         handleheight=0,
