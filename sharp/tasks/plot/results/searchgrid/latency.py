@@ -9,8 +9,8 @@ from sharp.util import cached
 
 class Latency(SearchGrid):
     filename_suffix = "delay"
-    xlabel = "Latency"
-    ylabel = ""
+    cell_xlabel = "Latency"
+    cell_ylabel = ""
     cmap = get_cmap("viridis_r")
     rowheight = 1.3
     text_kwargs = dict(x=0.99, y=0.94, ha="right", va="top")
@@ -33,5 +33,5 @@ class Latency(SearchGrid):
         index_max_F1 = argmax(self.sota_sweep.F1)
         return self.sota_sweep.threshold_evaluations[index_max_F1].rel_delays
 
-    def add_legend_hook(self, ax: Axes):
-        ax.set_yticks([])
+    def label_cell_y(self, ax):
+        pass

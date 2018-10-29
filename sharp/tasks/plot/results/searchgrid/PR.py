@@ -6,8 +6,8 @@ from sharp.tasks.plot.results.searchgrid.base import SearchGrid
 
 class PR(SearchGrid):
     filename_suffix = "PR"
-    xlabel = "Recall"
-    ylabel = "Precision"
+    cell_xlabel = "Recall"
+    cell_ylabel = "Precision"
     colorbar_label = "max $F_1$"
     color_range = (28, 97)
 

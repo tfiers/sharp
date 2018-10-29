@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from colorsys import rgb_to_hls
 from itertools import product
 from logging import getLogger
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Sequence
 
 from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
@@ -10,7 +10,8 @@ from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 from matplotlib.text import Text
-from numpy import percentile, array
+from matplotlib.transforms import Bbox
+from numpy import percentile, mean
 from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
@@ -32,12 +33,14 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
     num_delays = (0, 1, 2, 3, 5, 10, 20, 40)
     channel_combo_names = tuple(config.channel_combinations.keys())
     _arg_tuples = tuple(product(num_delays, channel_combo_names))
+    xlabel = "Included channels"
+    ylabel = "Number of delays"
 
     filename_suffix: str
     colorbar_label: str
     legend_text: Optional[str] = None
-    xlabel: str
-    ylabel: str
+    cell_xlabel: str
+    cell_ylabel: str
     cmap = get_cmap("viridis")
     rowheight = 1.7
     text_kwargs = dict(x=0.04, y=0.04)
@@ -85,20 +88,19 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
 
     def output(self):
         return (self.output_grid, self.output_colorbar)
-        # return (self.output_grid, self.output_colorbar, self.output_legend)
 
     def run(self):
         self.plot_grid()
         self.plot_colorbar()
-        # self.plot_legend()
 
     def plot_grid(self):
         num_gridrows = len(self.num_delays)
         nrows = num_gridrows + 1
         ncols = len(self.channel_combo_names)
         figwidth = 1 + 1.8 * ncols
-        figheight = self.rowheight * nrows
-        channelmap_rel_height = 2.5 * SearchGrid.rowheight / self.rowheight
+        figheight = 1 + self.rowheight * nrows
+        rel_rowheight = SearchGrid.rowheight / self.rowheight
+        channelmap_rel_height = 2.5 * rel_rowheight
         fig, axes = subplots(
             nrows=nrows,
             ncols=ncols,
@@ -109,11 +111,18 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         )
         self.plot_grid_cells(axes)
         self.plot_channelmaps(axes)
-        self.add_legend(axes)
-        # add_colored_legend(
-        #     fig, ("Online BPF", "GEVec"), (self.sota_color, self.GEVec_color)
-        # )
-        fig.tight_layout(w_pad=self.col_pad)
+        self.label_cell_x(axes[0, 0])
+        self.label_cell_y(axes[0, -1])
+        add_colored_legend(
+            fig,
+            ("GEVec", "Online BPF"),
+            (self.GEVec_color, self.sota_color),
+            ncol=2,
+            loc="upper center",
+        )
+        self.label_grid(fig, axes)
+        rect = (0.07, rel_rowheight * 0.013, 1, 1 - rel_rowheight * 0.04)
+        fig.tight_layout(w_pad=self.col_pad, rect=rect)
         self.output_grid.write(fig)
 
     def plot_grid_cells(self, axes):
@@ -179,23 +188,35 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         fig.tight_layout()
         self.output_colorbar.write(fig)
 
-    def add_legend(self, axes):
-        ax: Axes = axes[0, -1]
+    def label_cell_x(self, ax):
         ax.xaxis.set_major_formatter(fraction_formatter)
-        ax.yaxis.set_major_formatter(fraction_formatter)
         ax.set_xticks(ax.get_xlim())
-        ax.set_yticks(ax.get_ylim())
         ax.grid(False)
         ax.xaxis.tick_top()
-        ax.yaxis.tick_right()
         ax.xaxis.set_label_position("top")
-        ax.yaxis.set_label_position("right")
-        ax.set_xlabel(self.xlabel)
-        ax.set_ylabel(self.ylabel)
-        self.add_legend_hook(ax)
+        ax.set_xlabel(self.cell_xlabel)
 
-    def add_legend_hook(self, ax: Axes):
-        pass
+    def label_cell_y(self, ax):
+        ax.yaxis.set_major_formatter(fraction_formatter)
+        ax.set_yticks(ax.get_ylim())
+        ax.grid(False)
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
+        ax.set_ylabel(self.cell_ylabel)
+
+    def label_grid(self, fig: Figure, axes: Sequence[Axes]):
+        x_center = mean([get_pos(axes[0, 0]).xmin, get_pos(axes[0, -1]).xmax])
+        y_center = mean([get_pos(axes[0, 0]).ymax, get_pos(axes[-2, 0]).ymin])
+        kwargs = dict(ha="center", va="center", fontsize=22)
+        fig.text(x_center, 0.01, self.xlabel, **kwargs)
+        fig.text(
+            0.03,
+            y_center,
+            self.ylabel,
+            **kwargs,
+            rotation=90,
+            rotation_mode="anchor",
+        )
 
     @property
     @cached
@@ -204,3 +225,7 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
             self.summary_measure(sweep) for sweep in self.threshold_sweeps[:-1]
         ]
         return Normalize(*percentile(measures, self.color_range))
+
+
+def get_pos(ax: Axes) -> Bbox:
+    return ax.get_position(True)
