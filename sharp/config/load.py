@@ -36,7 +36,10 @@ try:
     # A global config object, for use in any Task:
     config: SharpConfigBase = SharpConfig()
 except Exception as err:
-    raise ConfigError("Could not initialise config.SharpConfig.") from err
+    raise ConfigError(
+        "Could not initialise config.SharpConfig. "
+        "See preceding exception for details."
+    ) from err
 
 
 output_root: Path = config.output_dir

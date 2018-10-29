@@ -1,14 +1,16 @@
 from os import environ
 from pathlib import Path
 from textwrap import fill
-from typing import Dict, Iterable, Optional, Tuple, TypeVar, Union, Sequence
+from typing import Dict, Iterable, Optional, Sequence, Tuple, TypeVar, Union
 from warnings import warn
 
 from sharp.config.default.channels import (
     L2_channel_combinations,
-    L_probe_outline,
     L2_channels,
+    L_probe_outline,
 )
+from typeguard import check_type
+
 
 ENV_VAR = "SHARP_CONFIG_DIR"
 
@@ -70,9 +72,9 @@ class SharpConfigBase:
 
     channel_combinations: Dict[str, Tuple[int, ...]] = L2_channel_combinations
 
-    probe_outline: Tuple[Tuple[float, float], ...] = L_probe_outline
-    electrodes_x: Tuple[float, ...] = [ch.x for ch in L2_channels]
-    electrodes_y: Tuple[float, ...] = [ch.y for ch in L2_channels]
+    probe_outline: Sequence[Tuple[float, float]] = L_probe_outline
+    electrodes_x: Sequence[float] = [ch.x for ch in L2_channels]
+    electrodes_y: Sequence[float] = [ch.y for ch in L2_channels]
 
     lockout_percentile: float = 25
     # Event detectios are threshold crossings of an algorithm's output
@@ -145,6 +147,16 @@ class SharpConfigBase:
                 raise ConfigError(
                     f"The mandatory config setting `{name}` is not set."
                 )
+            expected_type = self.__annotations__.get(name)
+            if expected_type:
+                try:
+                    check_type(name, value, expected_type)
+                except TypeError as e:
+                    raise ConfigError(
+                        f"The config setting `{name}` has an incorrect type. "
+                        f"Expected type: `{expected_type}`. "
+                        f"See preceding exception for details."
+                    ) from e
 
     def _normalize(self):
         if self.config_id is None:
@@ -179,6 +191,6 @@ class ConfigError(Exception):
         # Make sure the complete error message fits nice & square in the
         # terminal.
         future_prefix = f"{self.__class__}: "
-        square = fill(future_prefix + message)
+        square = fill(future_prefix + message, width=80)
         square_with_prefix_sized_hole = square[len(future_prefix) :]
         super().__init__(square_with_prefix_sized_hole)
