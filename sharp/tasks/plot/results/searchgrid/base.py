@@ -2,21 +2,19 @@ from abc import ABC, abstractmethod
 from colorsys import rgb_to_hls
 from itertools import product
 from logging import getLogger
-from typing import Tuple
+from typing import Optional, Sequence, Tuple
 
 from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import Normalize
 from matplotlib.ticker import PercentFormatter
-from numpy import argmax, max, percentile
+from numpy import percentile
 
-from seaborn import kdeplot
 from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
-from sharp.tasks.base import SharpTask
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
@@ -25,24 +23,21 @@ from sharp.util import cached
 log = getLogger(__name__)
 
 
-class PlotSearchGrids(SharpTask):
-    def requires(self):
-        kwargs = dict(subdir="space-time-comp")
-        return (PRGrid(**kwargs), DelayGrid(**kwargs))
-        # return DelayGrid(**kwargs)
-
-
 class SearchGrid(MultiEnvelopeFigureMaker, ABC):
     num_delays = (0, 1, 2, 3, 5, 10, 20, 40)
     channel_combo_names = tuple(config.channel_combinations.keys())
     arg_tuples = tuple(product(num_delays, channel_combo_names))
-    # __call__ converts a value in [0, 1] to an RGBA value.
-    filename_suffix: str = ...
+
+    # Options to override:
+    filename_suffix: str
+    legend_label: str
     cmap = get_cmap("viridis")
     rowheight = 1.7
     text_kwargs = dict(x=0.04, y=0.04)
-    text_format = "{summary_measure:.3f}"
-    legend_kwargs = dict()
+    text_format = "{summary_measure:.0%}"
+    col_pad = 1.08
+    color_range: Tuple[float, float] = (28, 97)
+    # As percentiles of `summary_measure` for all convolver sweeps.
 
     @property
     def convolvers(self) -> Tuple[SpatiotemporalConvolution, ...]:
@@ -95,7 +90,7 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         )
         self.plot_grid_cells(axes)
         self.plot_channelmaps(axes)
-        fig.tight_layout(w_pad=1.2)
+        fig.tight_layout(w_pad=self.col_pad)
         self.output_grid.write(fig)
 
     def plot_grid_cells(self, axes):
@@ -124,11 +119,13 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         ...
 
     def plot_cell_summary(self, ax: Axes, summary_measure: float):
+        # transform value in [vmin, vmax] to [0, 1]
         fraction = self.norm(summary_measure)
+        # convert value in [0, 1] to an RGBA value
         facecolor = self.cmap(fraction)
         ax.set_facecolor(facecolor)
         _, lightness, _ = rgb_to_hls(*facecolor[:3])
-        if lightness > 0.35:
+        if lightness > 0.4:
             text_color = "black"
         else:
             text_color = "white"
@@ -142,96 +139,56 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
     def plot_channelmaps(self, axes):
         for col, name in enumerate(self.channel_combo_names):
             ax = axes[-1, col]
-            config.draw_channelmap(
+            draw_channelmap(
                 ax, active_channels=config.channel_combinations[name]
             )
 
     def plot_legend(self):
         fig, ax = subplots(figsize=(2, 4))
         cbar = ColorbarBase(
-            ax=ax, norm=self.norm, cmap=self.cmap, **self.legend_kwargs
+            ax=ax,
+            label=self.legend_label,
+            norm=self.norm,
+            cmap=self.cmap,
+            extend="both",
+            format=PercentFormatter(xmax=1, decimals=0),
         )
-        self.plot_legend_hook(ax, cbar)
         fig.tight_layout()
         self.output_legend.write(fig)
-
-    def plot_legend_hook(self, ax: Axes, cbar: ColorbarBase):
-        pass
 
     @property
     @cached
     def norm(self):
-        # __call__ transforms a value in [vmin, vmax] to [0, 1]
-        return Normalize(*self.legend_lims)
-
-    @property
-    @abstractmethod
-    def legend_lims(self) -> Tuple[float, float]:
-        ...
-
-
-class PRGrid(SearchGrid):
-    filename_suffix = "PR"
-    legend_kwargs = dict(label="max $F_1$", extend="min", extendfrac=0.1)
-
-    def summary_measure(self, sweep: ThresholdSweep):
-        return max(sweep.F1)
-
-    def plot_in_cell(self, sweep: ThresholdSweep, ax: Axes):
-        ax.plot(
-            self.sota_sweep.recall, self.sota_sweep.precision, c="grey", lw=1.5
-        )
-        ax.plot(sweep.recall, sweep.precision, c="black")
-        ax.set_aspect("equal")
-        ax.set_xlim(0.75, 1)
-        ax.set_ylim(0.75, 1)
-
-    @property
-    def legend_lims(self):
-        max_F1s = [max(sweep.F1) for sweep in self.threshold_sweeps]
-        # vmin = 0.8
-        vmin = percentile(max_F1s, 28)
-        vmax = percentile(max_F1s, 97)
-        return (vmin, vmax)
-
-
-class DelayGrid(SearchGrid):
-    filename_suffix = "delay"
-    cmap = get_cmap("viridis_r")
-    rowheight = 1.3
-    text_kwargs = dict(x=0.99, y=0.94, ha="right", va="top")
-    text_format = "{summary_measure:.1%}"
-    legend_kwargs = dict(
-        label="Median latency",
-        format=PercentFormatter(xmax=1, decimals=0),
-        extend="max",
-        extendfrac=0.1,
-    )
-
-    def summary_measure(self, sweep: ThresholdSweep) -> float:
-        return sweep.at_max_F1().rel_delays_median
-
-    def plot_in_cell(self, sweep: ThresholdSweep, ax: Axes):
-        kdeplot(self.sota_delays, ax=ax, color="grey")
-        kdeplot(sweep.at_max_F1().rel_delays, ax=ax, color="black")
-        ax.set_xlim(0, 1)
-
-    @property
-    @cached
-    def sota_delays(self):
-        index_max_F1 = argmax(self.sota_sweep.F1)
-        return self.sota_sweep.threshold_evaluations[index_max_F1].rel_delays
-
-    @property
-    def legend_lims(self):
-        median_latencies = [
-            sweep.at_max_F1().rel_delays_median
-            for sweep in self.threshold_sweeps[:-1]
+        measures = [
+            self.summary_measure(sweep) for sweep in self.threshold_sweeps[:-1]
         ]
-        vmin = percentile(median_latencies, 28)
-        vmax = percentile(median_latencies, 97)
-        return (vmin, vmax)
+        return Normalize(*percentile(measures, self.color_range))
 
-    def plot_legend_hook(self, ax: Axes, cbar: ColorbarBase):
-        pass
-        # ax.invert_yaxis()
+
+def draw_channelmap(
+    ax: Axes, active_channels: Optional[Sequence[int]] = None, ms=5.5
+):
+    ax.invert_yaxis()  # Origin: top-left
+    ax.set_aspect("equal")
+    ax.axis("off")
+    # Close the path:
+    probe_outline = config.probe_outline + (config.probe_outline[0],)
+    probe_x = [vertex[0] for vertex in probe_outline]
+    probe_y = [vertex[1] for vertex in probe_outline]
+    ax.plot(probe_x, probe_y, c="black", lw=1.5)
+    num_channels = len(config.electrodes_x)
+    all_channels = tuple(range(num_channels))
+    if active_channels is None:
+        active_channels = all_channels
+    for channel in all_channels:
+        if channel in active_channels:
+            style = dict(color="black")
+        else:
+            style = dict(color="grey", markerfacecolor="none")
+        ax.plot(
+            config.electrodes_x[channel],
+            config.electrodes_y[channel],
+            marker="o",
+            ms=ms,
+            **style,
+        )

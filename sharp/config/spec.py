@@ -1,30 +1,23 @@
 from os import environ
 from pathlib import Path
 from textwrap import fill
-from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Dict, Iterable, Optional, Tuple, TypeVar, Union, Sequence
 from warnings import warn
 
-from matplotlib.axes import Axes
-
-from sharp.config.default.channels import L2_channel_combinations, draw_L_probe
-
+from sharp.config.default.channels import (
+    L2_channel_combinations,
+    L_probe_outline,
+    L2_channels,
+)
 
 ENV_VAR = "SHARP_CONFIG_DIR"
 
 config_dir = Path(environ.get(ENV_VAR, ".")).absolute()
 
 
-# We do not want to import from luigi yet, as it executes initalization code on
-# import. We want to control this initialization by setting env vars, later.
+# We do not want to import from luigi yet. (As it executes initalization code on
+# import. We want to control this initialization by setting env vars, later).
+# Therefore make a dummy Luigi.Task type.
 LuigiTask = TypeVar("LuigiTask")
 
 MANDATORY_SETTING = NotImplemented
@@ -44,11 +37,6 @@ class SharpConfigBase:
         import sharp.config.default.tasks as default_tasks
 
         return default_tasks.tasks_to_run
-
-    draw_channelmap: Optional[
-        Callable[[Axes, Optional[Sequence[int]], float], None]
-    ] = draw_L_probe
-    # Make sure to annotate this method as a `@staticmethod`.
 
     #
     # Data settings
@@ -81,6 +69,10 @@ class SharpConfigBase:
     # "sharp config dir" env var.
 
     channel_combinations: Dict[str, Tuple[int, ...]] = L2_channel_combinations
+
+    probe_outline: Tuple[Tuple[float, float], ...] = L_probe_outline
+    electrodes_x: Tuple[float, ...] = [ch.x for ch in L2_channels]
+    electrodes_y: Tuple[float, ...] = [ch.y for ch in L2_channels]
 
     lockout_percentile: float = 25
     # Event detectios are threshold crossings of an algorithm's output

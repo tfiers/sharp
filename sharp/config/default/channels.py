@@ -1,14 +1,12 @@
 from dataclasses import dataclass
-from typing import Optional, Sequence
-
-from matplotlib.axes import Axes
+from typing import Optional
 
 # `L2` is the L-style-probe recording at:
 # >> nerffs01/ratlab/Frederic/organized/Long Flexible Probes/For the paper/data/P2/30_08_2014/Nlx/L2
 
 # From: ./probe.svg
 # Units: micrometre
-probe_outline = (
+L_probe_outline = (
     (159.3, 695.8),
     (129, 663.6),
     (9.5, 190.3),
@@ -60,29 +58,7 @@ L2_channel_combinations = {
     "all": sorted(tuple(ch.index for ch in L2_channels)),
     "pyr": (11,),
     "sr": (3,),
-    "sr-clust": (2, 3, 4, 5, 6),
     "pyr+sr": (3, 11),
+    "sr-clust": (2, 3, 4, 5, 6),
     "tetr": (10, 11, 12, 13),
 }
-
-
-@staticmethod
-def draw_L_probe(
-    ax: Axes, active_channels: Optional[Sequence[int]] = None, ms=5.5
-):
-    ax.set_aspect("equal")
-    # Close the path:
-    probe = probe_outline + (probe_outline[0],)
-    probe_x = [vec[0] for vec in probe]
-    probe_y = [vec[1] for vec in probe]
-    ax.plot(probe_x, probe_y, c="black", lw=1.5)
-    ax.invert_yaxis()  # Origin: top-left
-    ax.axis("off")
-    if active_channels is None:
-        active_channels = [ch.index for ch in L2_channels]
-    for ch in L2_channels:
-        if ch.index in active_channels:
-            style = dict(color="black")
-        else:
-            style = dict(color="grey", markerfacecolor="none")
-        ax.plot(ch.x, ch.y, marker="o", ms=ms, **style)

@@ -1,19 +1,12 @@
 from typing import Sequence
 
-from sharp.data.files.figure import FigureTarget
-from sharp.data.types.aliases import subplots
-from sharp.tasks.base import SharpTask
-from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
-from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
-from sharp.tasks.plot.results.searchgrid import PlotSearchGrids
-from sharp.tasks.plot.results.weights import PlotWeights
-from sharp.tasks.plot.results.envelopes import PlotEnvelopes
-from sharp.tasks.plot.misc.reference import PlotReferenceMaker
 from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
+from sharp.tasks.plot.results.envelopes import PlotEnvelopes
 from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
-from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
-from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
+from sharp.tasks.plot.results.searchgrid.PR import PR
+from sharp.tasks.plot.results.searchgrid.latency import Latency
+from sharp.tasks.plot.results.weights import PlotWeights
 
 
 def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
@@ -24,6 +17,10 @@ def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
         PlotLatencyAndPR(**em_kwargs),
         PlotLatencyAndPR(zoom_from=0.65, **em_kwargs),
     )
+
+
+def searchgrids(**kwargs):
+    return (PR(**kwargs), Latency(**kwargs))
 
 
 tasks_to_run = (
@@ -39,5 +36,5 @@ tasks_to_run = (
     #         SpatiotemporalConvolution(num_delays=1),
     #     ),
     # ),
-    PlotSearchGrids(),
+    *searchgrids(subdir="space-time-comp"),
 )
