@@ -4,6 +4,7 @@ from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.results.envelopes import PlotEnvelopes
 from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
+from sharp.tasks.plot.results.searcharray import PlotSearchArray
 from sharp.tasks.plot.results.searchgrid.PR import PR
 from sharp.tasks.plot.results.searchgrid.latency import Latency
 from sharp.tasks.plot.results.weights import PlotWeights
@@ -36,5 +37,6 @@ tasks_to_run = (
     #         SpatiotemporalConvolution(num_delays=1),
     #     ),
     # ),
-    *searchgrids(subdir="space-time-comp"),
+    # *searchgrids(subdir="space-time-comp"),
+    PlotSearchArray(subdir="num-delays-search"),
 )

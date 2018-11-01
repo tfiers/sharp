@@ -19,6 +19,7 @@ readable = {
     'axes.labelpad': 22,
 
     'lines.linewidth': 3,
+    'lines.markersize': 16,
     'lines.solid_capstyle': 'round',
 }
 

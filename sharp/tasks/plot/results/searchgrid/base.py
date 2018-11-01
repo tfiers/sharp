@@ -19,7 +19,7 @@ from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import (
     MultiEnvelopeFigureMaker,
-    fraction_formatter,
+    fraction,
 )
 from sharp.tasks.plot.util.channelmap import draw_channelmap
 from sharp.tasks.plot.util.legend import add_colored_legend
@@ -183,13 +183,13 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
             norm=self.norm,
             cmap=self.cmap,
             extend="both",
-            format=fraction_formatter,
+            format=fraction,
         )
         fig.tight_layout()
         self.output_colorbar.write(fig)
 
     def label_cell_x(self, ax):
-        ax.xaxis.set_major_formatter(fraction_formatter)
+        ax.xaxis.set_major_formatter(fraction)
         ax.set_xticks(ax.get_xlim())
         ax.grid(False)
         ax.xaxis.tick_top()
@@ -197,7 +197,7 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         ax.set_xlabel(self.cell_xlabel)
 
     def label_cell_y(self, ax):
-        ax.yaxis.set_major_formatter(fraction_formatter)
+        ax.yaxis.set_major_formatter(fraction)
         ax.set_yticks(ax.get_ylim())
         ax.grid(False)
         ax.yaxis.tick_right()
