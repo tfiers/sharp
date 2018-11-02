@@ -5,7 +5,7 @@ from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask, TaskListParameter
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.signal.base import EnvelopeMaker
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class MultiEnvelopeEvaluator(SharpTask):

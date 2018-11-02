@@ -11,7 +11,7 @@ from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
 from sharp.tasks.multilin.base import GEVecMixin
 from sharp.tasks.signal.base import InputDataMixin
-from sharp.util import compiled
+from sharp.util.misc import compiled
 
 log = getLogger(__name__)
 

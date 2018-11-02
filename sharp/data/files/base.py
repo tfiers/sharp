@@ -1,28 +1,28 @@
 import os
 from abc import ABC, abstractmethod
 from logging import getLogger
-from pathlib import PosixPath, WindowsPath, Path
+from pathlib import Path, PosixPath, WindowsPath
 from typing import TypeVar, Union
 
 from luigi import Target
-from sharp.data.files.util import mkdir
 from sharp.config.load import output_root
+from sharp.util.misc import cached
 
 log = getLogger(__name__)
 
 
-# We cannot directly subclass pathlib.Path (and we therefore have to detect OS
-# manually).
+# We are not allowed to directly subclass pathlib.Path. (We therefore detect
+# the OS and set the Path flavour manually).
 if os.name == "nt":
-    OSPath = WindowsPath
+    PathlibPath = WindowsPath
 else:
-    OSPath = PosixPath
+    PathlibPath = PosixPath
 
 
 T = TypeVar("T")
 
 
-class FileTarget(OSPath, Target, ABC):
+class FileTarget(PathlibPath, Target, ABC):
     """
     A file that is an output of one of the batch jobs in `../tasks`.
 
@@ -42,10 +42,12 @@ class FileTarget(OSPath, Target, ABC):
     def write(self, object: T):
         """ Write a value to the file. """
 
+    @cached
     def __new__(cls, directory: Union[Path, str], filename: str):
-        dirr = mkdir(directory)
+        dirr = Path(directory)
+        dirr.mkdir(parents=True, exist_ok=True)
         path = dirr / (filename + cls.extension)
-        return OSPath.__new__(cls, path)
+        return PathlibPath.__new__(cls, path)
 
     @property
     def path_string(self) -> str:

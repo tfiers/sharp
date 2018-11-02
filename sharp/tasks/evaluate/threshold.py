@@ -7,7 +7,7 @@ from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.util import time_to_index
-from sharp.util import compiled
+from sharp.util.misc import compiled
 
 log = getLogger(__name__)
 

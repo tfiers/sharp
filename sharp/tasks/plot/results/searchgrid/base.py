@@ -24,7 +24,7 @@ from sharp.tasks.plot.results.base import (
 from sharp.tasks.plot.util.channelmap import draw_channelmap
 from sharp.tasks.plot.util.legend import add_colored_legend
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
-from sharp.util import cached
+from sharp.util.misc import cached
 
 log = getLogger(__name__)
 

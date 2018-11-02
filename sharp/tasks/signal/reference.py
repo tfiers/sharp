@@ -5,17 +5,16 @@ compare online detections against.
 from typing import Tuple
 
 import numpy as np
-from luigi import FloatParameter, TupleParameter
-
 from fklab.segments import Segment
 from fklab.signals.core import detect_mountains
 from fklab.signals.filter import compute_envelope
+from luigi import FloatParameter, TupleParameter
 from sharp.config.load import intermediate_output_dir
 from sharp.data.files.numpy import SegmentsFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.downsample import Downsample
-from sharp.util import cached, ignore
+from sharp.util.misc import cached, ignore
 
 
 class MakeReference(SharpTask):

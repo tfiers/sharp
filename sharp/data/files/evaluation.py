@@ -5,7 +5,7 @@ from h5py import File as HDF5File
 from sharp.data.files.base import FileTarget
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class HDF5Target(FileTarget, ABC):

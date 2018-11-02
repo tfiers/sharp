@@ -53,16 +53,18 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
     environ["LUIGI_CONFIG_PARSER"] = "toml"
     environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
-    # Now we can import from luigi (and from sharp.util, which imports luigi
-    # itself):
+    # Now we can import from luigi (and from sharp.util.startup, which imports
+    # luigi itself):
 
     from luigi import build
-    from sharp.util import clear_all_output, clear_output, init_log
+    from sharp.util.startup import clear_all_output, clear_output, init_log
 
-    init_log()
+    log = init_log()
     if clear_all:
         clear_all_output()
+    log.info("Importing tasks to run...")
     tasks_to_run = config.get_tasks_tuple()
+    log.info("Done importing tasks.")
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)

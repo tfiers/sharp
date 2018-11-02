@@ -4,7 +4,7 @@ from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.downsample import Downsample
 from sharp.tasks.signal.reference import MakeReference
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class InputDataMixin:

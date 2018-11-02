@@ -1,10 +1,10 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple
 
 from numpy import abs, argmax, argmin, array, diff, mean, min, ndarray, trapz
 
 from sharp.config.load import config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 def vectorizing_property(name: str):

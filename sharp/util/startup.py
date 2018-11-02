@@ -1,13 +1,9 @@
-from contextlib import contextmanager
 from datetime import date
-from functools import lru_cache
-from logging import getLogger
+from logging import getLogger, Logger
 from logging.config import fileConfig
 from shutil import rmtree
-from typing import Iterable, Type, Union
-from warnings import catch_warnings, simplefilter
+from typing import Iterable, Union
 
-import numba
 from luigi import Task
 from luigi.interface import core
 from luigi.task import flatten
@@ -50,7 +46,7 @@ def _clear(target: Union[FileTarget, Iterable[FileTarget]]):
             return
 
 
-def init_log():
+def init_log() -> Logger:
     # Luigi hasn't initalised logging yet when this is called in __main__.py,
     # so we apply the config file ourselves.
     try:
@@ -63,26 +59,4 @@ def init_log():
     log.info(f"Hello, it's {date.today():%b %d, %Y}.")
     log.info(f"Config directory: {config_dir}")
     log.info(f"Output root directory: {output_root}")
-
-
-@contextmanager
-def ignore(warning_type: Type[Warning]):
-    """
-    Executes a block of code while ignoring certain warnings. Usage example:
-
-        >>> with ignore(FutureWarning):
-        ...     scipy.filtfilt(b, a, signal)
-
-    """
-    with catch_warnings():
-        simplefilter("ignore", warning_type)
-        yield
-
-
-# Short alias. (We don't care that it's an _LRU_ cache, and we don't want to
-# change the cache size).
-# NOTE: when combined with @property, @cached goes nearest to the function.
-cached = lru_cache(maxsize=256)
-
-# Another short alias
-compiled = numba.jit(cache=True, nopython=True)
+    return log

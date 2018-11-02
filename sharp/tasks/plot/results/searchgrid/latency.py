@@ -4,7 +4,7 @@ from numpy import argmax
 from seaborn import kdeplot
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.plot.results.searchgrid.base import SearchGrid
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class Latency(SearchGrid):

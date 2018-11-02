@@ -9,7 +9,7 @@ from sharp.data.files.base import FileTarget
 from sharp.data.files.stdlib import FloatFile
 from sharp.data.types.aliases import ArrayLike
 from sharp.data.types.signal import Signal
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class NumpyArrayFile(FileTarget):

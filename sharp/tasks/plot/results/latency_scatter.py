@@ -5,7 +5,7 @@ from seaborn import JointGrid, kdeplot
 from sharp.data.files.figure import FigureTarget
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend
-from sharp.util import ignore
+from sharp.util.misc import ignore
 
 
 class PlotLatencyScatter(MultiEnvelopeFigureMaker):

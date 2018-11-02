@@ -11,7 +11,7 @@ from fklab.io.neuralynx import NlxFileCSC, NlxOpen
 from sharp.data.files.base import InputFileTarget
 from sharp.config.load import config
 from sharp.tasks.base import ExternalTask
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class Neuralynx_NCS_File(InputFileTarget):

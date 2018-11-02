@@ -13,7 +13,7 @@ from sharp.tasks.base import SharpTask
 from sharp.tasks.neuralnet.base import IOTuple, NeuralNetMixin
 from sharp.config.load import config
 from sharp.tasks.signal.util import time_to_index
-from sharp.util import cached
+from sharp.util.misc import cached
 
 log = getLogger(__name__)
 

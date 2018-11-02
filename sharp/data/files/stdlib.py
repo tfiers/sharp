@@ -5,7 +5,7 @@ Standard Python types, stored on disk.
 import toml
 
 from sharp.data.files.base import FileTarget
-from sharp.util import cached
+from sharp.util.misc import cached
 
 
 class TextFile(FileTarget):

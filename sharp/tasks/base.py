@@ -2,8 +2,8 @@ from typing import List
 
 from luigi import Target, Task
 from luigi.task import Parameter, flatten
-
 from sharp.config.load import config
+from sharp.util.misc import cached
 
 
 class SharpTask(Task):
@@ -17,6 +17,7 @@ class SharpTask(Task):
     config_id = Parameter(default=config.config_id)
     # (This `default` trick is an ugly but necessary luigi hack).
 
+    @cached
     def complete(self) -> bool:
         return all(
             dependency.complete() for dependency in self._dependencies
