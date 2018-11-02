@@ -5,16 +5,21 @@ Aliases of common types, for readability & consistency of type-hints.
 from typing import Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
-import numpy
 import torch
+from numpy import ndarray
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+
 
 TorchArray = torch.Tensor
 NeuralModel = torch.nn.Module
 
 Scalar = Union[complex, float, int, bool]
-ArrayLike = Union[numpy.ndarray, list, tuple, Scalar]
+ArrayLike = Union[ndarray, list, tuple, Scalar]
+
+RGB_tup = Tuple[float, float, float]
+RGBA_tup = Tuple[float, float, float, float]
+Color = Union[str, RGB_tup, RGBA_tup, ndarray]
 
 
 def subplots(

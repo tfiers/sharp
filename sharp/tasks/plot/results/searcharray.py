@@ -8,12 +8,13 @@ from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker, fraction
 from sharp.tasks.plot.style import blue, red
+from sharp.tasks.plot.util.legend import add_colored_legend
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 
 class PlotSearchArray(MultiEnvelopeFigureMaker):
     # num_delays = array(tuple(range(4)))
-    num_delays = array(tuple(range(10)) + tuple(range(10, 40, 3)))
+    num_delays = array(tuple(range(22)) + tuple(range(22, 40, 3)))
     linestyle = ".-"
     GEVec_color = blue
     sota_color = red
@@ -42,6 +43,11 @@ class PlotSearchArray(MultiEnvelopeFigureMaker):
         btm: Axes
         btm.set_xlabel("Number of delays")
         fig.tight_layout()
+        add_colored_legend(
+            parent=top,
+            labels=("GEVec, all channels", self.sota.title),
+            colors=(self.GEVec_color, self.sota_color),
+        )
         self.output().write(fig)
 
     def plot_delay(self, ax: Axes):
@@ -60,7 +66,7 @@ class PlotSearchArray(MultiEnvelopeFigureMaker):
             self.num_delays, centers, self.linestyle, color=self.GEVec_color
         )
         ax.fill_between(
-            self.num_delays, low, high, alpha=0.3, color=self.GEVec_color
+            self.num_delays, low, high, alpha=0.2, color=self.GEVec_color
         )
         ax.set_ylabel("Latency")
         # ax.invert_yaxis()
@@ -80,7 +86,7 @@ class PlotSearchArray(MultiEnvelopeFigureMaker):
             [Q1, Q1],
             [Q3, Q3],
             color=self.sota_color,
-            alpha=0.3,
+            alpha=0.2,
         )
 
     def plot_F1(self, ax: Axes):
