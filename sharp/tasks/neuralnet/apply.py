@@ -19,7 +19,7 @@ class ApplyRNN(EnvelopeMaker, NeuralNetMixin):
     def requires(self):
         return super().requires() + (self.model_selector,)
 
-    def run(self):
+    def work(self):
         with torch.no_grad():
             inputt = self.as_model_io(self.reference_channel_full.as_matrix())
             model: RNN = self.model_selector.output().read()

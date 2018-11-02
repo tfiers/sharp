@@ -28,7 +28,7 @@ class PlotSWRDurations(RecordingSummary):
     def output(self):
         return FigureTarget(self.output_dir, "SWR-durations")
 
-    def run(self):
+    def work(self):
         fig, ax = subplots(figsize=(8, 4))
         durations = self.reference_segs_all.duration
         distplot(1e3 * durations, ax=ax, palette=seaborn_colours)
@@ -41,7 +41,7 @@ class PlotInterSWRIntervals(RecordingSummary):
     def output(self):
         return FigureTarget(self.output_dir, "inter-SWR-intervals")
 
-    def run(self):
+    def work(self):
         intervals = self.reference_segs_all.intervals
         fig, ax = subplots(figsize=(8, 4))
         distplot(log10(intervals), ax=ax)
@@ -58,7 +58,7 @@ class PlotSWRLocations(RecordingSummary):
     def output(self):
         return FigureTarget(self.output_dir, "SWR-locations")
 
-    def run(self):
+    def work(self):
         pos = self.reference_segs_all.center
         sig_length = self.reference_channel_full.duration
         kde = KernelDensity(bandwidth=0.2)

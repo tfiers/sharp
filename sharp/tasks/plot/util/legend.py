@@ -4,12 +4,13 @@ from typing import Sequence, Union
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
+from sharp.data.types.aliases import Color
 
 
 def add_colored_legend(
     parent: Union[Figure, Axes],
     labels: Sequence[str] = None,
-    colors: Sequence[str] = None,
+    colors: Sequence[Color] = None,
     **legend_kwargs,
 ):
     """

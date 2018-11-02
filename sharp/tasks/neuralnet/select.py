@@ -37,7 +37,7 @@ class CalcValidLoss(SharpTask, NeuralNetMixin):
             filename=f"{model_file.stem}.valid-loss",
         )
 
-    def run(self):
+    def work(self):
         with torch.no_grad():
             valid_tuples = [self.io_tuple_valid]
             model: RNN = self.trainer.output().read()
@@ -59,7 +59,7 @@ class GatherValidLosses(SharpTask, NeuralNetMixin):
     def output(self):
         return NumpyArrayFile(self.output_dir, "validation-losses")
 
-    def run(self):
+    def work(self):
         validation_losses = [
             calc_valid_task.output().read()
             for calc_valid_task in self.requires()
@@ -84,7 +84,7 @@ class SelectBestRNN(SharpTask, NeuralNetMixin):
             self.output_dir, "best-model", self.get_model_prototype()
         )
 
-    def run(self):
+    def work(self):
         # Get index of model with lowest validation loss.
         valid_losses = self.input().read()
         best_epoch = int(valid_losses.argmin())

@@ -89,7 +89,7 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
     def output(self):
         return (self.output_grid, self.output_colorbar)
 
-    def run(self):
+    def work(self):
         self.plot_grid()
         self.plot_colorbar()
 

@@ -38,7 +38,7 @@ class MakeReference(SharpTask):
     def _input_channel(self) -> Signal:
         return self.downsampler.get_reference_channel()
 
-    def run(self):
+    def work(self):
         segs = self.calc_segments()
         self.output().write(segs)
 

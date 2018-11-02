@@ -55,7 +55,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
             filename = f"{start:.1f}--{stop:.1f}"
             yield FigureTarget(self.output_dir, filename)
 
-    def run(self):
+    def work(self):
         for time_range, output in zip(self.time_ranges, self.output()):
             fig = self.make_figure(time_range)
             log.info(f"Saving target {output.relative_to(output_root)}")

@@ -53,7 +53,7 @@ class ScatterPlot(FigureMaker):
     def output(self):
         return FigureTarget(output_dir, "scatter")
 
-    def run(self):
+    def work(self):
         fig, ax = subplots(figsize=(5, 5))
         scatter(S, ax, colors["Signal"])
         scatter(N, ax, colors["Noise"])
@@ -91,7 +91,7 @@ class StripPlot(FigureMaker):
     def output(self):
         return FigureTarget(output_dir, "strips")
 
-    def run(self):
+    def work(self):
         # fmt: off
         df: DataFrame = concat((
                  DataFrame(dict(proj=S.T @ -SVecs[:, 0],

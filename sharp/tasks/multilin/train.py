@@ -25,7 +25,7 @@ class MaximiseSNR(SharpTask, InputDataMixin, GEVecMixin):
     def output(self):
         return NumpyArrayFile(self.output_dir, self.filename)
 
-    def run(self):
+    def work(self):
         signal = self.multichannel_train[:, self.channels]
         segments = self.reference_segs_train
         data = Signal(data=delay_stack(signal, self.delays), fs=signal.fs)

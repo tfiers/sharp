@@ -19,7 +19,7 @@ class ApplyOnlineBPF(EnvelopeMaker):
     title = "Single-channel BPF"
     output_filename = "online-BPF"
 
-    def run(self):
+    def work(self):
         filtered = lfilter(*self.coeffs, self.input_signal)
         envelope = np.abs(filtered)
         envelope_sig = Signal(envelope, self.input_signal.fs)
@@ -45,7 +45,7 @@ class SaveBPFinfo(SharpTask):
     def output(self):
         return DictFile(final_output_dir, "online-BPF")
 
-    def run(self):
+    def work(self):
         b, a = self.filtertask.coeffs
         self.output().write(
             {

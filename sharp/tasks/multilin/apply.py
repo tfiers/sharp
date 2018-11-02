@@ -31,7 +31,7 @@ class SpatiotemporalConvolution(EnvelopeMaker, GEVecMixin):
     def requires(self):
         return (self.trainer,) + super().requires()
 
-    def run(self):
+    def work(self):
         input_signal = self.multichannel_full[:, self.channels]
         filter_weights = self.trainer.output().read()
         filter_output = convolve_spatiotemporal(

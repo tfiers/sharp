@@ -34,7 +34,7 @@ class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
         filename = f"PR-and-latency--{self.zoom_from}"
         return FigureTarget(self.output_dir, filename)
 
-    def run(self):
+    def work(self):
         fig, axes = subplots(
             nrows=2,
             ncols=2,

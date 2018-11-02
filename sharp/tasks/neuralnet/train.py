@@ -52,7 +52,7 @@ class TrainRNN(SharpTask, NeuralNetMixin):
     def output_dir(self):
         return super().output_dir / "epochs"
 
-    def run(self):
+    def work(self):
         if not self.is_initial_epoch:
             self.model = self.prev_epoch_trainer.output().read()
         self.tune_weights()

@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import List
 
 from luigi import Target, Task
@@ -6,7 +7,7 @@ from sharp.config.load import config
 from sharp.util.misc import cached
 
 
-class SharpTask(Task):
+class SharpTask(Task, ABC):
     """
     Base class for all tasks in this package.
 
@@ -19,9 +20,21 @@ class SharpTask(Task):
 
     @cached
     def complete(self) -> bool:
+        # Caching avoids many spurious checks. It requires invalidation of a
+        # task's cache after the function is run though.
+        # Caching complete() will probably not work for multiprocessing. In that
+        # case, we could maybe use a time-based cache (?).
         return all(
             dependency.complete() for dependency in self._dependencies
         ) and all(output.exists() for output in self._outputs)
+
+    def run(self):
+        self.complete.cache_clear()
+        self.work()
+
+    @abstractmethod
+    def work(self):
+        ...
 
     @property
     def _dependencies(self) -> List[Task]:
@@ -37,7 +50,7 @@ class ExternalTask(SharpTask):
     Makes sure external dependencies exist.
     """
 
-    run = None
+    work = None
 
 
 class CustomParameter(Parameter):

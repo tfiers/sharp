@@ -35,7 +35,7 @@ class PlotSearchArray(MultiEnvelopeFigureMaker):
     def output(self):
         return FigureTarget(self.output_dir, "searcharray")
 
-    def run(self):
+    def work(self):
         fig, (top, btm) = subplots(nrows=2, sharex=True, figsize=(10, 9))
         self.plot_F1(top)
         self.plot_delay(btm)

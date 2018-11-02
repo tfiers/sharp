@@ -18,7 +18,7 @@ class PlotValidLoss(FigureMaker):
     def output(self):
         return FigureTarget(self.output_dir, "valid-loss")
 
-    def run(self):
+    def work(self):
         losses = self.valid_loss_gatherer.output().read()
         fig = figure()
         ax = fig.add_subplot(1, 1, 1)

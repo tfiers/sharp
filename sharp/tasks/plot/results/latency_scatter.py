@@ -12,7 +12,7 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
     def output(self):
         return FigureTarget(self.output_dir, "latency-scatter")
 
-    def run(self):
+    def work(self):
         swr_duration = "SWR duration (ms)"
         delay = "Detection latency (ms)"
         algo = "Algorithm"

@@ -37,7 +37,7 @@ class ThresholdSweeper(SharpTask, InputDataMixin):
             self.reference_segs_all.duration, config.lockout_percentile
         )
 
-    def run(self):
+    def work(self):
         sweep = ThresholdSweep()
         threshold_range = self.envelope_maker.envelope_test.range
         log.info(

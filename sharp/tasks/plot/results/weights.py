@@ -35,7 +35,7 @@ class PlotWeights(MultiEnvelopeFigureMaker):
             for t in self.trainers
         ]
 
-    def run(self):
+    def work(self):
         tups = zip(self.trainers, self.convolvers, self.colors, self.output())
         for trainer, convolver, color, filetarget in tups:
             fig, ax = subplots(figsize=(5 + convolver.num_delays / 3, 5))

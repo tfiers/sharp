@@ -35,7 +35,7 @@ class Downsample(SharpTask):
             for file in self.raw_data_dir.output()
         ]
 
-    def run(self):
+    def work(self):
         for in_file, out_file in zip(self.raw_data_dir.output(), self.output()):
             log.info(f"Downsampling {in_file.name}")
             downsampled_data, fs = downsample(str(in_file), self.fs_target)
