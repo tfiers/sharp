@@ -20,9 +20,11 @@ from sharp.config.spec import (
 path.insert(0, str(config_dir))
 
 try:
-    # Load a file named `config.py`.
-    # For PyCharm:
+    # Try importing from a file named `config.py`.
+    #
+    # Instruction for the PyCharm editor:
     # noinspection PyUnresolvedReferences
+
     from config import SharpConfig
 
 except ModuleNotFoundError as err:

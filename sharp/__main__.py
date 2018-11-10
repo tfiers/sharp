@@ -52,10 +52,13 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
             "SharpConfig class (and not at the top of the file)."
         ) from err
 
-    environ["LUIGI_CONFIG_PARSER"] = "toml"
-    environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
+    luigi_config_path = config_dir / "luigi.toml"
+    if luigi_config_path.exists():
+        environ["LUIGI_CONFIG_PARSER"] = "toml"
+        environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)
+
     # Now we can import from luigi (and from sharp.util.startup, which imports
-    # luigi itself):
+    # luigi):
 
     from luigi import build
     from sharp.util.startup import clear_all_output, clear_output, init_log
