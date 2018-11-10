@@ -1,20 +1,20 @@
 from typing import Tuple
 
 from matplotlib.axes import Axes
-from numpy import array
+from numpy import arange
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker, fraction
-from sharp.tasks.plot.style import blue, red
+from sharp.data.types.style import blue, red
 from sharp.tasks.plot.util.legend import add_colored_legend
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 
 class PlotSearchArray(MultiEnvelopeFigureMaker):
     # num_delays = array(tuple(range(4)))
-    num_delays = array(tuple(range(22)) + tuple(range(22, 40, 3)))
+    num_delays = arange(40)
     linestyle = ".-"
     GEVec_color = blue
     sota_color = red

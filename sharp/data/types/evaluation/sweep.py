@@ -22,7 +22,7 @@ def vectorizing_property(name: str):
         ]
         return array(values)
 
-    return property(vectorize_attribute)
+    return property(fget=vectorize_attribute)
 
 
 class ThresholdSweep:
@@ -38,7 +38,7 @@ class ThresholdSweep:
         self.threshold_evaluations = []
 
     # FYI: We do not make this a proper dataclass, as `dataclass` does not
-    # recognize the following calculated properties, and takes them as init
+    # recognize the following properties as properties, and takes them as init
     # args (which they should not be).
     threshold: ndarray = vectorizing_property("threshold")
     num_detected: ndarray = vectorizing_property("num_detected")
@@ -115,5 +115,5 @@ class ThresholdSweep:
                 index_gap = index_largest_nc_gap
             else:
                 index_gap = index_largest_nd_gap
-            thresholds_gap = self.thresholds[index_gap : index_gap + 2]
-            return mean(thresholds_gap)
+            thresholds_at_gap = self.thresholds[index_gap : index_gap + 2]
+            return mean(thresholds_at_gap)

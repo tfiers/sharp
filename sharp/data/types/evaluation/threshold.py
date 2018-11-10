@@ -71,15 +71,15 @@ class ThresholdEvaluation:
     def precision(self) -> float:
         return self.num_correct / (self.num_correct + self.num_incorrect)
 
-    #
-    # --------
-    # F-scores
-    # --------
-
     @property
     def FDR(self) -> float:
         """ False discovery rate. """
         return 1 - self.precision
+
+    #
+    # --------
+    # F-scores
+    # --------
 
     @property
     def F1(self):

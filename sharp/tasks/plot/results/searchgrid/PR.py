@@ -4,7 +4,7 @@ from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.plot.results.searchgrid.base import SearchGrid
 
 
-class PR(SearchGrid):
+class PlotPRGrid(SearchGrid):
     filename_suffix = "PR"
     cell_xlabel = "Recall"
     cell_ylabel = "Precision"

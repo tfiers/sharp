@@ -54,11 +54,13 @@ L2_channels = (
     Channel("cluster: top, R", 15, SO, x=x_right, y=81.6),
 )
 
+# 0-based
 L2_channel_combinations = {
     "all": sorted(tuple(ch.index for ch in L2_channels)),
-    "pyr": (11,),
     "sr": (3,),
+    "pyr": (11,),
     "pyr+sr": (3, 11),
-    "sr-clust": (2, 3, 4, 5, 6),
+    # "sr-clust": (2, 3, 4, 5, 6),
+    "sr-only-clust": (1, 2, 3, 4),
     "tetr": (10, 11, 12, 13),
 }

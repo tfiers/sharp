@@ -7,7 +7,7 @@ from sharp.tasks.plot.results.searchgrid.base import SearchGrid
 from sharp.util.misc import cached
 
 
-class Latency(SearchGrid):
+class PlotLatencyGrid(SearchGrid):
     filename_suffix = "delay"
     cell_xlabel = "Latency"
     cell_ylabel = ""
@@ -17,7 +17,7 @@ class Latency(SearchGrid):
     colorbar_label = "Median latency"
     legend_text = "Median"
     col_pad = 1.6
-    color_range = (28, 95)
+    color_range = (28, 100)
 
     def summary_measure(self, sweep: ThresholdSweep) -> float:
         return sweep.at_max_F1().rel_delays_median

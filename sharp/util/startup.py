@@ -52,7 +52,7 @@ def init_log() -> Logger:
     try:
         fileConfig(core().logging_conf_file, disable_existing_loggers=False)
     except Exception as err:
-        raise Exception(
+        raise UserWarning(
             "The `logging_conf_file` setting may be incorrect in your `luigi.toml` file."
         ) from err
     log = getLogger("sharp")

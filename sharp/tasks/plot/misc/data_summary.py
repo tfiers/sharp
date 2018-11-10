@@ -7,7 +7,7 @@ from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker
-from sharp.tasks.plot.style import seaborn_colours
+from sharp.data.types.style import seaborn_colours
 from sharp.tasks.plot.util.scalebar import add_scalebar
 from sharp.tasks.signal.base import InputDataMixin
 

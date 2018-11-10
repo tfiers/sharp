@@ -1,16 +1,15 @@
 from typing import Sequence
 
-from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
+from sharp.tasks.plot.misc.F_score import PlotIsoFlines
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
-from sharp.tasks.plot.results.envelopes import PlotEnvelopes
-from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
-from sharp.tasks.plot.results.searcharray import PlotSearchArray
-from sharp.tasks.plot.results.searchgrid.PR import PR
-from sharp.tasks.plot.results.searchgrid.latency import Latency
-from sharp.tasks.plot.results.weights import PlotWeights
 
 
 def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
+    from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
+    from sharp.tasks.plot.results.envelopes import PlotEnvelopes
+    from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
+    from sharp.tasks.plot.results.weights import PlotWeights
+
     return (
         PlotWeights(**em_kwargs),
         PlotEnvelopes(**em_kwargs),
@@ -21,7 +20,10 @@ def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
 
 
 def searchgrids(**kwargs):
-    return (PR(**kwargs), Latency(**kwargs))
+    from sharp.tasks.plot.results.searchgrid.PR import PlotPRGrid
+    from sharp.tasks.plot.results.searchgrid.latency import PlotLatencyGrid
+
+    return (PlotPRGrid(**kwargs), PlotLatencyGrid(**kwargs))
 
 
 tasks_to_run = (
@@ -38,5 +40,6 @@ tasks_to_run = (
     #     ),
     # ),
     # *searchgrids(subdir="space-time-comp"),
-    PlotSearchArray(subdir="num-delays-search"),
+    PlotIsoFlines(),
+    # PlotSearchArray(subdir="num-delays-search"),
 )

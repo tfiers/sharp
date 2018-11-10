@@ -1,6 +1,11 @@
 from matplotlib import style, cycler
 from seaborn import color_palette
 
+# A4 dimensions, in inches
+paper_width = 8.27
+paper_height = 11.69
+linewidth = 0.7 * paper_width
+
 
 # fmt: off
 readable = {
