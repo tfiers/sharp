@@ -12,9 +12,9 @@ from sharp.config.default.channels import (
 from typeguard import check_type
 
 
-ENV_VAR = "SHARP_CONFIG_DIR"
+CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 
-config_dir = Path(environ.get(ENV_VAR, ".")).absolute()
+config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).absolute()
 
 
 # We do not want to import from luigi yet. (As it executes initalization code on

@@ -6,20 +6,10 @@ Usage:
     $ python -m sharp
     $ python -m sharp --help
 """
+
 from os import environ
 
 from click import command, option
-
-
-try:
-    from sharp.config.load import config
-    from sharp.config.spec import config_dir
-except ImportError as err:
-    raise UserWarning(
-        "Possible circular import. Make sure the Tasks you want to run are "
-        "imported *inside* the `get_tasks` method of your config.py > "
-        "SharpConfig class (and not at the top of the file)."
-    ) from err
 
 
 @command()
@@ -52,6 +42,16 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     --workers 2`) in this command, as this yields multiprocessing bugs in luigi
     / PyTorch / Python. See the ReadMe for how to run tasks in parallel.
     """
+    try:
+        from sharp.config.load import config
+        from sharp.config.spec import config_dir
+    except ImportError as err:
+        raise UserWarning(
+            "Possible circular import. Make sure the Tasks you want to run are "
+            "imported *inside* the `get_tasks` method of your config.py > "
+            "SharpConfig class (and not at the top of the file)."
+        ) from err
+
     environ["LUIGI_CONFIG_PARSER"] = "toml"
     environ["LUIGI_CONFIG_PATH"] = str(config_dir / "luigi.toml")
     # Now we can import from luigi (and from sharp.util.startup, which imports
@@ -63,7 +63,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     log = init_log()
     log.info("Importing tasks to run...")
     tasks_to_run = config.get_tasks_tuple()
-    log.info("Done importing tasks.")
+    log.info("Done importing tasks to run.")
     if clear_all:
         clear_all_output()
     if clear_last:
