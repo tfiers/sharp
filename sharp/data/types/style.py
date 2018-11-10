@@ -1,36 +1,51 @@
+from typing import Tuple
+
 from matplotlib import style, cycler
 from seaborn import color_palette
+from numpy import array
 
 # A4 dimensions, in inches
 paper_width = 8.27
 paper_height = 11.69
-linewidth = 0.7 * paper_width
+line_width = 0.7 * paper_width
 
+
+def paperfig(width=1.0, height=0.7) -> Tuple[float, float]:
+    """
+    :return:  A figure size tuple, in inches.
+    :param width:  Relative to paper linewidth.
+    :param height:  Also relative to paper linewidth.
+    """
+    return line_width * array((width, height))
+
+
+# Font sizes and linewidths are given in points, which are 1/72-th of an inch.
 
 # fmt: off
 readable = {
-    'figure.figsize': (7, 5),
+    'figure.figsize': paperfig(),
     'figure.dpi': 80,
     'savefig.dpi': 300,
 
-    'font.size': 15,
-    'axes.labelsize': 22,
-    'axes.titlesize': 22,
-    'legend.fontsize': 18,
-    'xtick.labelsize': 15,
-    'ytick.labelsize': 15,
+    'font.size': 8.5,
+    'axes.labelsize': 12,
+    'axes.titlesize': 12,
+    'legend.fontsize': 11,
+    'xtick.labelsize': 8.5,
+    'ytick.labelsize': 8.5,
 
-    'axes.titlepad': 30,
-    'axes.labelpad': 22,
+    'axes.titlepad': 12,
+    'axes.labelpad': 10,
 
-    'lines.linewidth': 3,
-    'lines.markersize': 16,
+    'lines.linewidth': 1.5,
+    'lines.markersize': 8,
     'lines.solid_capstyle': 'round',
 }
 
 griddy = {
     'axes.grid': True,
     'grid.color': 'D0D0D0',
+    'grid.linewidth': 0.4,
 
     'xtick.bottom': False,
     'ytick.left': False,
@@ -47,8 +62,8 @@ blue, orange, green, red, purple, brown, pink, *others = seaborn_colours
 colourful = {
     'axes.prop_cycle': cycler('color', seaborn_colours),
     'axes.labelcolor': '202020',
-    'xtick.color': '909090',
-    'ytick.color': '909090',
+    'xtick.color': '707070',
+    'ytick.color': '707070',
 }
 
 symposium = {**readable, **griddy, **colourful}
