@@ -8,10 +8,10 @@ from sharp.util.misc import cached
 
 
 class InputDataMixin:
-    _downsampler = Downsample()
-    _reference_maker = MakeReference()
+    downsampler = Downsample()
+    reference_maker = MakeReference()
 
-    input_data_makers = (_downsampler, _reference_maker)
+    input_data_makers = (downsampler, reference_maker)
     # Should be included in the return values of a Task's `requires()`.
 
     # -------------
@@ -20,7 +20,7 @@ class InputDataMixin:
     @property
     @cached
     def multichannel_full(self):
-        return self._downsampler.get_multichannel()
+        return self.downsampler.get_multichannel()
 
     @property
     def multichannel_train(self):
@@ -36,7 +36,7 @@ class InputDataMixin:
     @property
     @cached
     def reference_channel_full(self):
-        return self._downsampler.get_reference_channel()
+        return self.downsampler.get_reference_channel()
 
     @property
     def reference_channel_train(self):
@@ -52,7 +52,7 @@ class InputDataMixin:
     @property
     @cached
     def reference_segs_all(self):
-        return self._reference_maker.output().read()
+        return self.reference_maker.output().read()
 
     @property
     def reference_segs_train(self):

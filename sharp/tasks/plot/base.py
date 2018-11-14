@@ -140,7 +140,7 @@ def plot_signal_neat(signal: Signal, time_range: TimeRange, ax: Axes, **kwargs):
         ax=ax,
         time_grid=False,
         y_grid=False,
-        lw=1.2,
+        lw=0.9,
         clip_on=False,
         **kwargs,
     )

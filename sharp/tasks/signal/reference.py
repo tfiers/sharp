@@ -25,6 +25,9 @@ class MakeReference(SharpTask):
     min_duration: float = FloatParameter(25e-3)
     min_separation: float = FloatParameter(10e-3)
 
+    filter_options = dict(transition_width="10%", attenuation=40)
+    smooth_options = dict(kernel="gaussian", bandwidth=7.5e-3)
+
     downsampler = Downsample()
 
     def requires(self):
@@ -52,8 +55,8 @@ class MakeReference(SharpTask):
                 self._input_channel,
                 self.band,
                 fs=self._input_channel.fs,
-                filter_options=dict(transition_width="10%", attenuation=40),
-                smooth_options=dict(kernel="gaussian", bandwidth=7.5e-3),
+                filter_options=self.filter_options,
+                smooth_options=self.smooth_options,
             )
         return Signal(envelope, self._input_channel.fs)
 

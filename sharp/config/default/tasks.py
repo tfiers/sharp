@@ -1,6 +1,13 @@
 from typing import Sequence
 
-from sharp.tasks.plot.misc.F_score import PlotIsoFlines
+# from sharp.tasks.multilin.apply import SpatiotemporalConvolution
+# from sharp.tasks.plot.misc.F_score import PlotIsoFlines
+# from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
+# from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
+# from sharp.tasks.plot.misc.reference import PlotReferenceMaker
+# from sharp.tasks.plot.results.searcharray import PlotSearchArray
+# from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
+from sharp.tasks.plot.misc.offline_steps import PlotOfflineSteps
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 
 
@@ -40,6 +47,7 @@ tasks_to_run = (
     #     ),
     # ),
     # *searchgrids(subdir="space-time-comp"),
-    PlotIsoFlines(),
+    # PlotIsoFlines(),
     # PlotSearchArray(subdir="num-delays-search"),
+    PlotOfflineSteps(),
 )
