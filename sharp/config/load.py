@@ -38,7 +38,7 @@ except ModuleNotFoundError as err:
             f"Could not find file `config.py` in the directory where the "
             f"`python` process is run from ({config_dir}). You can specify an "
             f"explicit directory to look for a `config.py` file by setting the "
-            f"{CONFIG_DIR_ENV_VAR}  environment variable."
+            f"{CONFIG_DIR_ENV_VAR} environment variable."
         )
     raise ConfigError(msg) from err
 
@@ -52,6 +52,7 @@ except Exception as err:
     ) from err
 
 
+# Some more global config objects
 output_root: Path = config.output_dir
 intermediate_output_dir: Path = output_root / "intermediate"
 final_output_dir: Path = output_root / "final"
