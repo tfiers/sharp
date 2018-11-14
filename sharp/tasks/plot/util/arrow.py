@@ -1,37 +1,42 @@
-import numpy as np
+from math import tau
+from typing import Optional, Tuple
+
 from matplotlib.axes import Axes
+from matplotlib.transforms import Transform
+from numpy import array, cos, sin
 
-import sharp.tasks.plot.util.sizing as util
+from sharp.tasks.plot.util.sizing import transform_inches
 
 
-def add_arrow(ax: Axes, x, y, rot=60, length=20, coords="axes"):
+def add_arrow(
+    ax: Axes,
+    tip: Tuple[float, float],
+    rot: float = 60,
+    length: float = 0.3,
+    trans: Optional[Transform] = None,
+):
     """
-    Draws an arrow on an axes.
+    Highlight part of a plot by pointing an arrow to it.
 
-    Parameters
-    ----------
-    ax : mpl.axes.Axes
-    x, y : float
-        Where the arrow points at (location of the arrow end).
-    rot : float
-        Rotation of the arrow, in degrees.
-    length : float
-        Length of the arrow, in pixels.
-    coords : "axes", "data"  or  mpl.transforms.Transform
-        Coordinate system of `x` and `y`.
+    :param ax:  Axes to plot on.
+    :param tip:  Where the arrow points at (location of the arrow end).
+    :param rot:  Rotation of the arrow, in degrees. 0 is pointing east.
+    :param length:  Lenght of the arrow, in inches.
+    :param trans:  Coordinate system of `point`. Default: `ax.transAxes`, for
+                axes coordinates. Other interesting options: `ax.transData`,
+                `ax.get_xaxis_transform()`, and `ax.get_yaxis_transform()`.
+    :return:
     """
-    if coords == "axes":
+    if trans is None:
         trans = ax.transAxes
-    elif coords == "data":
-        trans = ax.transData
-    rot_rad = rot * np.pi / 180
-    length_coords = util.pixels_to_coords(length, trans)
-    vector = length_coords * np.array([np.cos(rot_rad), np.sin(rot_rad)])
-    end = (x, y)
-    base = end - vector
+    tip = array(tip)
+    angle = (rot / 360) * tau
+    length_transformed = transform_inches(length, trans)
+    vector = length_transformed * array([cos(angle), sin(angle)])
+    base = tip - vector
     ax.annotate(
         "",
-        end,
+        tip,
         base,
         xycoords=trans,
         textcoords=trans,
