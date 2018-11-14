@@ -8,9 +8,9 @@ from scipy.linalg import eigh
 from seaborn import stripplot
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
+from sharp.data.types.style import blue, green, orange, red
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker
-from sharp.data.types.style import blue, green, orange, red
 
 # Signal and noise covariance matrices:
 Rss = array([[1.5, 1], [1, 3]])

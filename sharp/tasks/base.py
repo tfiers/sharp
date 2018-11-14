@@ -1,8 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import List
 
 from luigi import Target, Task
 from luigi.task import Parameter, flatten
+
 from sharp.config.load import config
 from sharp.util.misc import cached
 
@@ -32,9 +33,8 @@ class SharpTask(Task, ABC):
         self.complete.cache_clear()
         self.work()
 
-    @abstractmethod
     def work(self):
-        ...
+        pass
 
     @property
     def _dependencies(self) -> List[Task]:
