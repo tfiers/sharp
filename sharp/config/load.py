@@ -24,9 +24,7 @@ try:
     #
     # Instruction for the PyCharm editor:
     # noinspection PyUnresolvedReferences
-
     from config import SharpConfig
-
 except ModuleNotFoundError as err:
     if CONFIG_DIR_ENV_VAR in environ:
         msg = (
@@ -41,6 +39,10 @@ except ModuleNotFoundError as err:
             f"{CONFIG_DIR_ENV_VAR} environment variable."
         )
     raise ConfigError(msg) from err
+except ImportError as err:
+    raise ConfigError(
+        "Your custom `config.py` must define a class named `SharpConfig`."
+    ) from err
 
 try:
     # A global config object, for use in any Task:
