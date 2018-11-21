@@ -71,11 +71,11 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         for i in range(num_ranges):
             stop = start + self.window_size
             time_range = (start, min(stop, duration))
-            if self.include(time_range):
+            if self.is_included(time_range):
                 yield time_range
             start = stop
 
-    def include(self, time_range: TimeRange) -> bool:
+    def is_included(self, time_range: TimeRange) -> bool:
         """ Whether to plot the given time range, or to skip it. """
         return True
 
@@ -112,7 +112,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
             ax.set_ylim(signal.range)
             add_scalebar(
                 ax,
-                orient="v",
+                direction="v",
                 length=signal.span,
                 label="",
                 pos_along=0,
@@ -133,15 +133,26 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         return []
 
 
-def plot_signal_neat(signal: Signal, time_range: TimeRange, ax: Axes, **kwargs):
+def plot_signal_neat(
+    signal: Signal,
+    time_range: TimeRange,
+    ax: Axes,
+    time_grid=False,
+    y_grid=False,
+    clip_on=False,
+    **kwargs,
+):
+    """
+    An opinionated `plot_signal()`, that yields a clean plot, well fitted for
+    plotting multiple signals in an array of axes.
+    """
     plot_signal(
         signal,
         time_range,
         ax=ax,
-        time_grid=False,
-        y_grid=False,
-        lw=0.9,
-        clip_on=False,
+        time_grid=time_grid,
+        y_grid=y_grid,
+        clip_on=clip_on,
         **kwargs,
     )
     # Add some padding in the beginning:

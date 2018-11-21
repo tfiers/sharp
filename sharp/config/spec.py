@@ -98,7 +98,7 @@ class SharpConfigBase:
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 
-    offline_steps_seg: Tuple[float, float] = (3.6, 3.9)
+    offline_steps_segs: Sequence[Tuple[float, float]] = [(0.68, 1.2)]
     # Segment of data to use for the `offline SWR detection steps` plot. In
     # seconds, relative to the start of the evaluation (AKA test) slice.
 

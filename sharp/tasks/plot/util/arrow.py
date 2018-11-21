@@ -5,14 +5,14 @@ from matplotlib.axes import Axes
 from matplotlib.transforms import Transform
 from numpy import array, cos, sin
 
-from sharp.tasks.plot.util.sizing import transform_inches
+from sharp.tasks.plot.util.sizing import points_to_figcoords
 
 
 def add_arrow(
     ax: Axes,
     tip: Tuple[float, float],
     rot: float = 60,
-    length: float = 0.3,
+    length: float = 20,
     trans: Optional[Transform] = None,
 ):
     """
@@ -21,7 +21,7 @@ def add_arrow(
     :param ax:  Axes to plot on.
     :param tip:  Where the arrow points at (location of the arrow end).
     :param rot:  Rotation of the arrow, in degrees. 0 is pointing east.
-    :param length:  Lenght of the arrow, in inches.
+    :param length:  Lenght of the arrow, in points (1/72-th of an inch).
     :param trans:  Coordinate system of `point`. Default: `ax.transAxes`, for
                 axes coordinates. Other interesting options: `ax.transData`,
                 `ax.get_xaxis_transform()`, and `ax.get_yaxis_transform()`.
@@ -31,8 +31,8 @@ def add_arrow(
         trans = ax.transAxes
     tip = array(tip)
     angle = (rot / 360) * tau
-    length_transformed = transform_inches(length, trans)
-    vector = length_transformed * array([cos(angle), sin(angle)])
+    vector_length = points_to_figcoords(length, trans)
+    vector = vector_length * array([cos(angle), sin(angle)])
     base = tip - vector
     ax.annotate(
         "",

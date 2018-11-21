@@ -32,7 +32,7 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
     def extra_signals(self):
         return self.test_envelopes
 
-    def include(self, time_range: TimeRange):
+    def is_included(self, time_range: TimeRange):
         return self._contains_any_detection(time_range)
 
     def _contains_any_detection(self, time_range: TimeRange) -> bool:
@@ -58,8 +58,12 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
                 linestyles="dashed",
                 linewidth=1,
             )
-            add_event_arrows(ax, sweep.at_recall().correct_detections, color="green")
-            add_event_arrows(ax, sweep.at_recall().incorrect_detections, color="red")
+            add_event_arrows(
+                ax, sweep.at_recall().correct_detections, color="green"
+            )
+            add_event_arrows(
+                ax, sweep.at_recall().incorrect_detections, color="red"
+            )
             ax.text(0.05, 0.91, title, color=color, transform=ax.transAxes)
 
 

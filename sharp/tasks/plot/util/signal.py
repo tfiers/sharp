@@ -30,10 +30,10 @@ def plot_signal(
     scale.
 
     :param time_range:  Time slice to plot. In seconds.
+    :param channels:  Which channels to plot. Plots all channels by default.
+    :param height:  Height of each channel, in inches.
     :param y_scale:  How much data-y-units the visual vertical spacing between
                 channels represents.
-    :param height:  Height of each channel, in inches.
-    :param channels:  Which channels to plot. Plots all channels by default.
     :param bottom_first:  If True (default), the first channel will be
                 plotted at the bottom of the figure.
     :param tight_ylims:  If True, adapts the ylims to tightly fit the data

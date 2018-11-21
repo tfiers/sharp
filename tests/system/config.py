@@ -4,8 +4,8 @@ from sharp.config.spec import SharpConfigBase
 class SharpConfig(SharpConfigBase):
 
     # [Data]
-    output_dir = "data/processed"
     raw_data_dir = "data/raw"
+    output_dir = "data/processed"
     reference_channel = "L2 - E13_extract"
 
     # [Main]

@@ -7,7 +7,7 @@ from typing import Sequence
 # from sharp.tasks.plot.misc.reference import PlotReferenceMaker
 # from sharp.tasks.plot.results.searcharray import PlotSearchArray
 # from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
-from sharp.tasks.plot.misc.offline_steps import PlotOfflineSteps
+from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultiple
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 
 
@@ -49,5 +49,5 @@ tasks_to_run = (
     # *searchgrids(subdir="space-time-comp"),
     # PlotIsoFlines(),
     # PlotSearchArray(subdir="num-delays-search"),
-    PlotOfflineSteps(),
+    PlotOfflineStepsMultiple(),
 )

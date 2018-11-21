@@ -24,6 +24,9 @@ def paperfig(width=1.0, height=0.7) -> Tuple[float, float]:
 # fmt: off
 readable = {
     'figure.figsize': paperfig(),
+    
+    # DPI (pixels-per-inch) is irrelevant for PDF's. But it does matter for
+    # Jupyter Notebooks ('figure.dpi') and saved PNG's ('savefig.dpi').
     'figure.dpi': 80,
     'savefig.dpi': 300,
 
