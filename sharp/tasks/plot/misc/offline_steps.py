@@ -55,7 +55,7 @@ def add_scalebar(ax, label=False, y=0.01):
     add_voltage_scalebar(ax, 250, "uV", pos_along=y, pos_across=0, **kwargs)
 
 
-def add_title(ax: Axes, title, color, x=0.041, y=0.91, **kwargs):
+def add_title(ax: Axes, title, color, x=0.038, y=0.91, **kwargs):
     # Darken text color to compensate for visual effect where thin text looks
     # lighter than thick plot lines.
     ax.text(
@@ -97,7 +97,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             ncols=2,
             figsize=paperfig(1.2, 1.2),
             gridspec_kw=dict(
-                width_ratios=(1, 0.26), height_ratios=(1, 1, 1, 1, 1.2)
+                width_ratios=(1, 0.24), height_ratios=(1, 1, 1, 1, 1.2)
             ),
         )
         self.remove_empty_axes(axes)
@@ -155,7 +155,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         ax_main.hlines(rm.threshold_high, *self.time_range, lw=thin_lw)
         ax_main.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
         add_scalebar(ax_main)
-        add_title(ax_main, "Thresholds", threshold_color, y=0.58)
+        add_title(ax_main, "Thresholds $T$", threshold_color, y=0.58)
         logger.info("Done")
         logger.info("Plotting envelope density..")
         self.plot_envelope_dist(ax_dist)
@@ -226,12 +226,19 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         e_dom = linspace(*self.e_t.range, 500)
         density = exp(kde.score_samples(as_data_matrix(e_dom)))
         ax.fill_betweenx(e_dom, density, color=envelope_color)
+        ax.axhline(0, color="gray", lw=thin_lw)
         rm = self.reference_maker
-        kwargs = dict(xmin=0, xmax=1, color=threshold_color, lw=thin_lw)
+        threshold_extent = 1.21
+        kwargs = dict(
+            xmin=0,
+            xmax=threshold_extent,
+            color=threshold_color,
+            lw=thin_lw,
+            clip_on=False,
+        )
         ax.axhline(rm.threshold_high, **kwargs)
         ax.axhline(rm.threshold_low, **kwargs)
         ax.axhline(rm.envelope_median, linestyle=":", **kwargs)
-        ax.axhline(0, color="gray", lw=thin_lw)
         ax.set_xticks([])
         ax.set_yticks([])
         add_title(
@@ -243,15 +250,15 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             clip_on=False,
         )
         text_kwargs = dict(
-            x=1.05,
+            x=threshold_extent + 0.05,
             color=threshold_color,
             transform=ax.get_yaxis_transform(),
-            fontsize=0.75 * annotation_text_size,
+            fontsize=0.71 * annotation_text_size,
             va="center",
         )
-        ax.text(y=rm.threshold_high, s="$T_h$", **text_kwargs)
-        ax.text(y=rm.threshold_low, s="$T_l$", **text_kwargs)
-        ax.text(y=rm.envelope_median, s="Median", **text_kwargs)
+        ax.text(y=rm.threshold_high, s="$T_{high}$", **text_kwargs)
+        ax.text(y=rm.threshold_low, s="$T_{low}$", **text_kwargs)
+        ax.text(y=rm.envelope_median, s="Median $m$", **text_kwargs)
 
     @property
     def x_t(self):
