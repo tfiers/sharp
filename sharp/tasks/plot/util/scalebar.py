@@ -37,6 +37,7 @@ def add_time_scalebar(
         label=label.format(**locals()),
         pos_along=pos_along,
         pos_across=pos_across,
+        **kwargs,
     )
 
 
@@ -71,6 +72,7 @@ def add_voltage_scalebar(
         label=label.format(**locals()).replace("uV", "μV"),
         pos_along=pos_along,
         pos_across=pos_across,
+        **kwargs,
     )
 
 
