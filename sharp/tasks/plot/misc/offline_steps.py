@@ -3,7 +3,7 @@ from logging import getLogger
 from luigi import TupleParameter
 from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
-from numpy import abs, array, ceil, imag, log, min, linspace, ndarray, exp
+from numpy import abs, array, ceil, exp, imag, linspace, log, min, ndarray
 from numpy.random import choice
 from scipy.signal import hilbert
 from sklearn.neighbors import KernelDensity
@@ -30,6 +30,7 @@ Hilbert_color = "gray"
 unsmoothed_envelope_color = blue
 envelope_color = red
 normal_lw = 1.5
+thin_lw = 0.5 * normal_lw
 bolder_lw = 1.25 * normal_lw
 thicc_lw = 1.5 * normal_lw
 
@@ -105,7 +106,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             ax_main,
             width="100%",
             height="100%",
-            bbox_to_anchor=(1, 0.25, 0.35, 1.4),
+            bbox_to_anchor=(1.04, 0.25, 0.31, 1.4),
             bbox_transform=ax_main.transAxes,
         )
         self.plot_analytic_signal_components(
@@ -113,7 +114,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         )
         start, stop = self.time_range
         span = stop - start
-        ax_inset.set_xlim(start + array([0.68, 0.75]) * span)
+        ax_inset.set_xlim(start + array([0.69, 0.75]) * span)
 
         class Corners:
             upper_right = 1
@@ -167,29 +168,32 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
 
     def plot_thresholded_envelope(self, ax_main: Axes, ax_dist: Axes):
         # e_t, with segment bands, and summary stats to the right :)
+        logger.info("Plotting thresholded envelope..")
         self.plot_envelope_main(ax_main)
         self.plot_envelope_dist(ax_dist)
         ax_dist.set_ylim(ax_main.get_ylim())
+        logger.info("Done")
 
     def plot_envelope_main(self, ax):
         self.plot_signal(self.e_t, ax=ax, color=envelope_color, lw=thicc_lw)
         rm = self.reference_maker
-        ax.hlines(rm.threshold_high, *self.time_range)
-        ax.hlines(rm.threshold_low, *self.time_range, linestyles="dashed")
+        ax.hlines(rm.threshold_high, *self.time_range, lw=thin_lw)
+        ax.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
         add_scalebar(ax)
 
     def plot_envelope_dist(self, ax):
-        sample = choice(self.e_t, 10000)
-        kde = KernelDensity(bandwidth=0.01 * self.e_t.span)
+        sample = choice(self.e_t, 5000)
+        kde = KernelDensity(bandwidth=0.02 * self.e_t.span)
         kde.fit(as_data_matrix(sample))
-        e_dom = linspace(*self.e_t.range, 1000)
+        e_dom = linspace(*self.e_t.range, 500)
         density = exp(kde.score_samples(as_data_matrix(e_dom)))
-        ax.plot(density, e_dom, color=envelope_color, lw=thicc_lw)
-        ax.fill_betweenx(e_dom, density, color=envelope_color, alpha=0.3)
+        ax.fill_betweenx(e_dom, density, color=envelope_color)
         rm = self.reference_maker
-        ax.axhline(rm.threshold_high, color="black")
-        ax.axhline(rm.threshold_low, color="black", linestyle="dashed")
-        # ax.grid("off")
+        kwargs = dict(xmin=0, xmax=1, color="black", lw=thin_lw)
+        ax.axhline(rm.threshold_high, **kwargs)
+        ax.axhline(rm.threshold_low, **kwargs)
+        ax.axhline(rm.envelope_median, linestyle=":", **kwargs)
+        ax.axhline(0, color="gray", lw=thin_lw)
         ax.set_xticks([])
         ax.set_yticks([])
 

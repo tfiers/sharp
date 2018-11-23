@@ -20,8 +20,8 @@ from sharp.util.misc import cached, ignore
 class MakeReference(SharpTask):
 
     band: Tuple[float, float] = TupleParameter((100, 250))
-    mult_detect: float = FloatParameter(12.7)
-    mult_support: float = FloatParameter(6.5)
+    mult_detect: float = FloatParameter(6.2)
+    mult_support: float = FloatParameter(3.6)
     min_duration: float = FloatParameter(25e-3)
     min_separation: float = FloatParameter(10e-3)
 
@@ -61,20 +61,16 @@ class MakeReference(SharpTask):
         return Signal(envelope, self._input_channel.fs)
 
     @property
-    def envelope_center(self):
+    def envelope_median(self):
         return np.median(self.envelope)
 
     @property
-    def envelope_spread(self):
-        return np.percentile(self.envelope, 75) - self.envelope_center
-
-    @property
     def threshold_low(self):
-        return self.envelope_center + self.mult_support * self.envelope_spread
+        return self.mult_support * self.envelope_median
 
     @property
     def threshold_high(self):
-        return self.envelope_center + self.mult_detect * self.envelope_spread
+        return self.mult_detect * self.envelope_median
 
     def calc_segments(self) -> Segment:
         """ Start and end times of sharp wave-ripple events. """
