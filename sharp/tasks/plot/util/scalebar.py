@@ -1,8 +1,9 @@
 # coding: utf8
 
-import numpy as np
+
 from matplotlib.axes import Axes
 from matplotlib.text import Text
+from numpy import diff, sign
 
 from sharp.tasks.plot.util.sizing import points_to_figcoords
 
@@ -114,7 +115,7 @@ def add_scalebar(
                 Ignored when `label_align` is "center".
     :param label_offset:  Position of the center-line of the label text,
                 relative to the scalebar. In `label_size` units. Negative
-                values position the label
+                values position the label to the left or below the scalebar.
     :param lw:  Line width of the scalebar.
     :param brackets:  Whether to end the scalebar in short perpendicular lines
                 at both ends.
@@ -130,7 +131,7 @@ def add_scalebar(
         lims = ax.get_ylim()
         orthogonal_direction = "h"
     # `bar_start` and `bar_end` are in data coordinates.
-    bar_start = lims[0] + (pos_along * np.diff(lims))
+    bar_start = lims[0] + (pos_along * diff(lims))
     bar_end = bar_start + length
     plot_options = dict(
         c="black",
@@ -163,13 +164,15 @@ def add_scalebar(
     text_coords = (label_pos_along, label_pos_across)
     bar_coords = ([bar_start, bar_end], [pos_across, pos_across])
     # Format of below coords: imagine a horizontal bar, then: ([x, x], [y, y]).
+    label_direction = sign(label_offset)
+    bracket_direction = -label_direction
     bracket_start_coords = (
         [bar_start, bar_start],
-        [pos_across, pos_across + bracket_length_axcoords],
+        [pos_across, pos_across + bracket_direction * bracket_length_axcoords],
     )
     bracket_end_coords = (
         [bar_end, bar_end],
-        [pos_across, pos_across + bracket_length_axcoords],
+        [pos_across, pos_across + bracket_direction * bracket_length_axcoords],
     )
     if direction == "v":
         bar_coords = reversed(bar_coords)
