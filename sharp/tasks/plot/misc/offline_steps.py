@@ -1,7 +1,9 @@
+from colorsys import hls_to_rgb, rgb_to_hls
 from logging import getLogger
 
 from luigi import TupleParameter
 from matplotlib.axes import Axes
+from matplotlib.colors import to_rgb
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 from numpy import abs, array, ceil, exp, imag, linspace, log, min, ndarray
 from numpy.random import choice
@@ -29,10 +31,12 @@ filter_output_color = green
 Hilbert_color = "gray"
 unsmoothed_envelope_color = blue
 envelope_color = red
+threshold_color = "black"
 normal_lw = 1.5
-thin_lw = 0.5 * normal_lw
+thin_lw = 0.7 * normal_lw
 bolder_lw = 1.25 * normal_lw
 thicc_lw = 1.5 * normal_lw
+annotation_text_size = 14
 
 
 class PlotOfflineStepsMultifig(SharpTask):
@@ -48,10 +52,31 @@ def add_scalebar(ax, label=False, y=0.01):
     add_voltage_scalebar(ax, 250, "uV", pos_along=y, pos_across=0, **kwargs)
 
 
+def add_title(ax: Axes, title, color, x=0.041, y=0.91, **kwargs):
+    # Darken text color to compensate for visual effect where thin text looks
+    # lighter than thick plot lines.
+    ax.text(
+        x=x,
+        y=y,
+        s=title,
+        color=darken(color),
+        transform=ax.transAxes,
+        fontsize=annotation_text_size,
+        **kwargs,
+    )
+
+
+def darken(color, amount: float = 0.14):
+    input_tup = to_rgb(color)
+    h, l, s = rgb_to_hls(*input_tup)
+    l_darker = (1 - amount) * l
+    output_tup = hls_to_rgb(h, l_darker, s)
+    return output_tup
+
+
 class PlotOfflineSteps(FigureMaker, InputDataMixin):
 
     time_range = TupleParameter()
-    nsteps = 5
 
     def output(self):
         start, stop = self.time_range
@@ -65,10 +90,12 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
 
     def work(self):
         fig, axes = subplots(
-            nrows=self.nsteps,
+            nrows=5,
             ncols=2,
             figsize=paperfig(1.2, 1.2),
-            gridspec_kw=dict(width_ratios=(1, 0.3)),
+            gridspec_kw=dict(
+                width_ratios=(1, 0.26), height_ratios=(1, 1, 1, 1, 1.2)
+            ),
         )
         self.remove_empty_axes(axes)
         self.plot_wideband(axes[0, 0])
@@ -81,32 +108,62 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         self.output().write(fig)
 
     def remove_empty_axes(self, axes):
-        for row in range(self.nsteps - 1):
+        for row in (0, 1, 2, 3):
             ax: Axes = axes[row, 1]
             ax.remove()
 
     def plot_wideband(self, ax):
         self.plot_signal(self.x_t, ax=ax, color=wideband_color)
+        add_title(ax, "LFP recording $z_t$", wideband_color)
         add_scalebar(ax, label=True, y=0.5)
 
     def plot_filter_output(self, ax):
         self.plot_signal(self.o_t, ax=ax, color=filter_output_color)
+        add_title(
+            ax, "Band-pass filter output $o_t$", filter_output_color, y=0.83
+        )
         add_scalebar(ax, y=0.4)
 
     def plot_analytic(self, ax):
-        self.plot_analytic_main(ax)
-        self.plot_analytic_inset(ax)
-
-    def plot_analytic_main(self, ax):
         self.plot_analytic_signal_components(ax)
+        self.plot_analytic_inset(ax)
+        add_title(ax, "Envelope $u_t$", unsmoothed_envelope_color, y=0.72)
         add_scalebar(ax, y=0.4)
+
+    def plot_smoothed_envelope(self, ax):
+        self.plot_signal(
+            self.envelope_unsmoothed,
+            ax,
+            color=unsmoothed_envelope_color,
+            lw=bolder_lw,
+        )
+        self.plot_signal(self.e_t, ax, color=envelope_color, lw=thicc_lw)
+        add_title(ax, "Smoothed envelope $n_t$", envelope_color, y=0.7)
+        add_scalebar(ax)
+
+    def plot_thresholded_envelope(self, ax_main: Axes, ax_dist: Axes):
+        # e_t, with segment bands, and summary stats to the right :)
+        logger.info("Plotting thresholded envelope..")
+        self.plot_signal(
+            self.e_t, ax=ax_main, color=envelope_color, lw=thicc_lw
+        )
+        rm = self.reference_maker
+        ax_main.hlines(rm.threshold_high, *self.time_range, lw=thin_lw)
+        ax_main.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
+        add_scalebar(ax_main)
+        add_title(ax_main, "Thresholds", threshold_color, y=0.58)
+        logger.info("Done")
+        logger.info("Plotting envelope density..")
+        self.plot_envelope_dist(ax_dist)
+        logger.info("Done")
+        ax_dist.set_ylim(ax_main.get_ylim())
 
     def plot_analytic_inset(self, ax_main: Axes):
         ax_inset: Axes = inset_axes(
             ax_main,
             width="100%",
             height="100%",
-            bbox_to_anchor=(1.04, 0.25, 0.31, 1.4),
+            bbox_to_anchor=(1.08, -0.16, 0.31, 1.4),
             bbox_transform=ax_main.transAxes,
         )
         self.plot_analytic_signal_components(
@@ -114,7 +171,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         )
         start, stop = self.time_range
         span = stop - start
-        ax_inset.set_xlim(start + array([0.69, 0.75]) * span)
+        zoom_to = 0.88 + array([-0.03, +0.03])  # fractions of time_range
+        ax_inset.set_xlim(start + zoom_to * span)
+        add_title(ax_inset, "$H[o_t]$", Hilbert_color, x=0.15, y=0.2)
 
         class Corners:
             upper_right = 1
@@ -126,7 +185,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             ax_main,
             ax_inset,
             Corners.upper_left,
-            Corners.lower_right,
+            Corners.lower_left,
             fc="none",
             ec="0.5",
         )
@@ -156,32 +215,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             **kwargs,
         )
 
-    def plot_smoothed_envelope(self, ax):
-        self.plot_signal(
-            self.envelope_unsmoothed,
-            ax,
-            color=unsmoothed_envelope_color,
-            lw=bolder_lw,
-        )
-        self.plot_signal(self.e_t, ax, color=envelope_color, lw=thicc_lw)
-        add_scalebar(ax)
-
-    def plot_thresholded_envelope(self, ax_main: Axes, ax_dist: Axes):
-        # e_t, with segment bands, and summary stats to the right :)
-        logger.info("Plotting thresholded envelope..")
-        self.plot_envelope_main(ax_main)
-        self.plot_envelope_dist(ax_dist)
-        ax_dist.set_ylim(ax_main.get_ylim())
-        logger.info("Done")
-
-    def plot_envelope_main(self, ax):
-        self.plot_signal(self.e_t, ax=ax, color=envelope_color, lw=thicc_lw)
-        rm = self.reference_maker
-        ax.hlines(rm.threshold_high, *self.time_range, lw=thin_lw)
-        ax.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
-        add_scalebar(ax)
-
-    def plot_envelope_dist(self, ax):
+    def plot_envelope_dist(self, ax: Axes):
         sample = choice(self.e_t, 5000)
         kde = KernelDensity(bandwidth=0.02 * self.e_t.span)
         kde.fit(as_data_matrix(sample))
@@ -189,13 +223,31 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         density = exp(kde.score_samples(as_data_matrix(e_dom)))
         ax.fill_betweenx(e_dom, density, color=envelope_color)
         rm = self.reference_maker
-        kwargs = dict(xmin=0, xmax=1, color="black", lw=thin_lw)
+        kwargs = dict(xmin=0, xmax=1, color=threshold_color, lw=thin_lw)
         ax.axhline(rm.threshold_high, **kwargs)
         ax.axhline(rm.threshold_low, **kwargs)
         ax.axhline(rm.envelope_median, linestyle=":", **kwargs)
         ax.axhline(0, color="gray", lw=thin_lw)
         ax.set_xticks([])
         ax.set_yticks([])
+        add_title(
+            ax,
+            "Empirical\ndistribution of $n_t$",
+            envelope_color,
+            x=0.1,
+            y=0.8,
+            clip_on=False,
+        )
+        text_kwargs = dict(
+            x=1.05,
+            color=threshold_color,
+            transform=ax.get_yaxis_transform(),
+            fontsize=0.75 * annotation_text_size,
+            va="center",
+        )
+        ax.text(y=rm.threshold_high, s="$T_h$", **text_kwargs)
+        ax.text(y=rm.threshold_low, s="$T_l$", **text_kwargs)
+        ax.text(y=rm.envelope_median, s="median", **text_kwargs)
 
     @property
     def x_t(self):
