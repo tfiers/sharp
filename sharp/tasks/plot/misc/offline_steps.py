@@ -19,7 +19,10 @@ from sharp.data.types.signal import Signal
 from sharp.data.types.style import blue, green, paperfig, red
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker, plot_signal_neat
-from sharp.tasks.plot.util.scalebar import add_voltage_scalebar
+from sharp.tasks.plot.util.scalebar import (
+    add_voltage_scalebar,
+    add_time_scalebar,
+)
 from sharp.tasks.signal.base import InputDataMixin
 from sharp.util.misc import cached, ignore
 
@@ -114,8 +117,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
 
     def plot_wideband(self, ax):
         self.plot_signal(self.x_t, ax=ax, color=wideband_color)
-        add_title(ax, "LFP recording $z_t$", wideband_color)
+        add_title(ax, "LFP recording $z_t$", wideband_color, y=0.89)
         add_scalebar(ax, label=True, y=0.5)
+        add_time_scalebar(ax, 100, "ms", pos_along=0.72, pos_across=0.06)
 
     def plot_filter_output(self, ax):
         self.plot_signal(self.o_t, ax=ax, color=filter_output_color)
@@ -247,7 +251,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         )
         ax.text(y=rm.threshold_high, s="$T_h$", **text_kwargs)
         ax.text(y=rm.threshold_low, s="$T_l$", **text_kwargs)
-        ax.text(y=rm.envelope_median, s="median", **text_kwargs)
+        ax.text(y=rm.envelope_median, s="Median", **text_kwargs)
 
     @property
     def x_t(self):
