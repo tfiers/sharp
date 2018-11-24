@@ -185,9 +185,8 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         ax_dist.set_ylim(ax_main.get_ylim())
 
     def plot_segments(self, ax):
-        self.plot_signal(
-            self.x_t, ax=ax, color=wideband_color, alpha=0.2, lw=thin_lw
-        )
+        self.plot_signal(self.x_t, ax=ax, color="none", alpha=0.2, lw=thin_lw)
+        # add_scalebar(ax, y=0.12)
         add_segments(
             ax,
             self.reference_segs_test,
@@ -201,7 +200,6 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             y=0.55,
             bbox=dict(facecolor="white", edgecolor="none"),
         )
-        add_scalebar(ax, y=0.12)
 
     def plot_analytic_inset(self, ax_main: Axes):
         ax_inset: Axes = inset_axes(
@@ -349,8 +347,8 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
 def hilbert_fast(sig: Signal):
     # Zero-pad signal to nearest power of 2 or 3 in order to speed up
     # computation
-    powers = ceil(log(sig.num_samples) / log([2, 3]))
-    N = int(min(array([2, 3]) ** powers))
+    exponents = ceil(log(sig.num_samples) / log([2, 3]))
+    N = int(min(array([2, 3]) ** exponents))
     with ignore(FutureWarning):
         analytic = hilbert(sig, N)
     return Signal(analytic[: sig.num_samples], sig.fs)
