@@ -3,6 +3,7 @@ from logging import getLogger
 
 from luigi import TupleParameter
 from matplotlib.axes import Axes
+from matplotlib.collections import BrokenBarHCollection
 from matplotlib.colors import to_rgb
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 from numpy import abs, array, ceil, exp, imag, linspace, log, min, ndarray
@@ -16,12 +17,13 @@ from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
-from sharp.data.types.style import blue, green, paperfig, red
+from sharp.data.types.style import blue, green, paperfig, pink, red
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker, plot_signal_neat
+from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
-    add_voltage_scalebar,
     add_time_scalebar,
+    add_voltage_scalebar,
 )
 from sharp.tasks.signal.base import InputDataMixin
 from sharp.util.misc import cached, ignore
@@ -35,6 +37,8 @@ Hilbert_color = "gray"
 unsmoothed_envelope_color = blue
 envelope_color = red
 threshold_color = "black"
+segment_color = pink
+segment_alpha = 0.5
 normal_lw = 1.5
 thin_lw = 0.7 * normal_lw
 bolder_lw = 1.25 * normal_lw
@@ -65,6 +69,7 @@ def add_title(ax: Axes, title, color, x=0.038, y=0.91, **kwargs):
         color=darken(color),
         transform=ax.transAxes,
         fontsize=annotation_text_size,
+        clip_on=False,
         **kwargs,
     )
 
@@ -93,11 +98,11 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
 
     def work(self):
         fig, axes = subplots(
-            nrows=5,
+            nrows=6,
             ncols=2,
-            figsize=paperfig(1.2, 1.2),
+            figsize=paperfig(1.2, 1.32),
             gridspec_kw=dict(
-                width_ratios=(1, 0.24), height_ratios=(1, 1, 1, 1, 1.2)
+                width_ratios=(1, 0.24), height_ratios=(1, 1, 1, 1, 1.2, 1)
             ),
         )
         self.remove_empty_axes(axes)
@@ -106,12 +111,13 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         self.plot_analytic(axes[2, 0])
         self.plot_smoothed_envelope(axes[3, 0])
         self.plot_thresholded_envelope(axes[4, 0], axes[4, 1])
+        self.plot_segments(axes[5, 0])
         with ignore(UserWarning):
             fig.tight_layout()
         self.output().write(fig)
 
     def remove_empty_axes(self, axes):
-        for row in (0, 1, 2, 3):
+        for row in (0, 1, 2, 3, 5):
             ax: Axes = axes[row, 1]
             ax.remove()
 
@@ -156,11 +162,33 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         ax_main.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
         add_scalebar(ax_main)
         add_title(ax_main, "Thresholds $T$", threshold_color, y=0.58)
+        segs = self.reference_segs_test
+        visible_segs = segs.intersection(ax_main.get_xlim())
+        bars = BrokenBarHCollection(
+            xranges=[
+                tup for tup in zip(visible_segs.start, visible_segs.duration)
+            ],
+            yrange=(0, rm.threshold_low),
+            facecolors=segment_color,
+            alpha=segment_alpha,
+        )
+        ax_main.add_collection(bars)
         logger.info("Done")
         logger.info("Plotting envelope density..")
         self.plot_envelope_dist(ax_dist)
         logger.info("Done")
         ax_dist.set_ylim(ax_main.get_ylim())
+
+    def plot_segments(self, ax):
+        self.plot_signal(self.x_t, ax=ax, color=wideband_color)
+        add_segments(
+            ax,
+            self.reference_segs_test,
+            color=segment_color,
+            alpha=segment_alpha,
+        )
+        add_title(ax, "Ripple segments", segment_color, y=1.09)
+        add_scalebar(ax, y=0.5)
 
     def plot_analytic_inset(self, ax_main: Axes):
         ax_inset: Axes = inset_axes(
@@ -242,12 +270,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         ax.set_xticks([])
         ax.set_yticks([])
         add_title(
-            ax,
-            "Empirical\ndistribution of $n_t$",
-            envelope_color,
-            x=0.1,
-            y=0.8,
-            clip_on=False,
+            ax, "Empirical\ndistribution of $n_t$", envelope_color, x=0.1, y=0.8
         )
         text_kwargs = dict(
             x=threshold_extent + 0.05,
