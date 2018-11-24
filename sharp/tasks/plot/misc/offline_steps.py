@@ -100,9 +100,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         fig, axes = subplots(
             nrows=6,
             ncols=2,
-            figsize=paperfig(1.2, 1.32),
+            figsize=paperfig(1.2, 1.31),
             gridspec_kw=dict(
-                width_ratios=(1, 0.24), height_ratios=(1, 1, 1, 1, 1.2, 1)
+                width_ratios=(1, 0.24), height_ratios=(1, 1, 1, 1, 1.22, 0.8)
             ),
         )
         self.remove_empty_axes(axes)
@@ -130,7 +130,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
     def plot_filter_output(self, ax):
         self.plot_signal(self.o_t, ax=ax, color=filter_output_color)
         add_title(
-            ax, "Band-pass filter output $o_t$", filter_output_color, y=0.83
+            ax, "Band-pass filter\noutput $o_t$", filter_output_color, y=0.79
         )
         add_scalebar(ax, y=0.4)
 
@@ -148,7 +148,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             lw=bolder_lw,
         )
         self.plot_signal(self.e_t, ax, color=envelope_color, lw=thicc_lw)
-        add_title(ax, "Smoothed envelope $n_t$", envelope_color, y=0.7)
+        add_title(ax, "Smoothed\nenvelope $n_t$", envelope_color, y=0.4)
         add_scalebar(ax)
 
     def plot_thresholded_envelope(self, ax_main: Axes, ax_dist: Axes):
@@ -185,15 +185,23 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         ax_dist.set_ylim(ax_main.get_ylim())
 
     def plot_segments(self, ax):
-        self.plot_signal(self.x_t, ax=ax, color=wideband_color)
+        self.plot_signal(
+            self.x_t, ax=ax, color=wideband_color, alpha=0.2, lw=thin_lw
+        )
         add_segments(
             ax,
             self.reference_segs_test,
             color=segment_color,
             alpha=segment_alpha,
         )
-        add_title(ax, "Ripple segments", segment_color, y=1.09)
-        add_scalebar(ax, y=0.5)
+        add_title(
+            ax,
+            "Ripple\nsegments",
+            segment_color,
+            y=0.55,
+            bbox=dict(facecolor="white", edgecolor="none"),
+        )
+        add_scalebar(ax, y=0.12)
 
     def plot_analytic_inset(self, ax_main: Axes):
         ax_inset: Axes = inset_axes(
@@ -253,8 +261,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         )
 
     def plot_envelope_dist(self, ax: Axes):
+        yrange = self.e_t.span
         sample = choice(self.e_t, 5000)
-        kde = KernelDensity(bandwidth=0.02 * self.e_t.span)
+        kde = KernelDensity(bandwidth=0.02 * yrange)
         kde.fit(as_data_matrix(sample))
         e_dom = linspace(*self.e_t.range, 500)
         density = exp(kde.score_samples(as_data_matrix(e_dom)))
@@ -281,7 +290,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             x=threshold_extent + 0.05,
             color=threshold_color,
             transform=ax.get_yaxis_transform(),
-            fontsize=0.71 * annotation_text_size,
+            fontsize=0.69 * annotation_text_size,
             va="center",
         )
         ax.text(y=rm.threshold_high, s="$T_{high}$", **text_kwargs)
