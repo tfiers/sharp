@@ -43,7 +43,7 @@ normal_lw = 1.5
 thin_lw = 0.7 * normal_lw
 bolder_lw = 1.25 * normal_lw
 thicc_lw = 1.5 * normal_lw
-annotation_text_size = 14
+annotation_text_size = 12
 
 
 class PlotOfflineStepsMultifig(SharpTask):
