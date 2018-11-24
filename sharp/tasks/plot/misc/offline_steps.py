@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from matplotlib.collections import BrokenBarHCollection
 from matplotlib.colors import to_rgb
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
-from numpy import abs, array, ceil, exp, imag, linspace, log, min, ndarray
+from numpy import abs, array, ceil, diff, exp, imag, linspace, log, min, nonzero
 from numpy.random import choice
 from scipy.signal import hilbert
 from sklearn.neighbors import KernelDensity
@@ -90,7 +90,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         start, stop = self.time_range
         return FigureTarget(
             directory=self.output_dir / "steps-offline-SWR-detection",
-            filename=f"{start:.1f}--{stop:.1f}",
+            filename=f"{start:.1f}--{stop:.1f}".replace(".", "_"),
         )
 
     def requires(self):
@@ -173,6 +173,11 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             alpha=segment_alpha,
         )
         ax_main.add_collection(bars)
+        # Find and plot crossings of lower threshold
+        crossings_ix = nonzero(diff(self.e_t > rm.threshold_low))[0]
+        crossings_t = crossings_ix / self.fs
+        crossings_y = [rm.threshold_low] * len(crossings_t)
+        ax_main.plot(crossings_t, crossings_y, ".", c="black")
         logger.info("Done")
         logger.info("Plotting envelope density..")
         self.plot_envelope_dist(ax_dist)
@@ -342,5 +347,5 @@ def hilbert_fast(sig: Signal):
     return Signal(analytic[: sig.num_samples], sig.fs)
 
 
-def as_data_matrix(array: ndarray):
+def as_data_matrix(array):
     return array[:, None]
