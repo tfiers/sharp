@@ -5,10 +5,7 @@ import numpy as np
 from numpy import ndarray
 from scipy.signal import cheb2ord, cheby2, lfilter
 
-from sharp.config.load import final_output_dir
-from sharp.data.files.stdlib import DictFile
 from sharp.data.types.signal import Signal
-from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.base import EnvelopeMaker
 
 log = getLogger(__name__)
@@ -33,28 +30,6 @@ class ApplyOnlineBPF(EnvelopeMaker):
     @property
     def input_signal(self):
         return self.reference_channel_full.as_vector()
-
-
-class SaveBPFinfo(SharpTask):
-
-    filtertask = ApplyOnlineBPF()
-
-    def requires(self):
-        return self.filtertask
-
-    def output(self):
-        return DictFile(final_output_dir, "online-BPF")
-
-    def work(self):
-        b, a = self.filtertask.coeffs
-        self.output().write(
-            {
-                "fs": self.filtertask.input_signal.fs,
-                "numerator-b": b.tolist(),
-                "denominator-a": a.tolist(),
-                "order": len(a),
-            }
-        )
 
 
 def get_SOTA_online_BPF(

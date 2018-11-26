@@ -9,6 +9,7 @@ from typing import Sequence
 # from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
 from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultifig
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
+from sharp.tasks.text.offline_steps_info import WriteOfflineInfo
 
 
 def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
@@ -49,5 +50,6 @@ tasks_to_run = (
     # *searchgrids(subdir="space-time-comp"),
     # PlotIsoFlines(),
     # PlotSearchArray(subdir="num-delays-search"),
-    PlotOfflineStepsMultifig(),
+    # PlotOfflineStepsMultifig(),
+    WriteOfflineInfo(),
 )

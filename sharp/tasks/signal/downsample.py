@@ -23,8 +23,8 @@ class Downsample(SharpTask):
     output_dir = intermediate_output_dir / "downsampled-recording"
 
     fs_target = FloatParameter(default=1000)
-    # Target sampling rate after downsampling (see `fklab..downsample()`). In
-    # hertz.
+    # Target sampling rate after downsampling (see
+    # `fklab.signals.multirate.downsample()`). In hertz.
 
     def requires(self):
         return self.raw_data_dir

@@ -293,7 +293,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         )
         ax.text(y=rm.threshold_high, s="$T_{high}$", **text_kwargs)
         ax.text(y=rm.threshold_low, s="$T_{low}$", **text_kwargs)
-        ax.text(y=rm.envelope_median, s="Median $m$", **text_kwargs)
+        ax.text(y=rm.envelope_median, s="Median", **text_kwargs)
 
     @property
     def x_t(self):
