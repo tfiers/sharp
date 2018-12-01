@@ -7,9 +7,9 @@ from typing import Sequence
 # from sharp.tasks.plot.misc.reference import PlotReferenceMaker
 # from sharp.tasks.plot.results.searcharray import PlotSearchArray
 # from sharp.tasks.signal.online_bpf import ApplyOnlineBPF, SaveBPFinfo
-from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultifig
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
-from sharp.tasks.text.offline_steps_info import WriteOfflineInfo
+from sharp.tasks.plot.results.searchlines.BPF import PlotSearchLines_BPF
+from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
 
 
 def multi_envelope_plots(**em_kwargs) -> Sequence[MultiEnvelopeFigureMaker]:
@@ -49,7 +49,9 @@ tasks_to_run = (
     # ),
     # *searchgrids(subdir="space-time-comp"),
     # PlotIsoFlines(),
-    # PlotSearchArray(subdir="num-delays-search"),
     # PlotOfflineStepsMultifig(),
-    WriteOfflineInfo(),
+    # WriteOfflineInfo(),
+    # WriteEvalInfo(),
+    PlotSearchLines_BPF(),
+    # PlotSearchLines_GEVec(),
 )

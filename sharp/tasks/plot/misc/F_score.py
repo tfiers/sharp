@@ -2,9 +2,8 @@ from numpy import linspace, ndarray
 
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
-from sharp.data.types.style import paperfig
+from sharp.data.types.style import paperfig, fraction
 from sharp.tasks.plot.base import FigureMaker
-from sharp.tasks.plot.results.base import fraction
 
 
 class PlotIsoFlines(FigureMaker):

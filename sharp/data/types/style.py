@@ -1,6 +1,8 @@
 from typing import Tuple
 
 from matplotlib import style, cycler
+from matplotlib.ticker import PercentFormatter
+
 from seaborn import color_palette
 from numpy import array
 
@@ -68,6 +70,8 @@ colourful = {
     'xtick.color': '707070',
     'ytick.color': '707070',
 }
+
+fraction = PercentFormatter(xmax=1, decimals=0)
 
 symposium = {**readable, **griddy, **colourful}
 style.use(symposium)
