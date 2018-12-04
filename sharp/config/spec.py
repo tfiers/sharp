@@ -4,13 +4,13 @@ from textwrap import fill
 from typing import Dict, Iterable, Optional, Sequence, Tuple, TypeVar, Union
 from warnings import warn
 
+from typeguard import check_type
+
 from sharp.config.default.channels import (
     L2_channel_combinations,
     L2_channels,
     L_probe_outline,
 )
-from typeguard import check_type
-
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 
