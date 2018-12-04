@@ -4,7 +4,8 @@ from luigi import IntParameter
 from numpy import abs
 from scipy.signal import lfilter
 
-from sharp.config.filters import FalconCheby2, LTIRippleFilter
+from sharp.config.default.filters import FalconCheby2
+from sharp.config.spec import LTIRippleFilter
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import TaskParameter
 from sharp.tasks.signal.base import EnvelopeMaker

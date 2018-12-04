@@ -36,6 +36,7 @@ readable = {
     'axes.labelsize': 12,
     'axes.titlesize': 12,
     'legend.fontsize': 11,
+    'legend.title_fontsize': 11,
     'xtick.labelsize': 8.5,
     'ytick.labelsize': 8.5,
 

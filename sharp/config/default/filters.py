@@ -1,4 +1,70 @@
-from sharp.config.filters import Butterworth, Cheby1, Cheby2, WindowedSincFIR
+from dataclasses import dataclass
+
+from numpy.core.multiarray import array
+from scipy.signal import butter, cheb2ord, cheby1, cheby2, firwin, iirfilter
+
+from sharp.config.spec import LTIRippleFilter, num_taps_BPF
+
+
+class Butterworth(LTIRippleFilter):
+    def get_taps(self, order, fs):
+        return butter(order, self.get_passband_normalized(fs), "bandpass")
+
+
+@dataclass
+class Cheby1(LTIRippleFilter):
+    """
+    max_passband_atten:  Maximum attenuation in the passband, in dB.
+    """
+
+    max_passband_atten: int = 4
+
+    def get_taps(self, order, fs):
+        return cheby1(
+            order,
+            self.max_passband_atten,
+            self.get_passband_normalized(fs),
+            "bandpass",
+        )
+
+
+@dataclass
+class Cheby2(LTIRippleFilter):
+    """
+    min_stopband_atten:  Minimum attenuation in the stopbands, in dB.
+    """
+
+    min_stopband_atten: int = 40
+
+    def get_taps(self, order, fs):
+        return cheby2(
+            order,
+            self.min_stopband_atten,
+            self.get_passband_normalized(fs),
+            "bandpass",
+        )
+
+
+@dataclass
+class WindowedSincFIR(LTIRippleFilter):
+    """
+    Uses a Kaiser window (via SciPy's `kaiser_atten` and `kaiser_beta`
+    functions).
+    
+    transition_width:  Desired width of the transition regions between
+                passband and stopbands, as a fraction of the bandwidth.
+    """
+
+    transition_width: float = 0.1
+
+    def get_taps(self, order, fs):
+        tw = self.transition_width * self.bandwidth
+        b = firwin(
+            num_taps_BPF(order), self.passband, tw, pass_zero=False, fs=fs
+        )
+        a = 1
+        return b, a
+
 
 # kwargs for SearchLines_BPF
 # --------------------------
@@ -15,6 +81,7 @@ main_comp = dict(
 
 cheby1_comp = dict(
     filename="cheby1-comp",
+    legend_title="Max. passband\nattenuation",
     filters={
         "0.1 dB": Cheby1(max_passband_atten=0.1),
         "1 dB": Cheby1(max_passband_atten=1),
@@ -27,6 +94,7 @@ cheby1_comp = dict(
 
 cheby2_comp = dict(
     filename="cheby2-comp",
+    legend_title="Min. stopband\nattenuation",
     filters={
         "4 dB": Cheby2(min_stopband_atten=4),
         "10 dB": Cheby2(min_stopband_atten=10),
@@ -39,6 +107,7 @@ cheby2_comp = dict(
 
 sinc_FIR_comp = dict(
     filename="sinc-FIR-comp",
+    legend_title="Transition\nwidth",
     filters={
         "1 %": WindowedSincFIR(transition_width=0.01),
         "2 %": WindowedSincFIR(transition_width=0.02),
@@ -48,3 +117,51 @@ sinc_FIR_comp = dict(
         "40 %": WindowedSincFIR(transition_width=0.40),
     },
 )
+
+
+class FalconCheby2(LTIRippleFilter):
+    """
+    "State-of-the-art" online IIR band pass filter.
+
+    fs: Signal sampling frequency.
+    left_edge: Left edge of passband. In hertz.
+    right_edge: idem for right edge.
+    passband_ripple: Maximum attenuation in the passband, in dB.
+    attenuation: Minimum attenuation of the stopband, in dB.
+
+    Notes
+    -----
+    Design method and parameters are the same as in the file:
+     - falcon/tests/filters/iir_ripple_low_delay/matlab_design/iir_ripple_low_delay.filter
+    from the private Kloostermanlab 'RealTime/falcon' repository.
+    """
+
+    left_edge = (90, 110)
+    right_edge = (190, 210)
+    passband_ripple = 1
+    attenuation = 40
+
+    def get_taps(self, order, fs):
+        """ `order` argument is ignored. """
+        f_nyq = fs / 2
+        wp = array((self.left_edge[1], self.right_edge[0])) / f_nyq
+        ws = array((self.left_edge[0], self.right_edge[1])) / f_nyq
+        order, critical_freqs = cheb2ord(
+            wp, ws, self.passband_ripple, self.attenuation
+        )
+        return cheby2(order, self.attenuation, critical_freqs, "bandpass")
+
+    passband = left_edge + right_edge
+
+
+class FalconElliptic(LTIRippleFilter):
+    """
+    Based on
+    https://bitbucket.org/kloostermannerflab/falcon/src/master/tests/filters/elliptic_rippleband.filter
+    """
+
+    def get_taps(self, order, fs):
+        """ `order` is ignored. """
+        return iirfilter(
+            N=4, Wn=self.get_passband_normalized(fs), rp=1, rs=80, ftype="ellip"
+        )

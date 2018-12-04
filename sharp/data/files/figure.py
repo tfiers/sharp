@@ -6,7 +6,7 @@ from sharp.config.load import config
 
 class MatplotlibFigureFile(OutputFileTarget):
     def write(self, fig: Figure):
-        fig.savefig(self)
+        fig.savefig(self, bbox_inches="tight")
 
 
 class BitmapFigureFile(MatplotlibFigureFile):

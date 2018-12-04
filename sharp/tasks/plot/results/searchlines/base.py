@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List, Sequence
+from typing import List, Sequence, Optional
 
 from matplotlib.axes import Axes
 
@@ -22,6 +22,7 @@ class PlotSearchLines(MultiEnvelopeFigureMaker):
     titles: List[str]
     envelope_maker_lists: Sequence[Sequence[EnvelopeMaker]]
     plot_IQR: bool = False
+    legend_title: Optional[str] = None
 
     subdir = "searcharrays"
     reference_maker = ApplyOnlineBPF()
@@ -65,9 +66,12 @@ class PlotSearchLines(MultiEnvelopeFigureMaker):
             self.plot_delay(ax_delay, sweeps, color)
         fig.tight_layout()
         add_colored_legend(
-            parent=ax_F1,
+            parent=fig,
             labels=self.titles + ["Reference"],
             colors=self.colors + [self.reference_color],
+            loc="center left",
+            bbox_to_anchor=(0.98, 0.5),
+            title=self.legend_title,
         )
         self.output().write(fig)
 
@@ -116,7 +120,5 @@ def get_sweep(envelope_maker: EnvelopeMaker) -> ThresholdSweep:
     return sweep
 
 
-def get_sweeps(
-    envelope_makers: Sequence[EnvelopeMaker]
-) -> Sequence[ThresholdSweep]:
+def get_sweeps(envelope_makers):
     return [get_sweep(em) for em in envelope_makers]
