@@ -1,33 +1,27 @@
 from logging import getLogger
-from typing import List, Sequence, Optional
+from typing import Sequence
 
 from matplotlib.axes import Axes
 
 from sharp.data.files.figure import FigureTarget
-from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
-from sharp.data.types.style import fraction, paperfig
+from sharp.data.types.style import fraction
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
+from sharp.tasks.plot.misc.searchlines import PlotSearchLines
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
-from sharp.tasks.plot.util.legend import add_colored_legend
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 log = getLogger(__name__)
 
 
-class PlotSearchLines(MultiEnvelopeFigureMaker):
+class PlotEnvelopeSearchLines(PlotSearchLines, MultiEnvelopeFigureMaker):
     filename: str
-    num_delays: Sequence[int]
-    titles: List[str]
     envelope_maker_lists: Sequence[Sequence[EnvelopeMaker]]
     plot_IQR: bool = False
-    legend_title: Optional[str] = None
 
     subdir = "searcharrays"
     reference_maker = ApplyOnlineBPF()
-    linestyle = ".-"
-    reference_color = "silver"
 
     @property
     def envelope_makers(self):
@@ -39,17 +33,10 @@ class PlotSearchLines(MultiEnvelopeFigureMaker):
     def reference_sweep(self) -> ThresholdSweep:
         return get_sweep(self.reference_maker)
 
-    @property
-    def colors(self):
-        return [f"C{i}" for i in range(len(self.titles))]
-
     def output(self):
         return FigureTarget(self.output_dir, self.filename)
 
-    def work(self):
-        fig, axes = subplots(nrows=2, sharex=True, figsize=paperfig())
-        ax_top, ax_btm = axes
-        ax_btm.set_xlabel("Number of delays")
+    def plot_on_axes(self, ax_top: Axes, ax_btm: Axes):
         ax_F1 = ax_top
         ax_F1.set_ylabel("max $F_1$")
         ax_F1.yaxis.set_major_formatter(fraction)
@@ -58,22 +45,12 @@ class PlotSearchLines(MultiEnvelopeFigureMaker):
         ax_delay.yaxis.set_major_formatter(fraction)
         self.plot_reference_F1(ax_F1)
         self.plot_reference_delay(ax_delay)
-        tups = zip(self.envelope_maker_lists, self.colors, self.titles)
+        tups = zip(self.envelope_maker_lists, self.colors, self.labels)
         for em_list, color, title in tups:
             log.info(f"Plotting searchline for {title}")
             sweeps = get_sweeps(em_list)
             self.plot_F1(ax_F1, sweeps, color)
             self.plot_delay(ax_delay, sweeps, color)
-        fig.tight_layout()
-        add_colored_legend(
-            parent=fig,
-            labels=self.titles + ["Reference"],
-            colors=self.colors + [self.reference_color],
-            loc="center left",
-            bbox_to_anchor=(0.98, 0.5),
-            title=self.legend_title,
-        )
-        self.output().write(fig)
 
     def plot_F1(self, ax: Axes, sweeps: Sequence[ThresholdSweep], color):
         F1s = [sweep.max_F1 for sweep in sweeps]

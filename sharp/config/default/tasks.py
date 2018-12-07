@@ -4,6 +4,9 @@ from sharp.config.default.filters import (
     cheby2_comp,
     sinc_FIR_comp,
 )
+from sharp.tasks.plot.misc.filter_theory_searchlines import (
+    PlotFilterTheorySearchlines,
+)
 from sharp.tasks.plot.results.searchlines.BPF import PlotSearchLines_BPF
 
 
@@ -66,8 +69,9 @@ def tasks_on_hold():
 
 tasks_to_run = (
     # *tasks_on_hold(),
+    PlotFilterTheorySearchlines(**main_comp),
     # PlotSearchLines_BPF(**main_comp),
-    PlotSearchLines_BPF(**sinc_FIR_comp),
-    PlotSearchLines_BPF(**cheby1_comp),
-    PlotSearchLines_BPF(**cheby2_comp),
+    # PlotSearchLines_BPF(**sinc_FIR_comp),
+    # PlotSearchLines_BPF(**cheby1_comp),
+    # PlotSearchLines_BPF(**cheby2_comp),
 )

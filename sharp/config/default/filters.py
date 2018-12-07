@@ -164,7 +164,7 @@ class FalconElliptic(LTIRippleFilter):
     """
 
     def get_taps(self, order, fs):
-        """ `order` is ignored. """
+        """ `order` argument is ignored. """
         return iirfilter(
             N=4, Wn=self.get_passband_normalized(fs), rp=1, rs=80, ftype="ellip"
         )
