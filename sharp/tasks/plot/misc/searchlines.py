@@ -8,7 +8,7 @@ from numpy import arange
 
 from sharp.config.spec import num_delays_BPF, LTIRippleFilter
 from sharp.data.types.aliases import subplots
-from sharp.data.types.style import paperfig
+from sharp.config.style import paperfig
 from sharp.tasks.base import CustomParameter
 from sharp.tasks.plot.base import FigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend

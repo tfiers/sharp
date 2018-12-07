@@ -1,6 +1,6 @@
 from numpy.core.multiarray import arange
 
-from sharp.data.types.style import blue
+from sharp.config.style import blue
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.searchlines.base import PlotEnvelopeSearchLines
 

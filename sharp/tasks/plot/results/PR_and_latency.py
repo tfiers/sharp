@@ -11,7 +11,7 @@ from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.plot.results.base import (
     MultiEnvelopeFigureMaker,
 )
-from sharp.data.types.style import fraction
+from sharp.config.style import fraction
 from sharp.tasks.plot.util.legend import add_colored_legend
 
 DISCRETE = dict(lw=2, marker=".", ms=10)
