@@ -1,4 +1,4 @@
-from sharp.tasks.plot.misc.approx_lit_BPF import ApproximateLiteratureBPF
+from sharp.tasks.plot.misc.approx_lit_BPF import PlotAllOnlineBPFReplications
 
 
 def multi_envelope_plots(**em_kwargs):
@@ -75,5 +75,5 @@ def tasks_on_hold():
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    ApproximateLiteratureBPF(),
+    PlotAllOnlineBPFReplications(),
 )
