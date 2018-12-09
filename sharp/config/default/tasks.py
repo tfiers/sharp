@@ -1,13 +1,4 @@
-from sharp.config.default.filters import (
-    main_comp,
-    cheby1_comp,
-    cheby2_comp,
-    sinc_FIR_comp,
-)
-from sharp.tasks.plot.misc.filter_theory_searchlines import (
-    PlotFilterTheorySearchlines,
-)
-from sharp.tasks.plot.results.searchlines.BPF import PlotSearchLines_BPF
+from sharp.tasks.plot.misc.approx_lit_BPF import ApproximateLiteratureBPF
 
 
 def multi_envelope_plots(**em_kwargs):
@@ -44,6 +35,16 @@ def tasks_on_hold():
     from sharp.tasks.text.online_BPF_info import SaveBPFinfo
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
+    from sharp.config.default.filters import (
+        main_comp,
+        cheby1_comp,
+        cheby2_comp,
+        sinc_FIR_comp,
+    )
+    from sharp.tasks.plot.misc.filter_theory_searchlines import (
+        PlotFilterTheorySearchlines,
+    )
+    from sharp.tasks.plot.results.searchlines.BPF import PlotSearchLines_BPF
 
     return (
         PlotGEVecPrinciple(),
@@ -64,14 +65,15 @@ def tasks_on_hold():
         WriteOfflineInfo(),
         WriteEvalInfo(),
         PlotSearchLines_GEVec(),
+        PlotFilterTheorySearchlines(**main_comp),
+        PlotSearchLines_BPF(**main_comp),
+        PlotSearchLines_BPF(**sinc_FIR_comp),
+        PlotSearchLines_BPF(**cheby1_comp),
+        PlotSearchLines_BPF(**cheby2_comp),
     )
 
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    PlotFilterTheorySearchlines(**main_comp),
-    # PlotSearchLines_BPF(**main_comp),
-    # PlotSearchLines_BPF(**sinc_FIR_comp),
-    # PlotSearchLines_BPF(**cheby1_comp),
-    # PlotSearchLines_BPF(**cheby2_comp),
+    ApproximateLiteratureBPF(),
 )
