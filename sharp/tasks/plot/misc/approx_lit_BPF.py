@@ -14,9 +14,8 @@ from numpy import (
     pi,
     unwrap,
     where,
-    polymul,
 )
-from scipy.signal import butter, firwin, freqs, freqz, savgol_filter, bessel
+from scipy.signal import butter, firwin, freqs, freqz, savgol_filter
 
 from sharp.config.load import final_output_dir
 from sharp.config.style import paperfig
@@ -29,8 +28,7 @@ from sharp.tasks.plot.util.legend import add_colored_legend
 
 class PlotAllOnlineBPFReplications(SharpTask):
     def requires(self):
-        return (Jadhav(),)
-        # return (EgoStengel(), Jadhav(), Dutta())
+        return (EgoStengel(), Dutta(), Falcon())
 
 
 class OnlineBPFReplication(FigureMaker):
@@ -134,31 +132,6 @@ class EgoStengel(OnlineBPFReplication):
         return H_high * H_low
 
 
-class Jadhav(OnlineBPFReplication):
-
-    band = (100, 400)
-
-    @property
-    def H_original(self):
-        fs = 1500
-        band = self.normalize(self.band, fs)
-        ba = bessel(9, band, "bandpass")
-        _, H = freqz(*ba, self.get_w(fs))
-        return H
-
-    @property
-    def H_replication(self):
-        # Given a numeric frequency response. IDFT is impulse response. Nah.
-        # Fit H(z) with ratio of polynomials :p
-        band = self.normalize(self.band)
-        b_high, a_high, = bessel(9, band[0], "high")
-        b_low, a_low = bessel(5, band[1], "low")
-        b = polymul(b_high, b_low)
-        a = polymul(a_high, a_low)
-        _, H = freqz(b, a, self.get_w())
-        return H
-
-
 class Dutta(OnlineBPFReplication):
 
     band = (150, 250)
@@ -176,6 +149,11 @@ class Dutta(OnlineBPFReplication):
         b = firwin(11, self.band, pass_zero=False, fs=fs)
         _, H = freqz(b, 1, self.get_w(fs))
         return H
+
+
+class Falcon(OnlineBPFReplication):
+
+    band = ()
 
 
 def gain(H):
