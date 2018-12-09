@@ -40,8 +40,8 @@ readable = {
     'xtick.labelsize': 8.5,
     'ytick.labelsize': 8.5,
 
-    'axes.titlepad': 12,
-    'axes.labelpad': 10,
+    'axes.titlepad': 10,
+    'axes.labelpad': 9,
 
     'lines.linewidth': 1.5,
     'lines.markersize': 8,

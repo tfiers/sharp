@@ -14,8 +14,9 @@ from numpy import (
     pi,
     unwrap,
     where,
+    polymul,
 )
-from scipy.signal import butter, firwin, freqs, freqz, savgol_filter
+from scipy.signal import butter, firwin, freqs, freqz, savgol_filter, bessel
 
 from sharp.config.load import final_output_dir
 from sharp.config.style import paperfig
@@ -28,7 +29,8 @@ from sharp.tasks.plot.util.legend import add_colored_legend
 
 class PlotAllOnlineBPFReplications(SharpTask):
     def requires(self):
-        return (Dutta(), EgoStengel())
+        return (Jadhav(),)
+        # return (EgoStengel(), Jadhav(), Dutta())
 
 
 class OnlineBPFReplication(FigureMaker):
@@ -69,7 +71,7 @@ class OnlineBPFReplication(FigureMaker):
             loc="lower left",
             bbox_to_anchor=(0.5, 0.6),
         )
-        fig.tight_layout()
+        fig.tight_layout(w_pad=3)
         self.output().write(fig)
 
     def get_f_Nyq(self, fs=None):
@@ -117,6 +119,9 @@ class EgoStengel(OnlineBPFReplication):
         ba_low = butter(8, self.band[1], "low", analog=True)
         _, H_high = freqs(*ba_high, self.f)
         _, H_low = freqs(*ba_low, self.f)
+        # Exact alternative:
+        #   b = polymul(b_high, b_low)
+        #   a = polymul(a_high, a_low)
         return H_high * H_low
 
     @property
@@ -127,6 +132,31 @@ class EgoStengel(OnlineBPFReplication):
         _, H_high = freqz(*ba_high, self.get_w())
         _, H_low = freqz(*ba_low, self.get_w())
         return H_high * H_low
+
+
+class Jadhav(OnlineBPFReplication):
+
+    band = (100, 400)
+
+    @property
+    def H_original(self):
+        fs = 1500
+        band = self.normalize(self.band, fs)
+        ba = bessel(9, band, "bandpass")
+        _, H = freqz(*ba, self.get_w(fs))
+        return H
+
+    @property
+    def H_replication(self):
+        # Given a numeric frequency response. IDFT is impulse response. Nah.
+        # Fit H(z) with ratio of polynomials :p
+        band = self.normalize(self.band)
+        b_high, a_high, = bessel(9, band[0], "high")
+        b_low, a_low = bessel(5, band[1], "low")
+        b = polymul(b_high, b_low)
+        a = polymul(a_high, a_low)
+        _, H = freqz(b, a, self.get_w())
+        return H
 
 
 class Dutta(OnlineBPFReplication):
