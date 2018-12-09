@@ -33,10 +33,10 @@ readable = {
     'savefig.dpi': 300,
 
     'font.size': 8.5,
-    'axes.labelsize': 12,
-    'axes.titlesize': 12,
-    'legend.fontsize': 11,
-    'legend.title_fontsize': 11,
+    'axes.labelsize': 10.5,
+    'axes.titlesize': 10.5,
+    'legend.fontsize': 11.5,
+    'legend.title_fontsize': 11.5,
     'xtick.labelsize': 8.5,
     'ytick.labelsize': 8.5,
 

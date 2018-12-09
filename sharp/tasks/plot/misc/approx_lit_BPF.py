@@ -40,21 +40,35 @@ class OnlineBPFReplication(FigureMaker):
         return FigureTarget(final_output_dir / "approx-lit-BPF", filename)
 
     def work(self):
-        fig, (ax_left, ax_right) = subplots(
-            ncols=2, figsize=paperfig(height=0.4)
+        fig, axes = subplots(
+            nrows=2, ncols=2, figsize=paperfig(width=1.2, height=0.55)
         )
-        ax_gain: Axes = ax_left
-        ax_grpdelay: Axes = ax_right
-        ax_gain.set_xlabel("Frequency (Hz)")
-        ax_gain.set_ylabel("Gain (dB)")
-        ax_gain.set_ylim(-43, 3)
-        ax_grpdelay.set_xlabel("Frequency (Hz)")
+        ax_top_left: Axes = axes[0, 0]
+        ax_top_right: Axes = axes[0, 1]
+        ax_bottom_left: Axes = axes[1, 0]
+        ax_bottom_right: Axes = axes[1, 1]
+        ax_top_right.remove()
+        ax_bottom_left.set_xlabel("Frequency (Hz)")
+        ax_bottom_right.set_xlabel("Frequency (Hz)")
+        ax_gain_dB = ax_top_left
+        ax_gain = ax_bottom_left
+        ax_grpdelay = ax_bottom_right
+        ax_gain.set_ylabel("Gain")
+        ax_gain_dB.set_ylabel("Gain (dB)")
+        ax_gain_dB.set_ylim(-43, 3)
         ax_grpdelay.set_ylabel("Group delay (ms)")
         ax_grpdelay.set_ylim(-3, 117)
         for H in (self.H_original, self.H_replication):
-            ax_gain.plot(self.f, gain(H))
+            g = gain(H)
+            ax_gain.plot(self.f, g)
+            ax_gain_dB.plot(self.f, dB(g))
             ax_grpdelay.plot(self.f, group_delay(H, self.f))
-        add_colored_legend(ax_right, ("Original", "Replication"))
+        add_colored_legend(
+            fig,
+            ("Original", "Replication"),
+            loc="lower left",
+            bbox_to_anchor=(0.5, 0.6),
+        )
         fig.tight_layout()
         self.output().write(fig)
 
@@ -137,9 +151,13 @@ class Dutta(OnlineBPFReplication):
 def gain(H):
     """
     :param H:  Array of complex frequency responses of a filter.
-    :return:  Gain of the filter, in dB.
+    :return:  Gain of the filter (dimensionless).
     """
-    return 20 * log10(abs(H))
+    return abs(H)
+
+
+def dB(x):
+    return 20 * log10(x)
 
 
 def phase(H):
