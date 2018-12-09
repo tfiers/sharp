@@ -15,7 +15,16 @@ from numpy import (
     unwrap,
     where,
 )
-from scipy.signal import butter, firwin, freqs, freqz, savgol_filter
+from scipy.signal import (
+    butter,
+    cheb2ord,
+    cheby2,
+    firwin,
+    freqs,
+    freqz,
+    savgol_filter,
+    sosfreqz,
+)
 
 from sharp.config.load import final_output_dir
 from sharp.config.style import paperfig
@@ -28,7 +37,8 @@ from sharp.tasks.plot.util.legend import add_colored_legend
 
 class PlotAllOnlineBPFReplications(SharpTask):
     def requires(self):
-        return (EgoStengel(), Dutta(), Falcon())
+        return Falcon()
+        # return (EgoStengel(), Dutta(), Falcon())
 
 
 class OnlineBPFReplication(FigureMaker):
@@ -55,9 +65,10 @@ class OnlineBPFReplication(FigureMaker):
         ax_grpdelay = ax_bottom_right
         ax_gain.set_ylabel("Gain")
         ax_gain_dB.set_ylabel("Gain (dB)")
-        ax_gain_dB.set_ylim(-43, 3)
+        ax_gain_dB.set_ylim(-63, 4)
         ax_grpdelay.set_ylabel("Group delay (ms)")
-        ax_grpdelay.set_ylim(-3, 117)
+        # Force zero-line in view:
+        ax_grpdelay.axhline(y=0, color="none")
         for H in (self.H_original, self.H_replication):
             g = gain(H)
             ax_gain.plot(self.f, g)
@@ -65,12 +76,20 @@ class OnlineBPFReplication(FigureMaker):
             ax_grpdelay.plot(self.f, group_delay(H, self.f))
         add_colored_legend(
             fig,
-            ("Original", "Replication"),
+            (self.label_original, self.label_replication),
             loc="lower left",
             bbox_to_anchor=(0.5, 0.6),
         )
         fig.tight_layout(w_pad=3)
         self.output().write(fig)
+
+    @property
+    def label_original(self):
+        return f"Original ($f_s =$ {self.fs_original:.0f})"
+
+    @property
+    def label_replication(self):
+        return f"Replication ($f_s =$ {self.fs_replication:.0f})"
 
     def get_f_Nyq(self, fs=None):
         if fs is None:
@@ -112,6 +131,10 @@ class EgoStengel(OnlineBPFReplication):
     band = (100, 400)
 
     @property
+    def label_original(self):
+        return "Original (continuous time)"
+
+    @property
     def H_original(self):
         ba_high = butter(8, self.band[0], "high", analog=True)
         ba_low = butter(8, self.band[1], "low", analog=True)
@@ -135,10 +158,11 @@ class EgoStengel(OnlineBPFReplication):
 class Dutta(OnlineBPFReplication):
 
     band = (150, 250)
+    fs_original = 3000
 
     @property
     def H_original(self):
-        fs = 3000
+        fs = self.fs_original
         b = firwin(30, self.band, pass_zero=False, fs=fs)
         _, H = freqz(b, 1, self.get_w(fs))
         return H
@@ -151,9 +175,61 @@ class Dutta(OnlineBPFReplication):
         return H
 
 
-class Falcon(OnlineBPFReplication):
+# fmt: off
+falcon_k = 0.009057795102643
+falcon_sos = [
+    [1, -1.999395559517321, 1, 1, -1.993909539451596, 0.996949008352066],
+    [1, -1.996612125975065, 1, 1, -1.997891867240842, 0.998564128524551],
+    [1, -1.999446113435119, 1, 1, -1.986445337112073, 0.989595554723684],
+    [1, -1.996303149576368, 1, 1, -1.994638119350132, 0.995283281771532],
+    [1, -1.999557218946594, 1, 1, -1.974166315776471, 0.977537474144240],
+    [1, -1.995376455665212, 1, 1, -1.989909202085253, 0.990506963867645],
+    [1, -1.999742604408150, 1, 1, -1.951752813122145, 0.955282256896558],
+    [1, -1.992052662874018, 1, 1, -1.981463742801058, 0.982025842300048],
+    [1, -1.999957242442239, 1, 1, -1.962151711669329, 0.962892139920814],
+    [1, -1.952627879781272, 1, 1, -1.928156725555454, 0.930777461944991],
+]
+# fmt: on
 
-    band = ()
+
+class Falcon(OnlineBPFReplication):
+    """
+    Based on:
+    https://bitbucket.org/kloostermannerflab/falcon/src/master/tests/filters/iir_ripple_low_delay/matlab_design/iir_ripple_low_delay.filter
+    """
+
+    # From comments; Seems wrong.
+    # left_edge = (115, 135)
+    # right_edge = (255, 275)
+
+    left_edge = (125, 135)
+    right_edge = (278, 300)
+    max_passband_atten = 1  # dB
+    min_stopband_atten = 40  # dB
+
+    fs_original = 32000
+
+    @property
+    def H_original(self):
+        fs = self.fs_original
+        # Using b/a (transfer function) representation of filter results in
+        # nonsense calculated frequency response. Second-order-sections (sos)
+        # representation of filter avoids these numerical errors.
+        _, H = sosfreqz(falcon_sos, self.get_w(fs))
+        return falcon_k * H
+
+    @property
+    def H_replication(self):
+        fs = self.fs_replication
+        f_Nyq = fs / 2
+        wp = array((self.left_edge[1], self.right_edge[0])) / f_Nyq
+        ws = array((self.left_edge[0], self.right_edge[1])) / f_Nyq
+        order, critical_freqs = cheb2ord(
+            wp, ws, self.max_passband_atten, self.min_stopband_atten
+        )
+        ba = cheby2(order, self.min_stopband_atten, critical_freqs, "bandpass")
+        _, H = freqz(*ba, self.get_w(fs))
+        return H
 
 
 def gain(H):
