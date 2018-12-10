@@ -5,7 +5,7 @@ from matplotlib.axes import Axes
 
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.evaluation.sweep import ThresholdSweep
-from sharp.config.style import fraction
+from sharp.data.hardcoded.style import fraction
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.plot.misc.searchlines import PlotSearchLines
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker

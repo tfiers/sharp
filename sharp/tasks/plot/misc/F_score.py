@@ -2,7 +2,7 @@ from numpy import linspace, ndarray
 
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
-from sharp.config.style import paperfig, fraction
+from sharp.data.hardcoded.style import paperfig, fraction
 from sharp.tasks.plot.base import FigureMaker
 
 

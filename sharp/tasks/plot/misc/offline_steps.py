@@ -17,7 +17,7 @@ from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
-from sharp.config.style import blue, green, paperfig, pink, red
+from sharp.data.hardcoded.style import blue, green, paperfig, pink, red
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker, plot_signal_neat
 from sharp.tasks.plot.util.annotations import add_segments

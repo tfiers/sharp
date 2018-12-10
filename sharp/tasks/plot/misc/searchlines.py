@@ -6,9 +6,9 @@ from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
 from numpy import arange
 
-from sharp.config.spec import num_delays_BPF, LTIRippleFilter
+from sharp.data.hardcoded.filters import num_delays_BPF, LTIRippleFilter
 from sharp.data.types.aliases import subplots
-from sharp.config.style import paperfig
+from sharp.data.hardcoded.style import paperfig
 from sharp.tasks.base import CustomParameter
 from sharp.tasks.plot.base import FigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend

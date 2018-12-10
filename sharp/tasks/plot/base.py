@@ -13,7 +13,7 @@ from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.config.style import symposium
+from sharp.data.hardcoded.style import symposium
 from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
     add_scalebar,

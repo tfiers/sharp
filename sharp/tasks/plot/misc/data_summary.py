@@ -5,7 +5,7 @@ from sklearn.neighbors import KernelDensity
 from raincloud import distplot
 from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
-from sharp.config.style import seaborn_colours
+from sharp.data.hardcoded.style import seaborn_colours
 from sharp.tasks.base import SharpTask
 from sharp.tasks.plot.base import FigureMaker
 from sharp.tasks.plot.util.scalebar import add_scalebar

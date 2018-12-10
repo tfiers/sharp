@@ -35,7 +35,7 @@ def tasks_on_hold():
     from sharp.tasks.text.online_BPF_info import SaveBPFinfo
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
-    from sharp.config.default.filters import (
+    from sharp.data.hardcoded.filters import (
         main_comp,
         cheby1_comp,
         cheby2_comp,

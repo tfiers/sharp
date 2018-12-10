@@ -1,11 +1,9 @@
-from abc import ABC, abstractmethod
 from os import environ
 from pathlib import Path
 from textwrap import fill
 from typing import Dict, Iterable, Optional, Sequence, Tuple, TypeVar, Union
 from warnings import warn
 
-from numpy import diff, array, ndarray
 from typeguard import check_type
 
 from sharp.config.default.channels import (
@@ -200,38 +198,3 @@ class ConfigError(Exception):
         square = fill(future_prefix + message, width=80)
         square_with_prefix_sized_hole = square[len(future_prefix) :]
         super().__init__(square_with_prefix_sized_hole)
-
-
-def num_taps_BPF(order: int) -> int:
-    return 2 * order + 1
-
-
-def num_delays_BPF(order: int) -> int:
-    return num_taps_BPF(order) - 1
-
-
-class LTIRippleFilter(ABC):
-
-    passband = (100, 200)
-
-    @abstractmethod
-    def get_taps(self, order, fs) -> (ndarray, ndarray):
-        """
-        :param order:  Order N of a typical band-pass filter, created by
-                    convolution of a low-pass and a high-pass filter. (I.e.
-                    order N for which num_taps = 2 * N + 1).
-        :param fs:  Signal sampling frequency, in Hz.
-        :return: (b, a), i.e. coefficients of (numerator, denominator) of the
-        filter.
-        """
-
-    @property
-    def bandwidth(self):
-        return diff(self.passband)
-
-    def get_passband_normalized(self, fs):
-        f_nyq = fs / 2
-        return array(self.passband) / f_nyq
-
-    def __repr__(self):
-        return str(self.__class__.__name__)
