@@ -1,6 +1,7 @@
 # coding: utf8
+from typing import List
 
-
+from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 from matplotlib.text import Text
 from numpy import diff, sign
@@ -85,7 +86,7 @@ def add_scalebar(
     align: str = "left",
     pos_along: float = 0.1,
     pos_across: float = 0.12,
-    label_size: float = 10,
+    label_size: float = 8.5,
     label_align: str = "center",
     label_pad: float = 0.2,
     label_offset: float = -0.75,
@@ -93,6 +94,7 @@ def add_scalebar(
     brackets: bool = True,
     bracket_length: float = 3,
     label_background: dict = dict(facecolor="white", edgecolor="none", alpha=1),
+    in_layout: bool = True,
 ):
     """
     Indicate horizontal or vertical scale of an axes.
@@ -121,6 +123,8 @@ def add_scalebar(
                 at both ends.
     :param bracket_length:  In points (1/72-th of an inch).
     :param label_background:  Passed on to `set_bbox()` of the label text.
+    :param in_layout:  Whether to take the scalebar into account when calling
+                `fig.tight_layout()`.
     """
     if direction == "h":
         trans = ax.get_xaxis_transform()
@@ -180,9 +184,13 @@ def add_scalebar(
         bracket_start_coords = reversed(bracket_start_coords)
         bracket_end_coords = reversed(bracket_end_coords)
         text_options.update(dict(rotation=90, rotation_mode="anchor"))
-    ax.plot(*bar_coords, **plot_options)
+    artists: List[Artist] = []
+    artists.extend(ax.plot(*bar_coords, **plot_options))
     if brackets:
-        ax.plot(*bracket_start_coords, **plot_options)
-        ax.plot(*bracket_end_coords, **plot_options)
+        artists.extend(ax.plot(*bracket_start_coords, **plot_options))
+        artists.extend(ax.plot(*bracket_end_coords, **plot_options))
     text: Text = ax.text(*text_coords, label, **text_options)
     text.set_bbox(label_background)
+    artists.append(text)
+    for artist in artists:
+        artist.set_in_layout(in_layout)

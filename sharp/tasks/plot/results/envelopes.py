@@ -52,19 +52,19 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
         tups = zip(self.threshold_sweeps, extra_axes, self.titles, self.colors)
         for sweep, ax, title, color in tups:
             ax.hlines(
-                sweep.at_recall().threshold,
+                sweep.at_max_F1().threshold,
                 *time_range,
                 clip_on=False,
                 linestyles="dashed",
-                linewidth=1,
+                linewidth=0.8,
             )
             add_event_arrows(
-                ax, sweep.at_recall().correct_detections, color="green"
+                ax, sweep.at_max_F1().correct_detections, color="green"
             )
             add_event_arrows(
-                ax, sweep.at_recall().incorrect_detections, color="red"
+                ax, sweep.at_max_F1().incorrect_detections, color="red"
             )
-            ax.text(0.05, 0.91, title, color=color, transform=ax.transAxes)
+            ax.text(0.03, 0.74, title, color=color, transform=ax.transAxes)
 
 
 def _contains_at_least_one(seg: Segment, events: ndarray):

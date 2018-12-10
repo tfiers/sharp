@@ -1,4 +1,10 @@
-from sharp.tasks.plot.misc.approx_lit_BPF import PlotAllOnlineBPFReplications
+from sharp.data.hardcoded.filters.literature import (
+    DuttaReplica,
+    EgoStengelReplica,
+    FalconReplica,
+)
+from sharp.tasks.plot.results.envelopes import PlotEnvelopes
+from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 
 def multi_envelope_plots(**em_kwargs):
@@ -32,7 +38,7 @@ def tasks_on_hold():
     from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
     from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultifig
     from sharp.tasks.text.offline_steps_info import WriteOfflineInfo
-    from sharp.tasks.text.online_BPF_info import SaveBPFinfo
+    from sharp.tasks.text.online_BPF_info import WriteOnlineBPFInfo
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
     from sharp.data.hardcoded.filters.search_best import (
@@ -50,7 +56,6 @@ def tasks_on_hold():
         PlotGEVecPrinciple(),
         PlotReferenceMaker(),
         PlotRecordingSummaries(),
-        SaveBPFinfo(),
         *multi_envelope_plots(
             subdir="LSM-main",
             envelope_makers=(
@@ -61,6 +66,7 @@ def tasks_on_hold():
         ),
         *searchgrids(subdir="space-time-comp"),
         PlotIsoFlines(),
+        WriteOnlineBPFInfo(),
         WriteOfflineInfo(),
         WriteEvalInfo(),
         PlotSearchLines_GEVec(),
@@ -75,5 +81,12 @@ def tasks_on_hold():
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    PlotAllOnlineBPFReplications(),
+    PlotEnvelopes(
+        subdir="online-BPF",
+        envelope_makers=(
+            ApplyOnlineBPF(ripple_filter=EgoStengelReplica()),
+            ApplyOnlineBPF(ripple_filter=DuttaReplica()),
+            ApplyOnlineBPF(ripple_filter=FalconReplica()),
+        ),
+    ),
 )

@@ -52,6 +52,8 @@ class EgoStengelDiscretized(EgoStengelFilter):
 
 
 class EgoStengelReplica(EgoStengelFilter):
+    title = "Ego-Stengel et al."
+
     @property
     def tf(self):
         band = self.normalized_passband
@@ -77,6 +79,7 @@ class DuttaOriginal(DuttaFilter):
 
 
 class DuttaReplica(DuttaFilter):
+    title = "Dutta et al."
     numtaps = 11
 
 
@@ -129,6 +132,8 @@ class FalconReplica(LTIRippleFilter):
     # Corrected:
     left_edge = (125, 135)
     right_edge = (278, 300)
+
+    title = "Falcon"
 
     @property
     def tf(self):

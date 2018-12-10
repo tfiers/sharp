@@ -9,6 +9,9 @@ class PlotReferenceMaker(TimeRangesPlotter):
     reference segments. Does this only for the evaluation slice.
     """
 
+    selected_time_ranges_only = False
+    reference_channel_only = False
+    full_range_scalebars = True
     output_dir = TimeRangesPlotter.output_dir / "reference"
 
     reference_maker = MakeReference()

@@ -1,19 +1,18 @@
 from logging import getLogger
 from typing import Iterable, Sequence, Tuple
 
-from luigi import FloatParameter
+from luigi import BoolParameter
 from matplotlib import pyplot as plt, style
 from matplotlib.axes import Axes
 from matplotlib.pyplot import close
-from numpy import ones
-from numpy.core.umath import ceil
-from sharp.config.load import final_output_dir, output_root
+from numpy import ceil, diff, ones
+
+from sharp.config.load import config, final_output_dir, output_root
 from sharp.data.files.figure import FigureTarget
+from sharp.data.hardcoded.style import paperfig, symposium
 from sharp.data.types.aliases import subplots
 from sharp.data.types.signal import Signal
-from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.data.hardcoded.style import symposium
 from sharp.tasks.plot.util.annotations import add_segments
 from sharp.tasks.plot.util.scalebar import (
     add_scalebar,
@@ -40,11 +39,17 @@ TimeRange = Tuple[float, float]
 
 class TimeRangesPlotter(FigureMaker, InputDataMixin):
     """
-    Makes many plots of a set of time ranges, that together cover the entire
-    test slice.
+    For each time-range out of a set of time-ranges, makes a figure with
+    multiple synchronized signals plotted beneath each other.
+    
+    By default, makes many plots that together cover the entire test slice.
     """
 
-    window_size: float = FloatParameter(0.6, significant=False)
+    selected_time_ranges_only: bool = BoolParameter(default=True)
+    reference_channel_only: bool = BoolParameter(default=True)
+    full_range_scalebars: bool = False
+
+    window_size: float = 0.6
     # Duration of each time slice (and thus of each plot). In seconds.
 
     def requires(self):
@@ -63,10 +68,23 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
             plt.close()
 
     @property
-    def time_ranges(self) -> Iterable[TimeRange]:
+    def time_ranges(self):
+        if self.selected_time_ranges_only:
+            return config.time_ranges
+        else:
+            return self.all_time_ranges
+
+    @property
+    def input_signal(self):
+        if self.reference_channel_only:
+            return self.reference_channel_test
+        else:
+            return self.multichannel_test
+
+    @property
+    def all_time_ranges(self) -> Iterable[TimeRange]:
         duration = self.multichannel_test.duration
         num_ranges = int(ceil(duration / self.window_size))
-        split = TrainTestSplit(self.reference_channel_full)
         start = 0
         for i in range(num_ranges):
             stop = start + self.window_size
@@ -81,13 +99,14 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
 
     def make_figure(self, time_range):
         nrows = 1 + len(self.extra_signals)
-        num_channels = self.multichannel_test.num_channels
         axheights = ones(nrows)
-        axheights[0] = 1 + num_channels / 6
+        if not self.reference_channel_only:
+            num_channels = self.multichannel_test.num_channels
+            axheights[0] = 1 + num_channels / 6
         fig, axes = subplots(
             nrows=nrows,
             sharex=True,
-            figsize=[5, 1 + sum(axheights)],
+            figsize=paperfig(width=0.5, height=0.5),
             gridspec_kw=dict(height_ratios=axheights),
         )
         input_ax = axes[0]
@@ -97,27 +116,43 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         self.post_plot(time_range, input_ax, extra_axes)
         add_segments(input_ax, self.reference_segs_test)
         add_time_scalebar(
-            extra_axes[0], 100, "ms", pos_along=0.74, pos_across=1.1
+            extra_axes[0],
+            select_scalebar_time(time_range),
+            "ms",
+            pos_along=0.73,
+            pos_across=1.25,
+            in_layout=False,
         )
         fig.tight_layout(rect=(0.02, 0, 1, 1))
         return fig
 
     def plot_input_signal(self, time_range: TimeRange, ax: Axes):
-        plot_signal_neat(self.multichannel_test, time_range, ax)
-        add_voltage_scalebar(ax, 1, "mV", pos_along=0.1, pos_across=0)
+        plot_signal_neat(
+            self.input_signal,
+            time_range,
+            ax,
+            tight_ylims=self.selected_time_ranges_only,
+        )
+        add_voltage_scalebar(ax, 500, "uV", pos_along=0.1, pos_across=-0.01)
 
     def plot_other_signals(self, time_range: TimeRange, axes: Sequence[Axes]):
         for ax, signal, color in zip(axes, self.extra_signals, self.colors):
-            plot_signal_neat(signal, time_range, ax, color=color)
-            ax.set_ylim(signal.range)
-            add_scalebar(
+            plot_signal_neat(
+                signal,
+                time_range,
                 ax,
-                direction="v",
-                length=signal.span,
-                label="",
-                pos_along=0,
-                pos_across=0,
+                color=color,
+                tight_ylims=self.selected_time_ranges_only,
             )
+            if self.full_range_scalebars:
+                add_scalebar(
+                    ax,
+                    direction="v",
+                    length=signal.span,
+                    label="",
+                    pos_along=0,
+                    pos_across=0,
+                )
 
     def post_plot(
         self, time_range: TimeRange, input_ax: Axes, extra_axes: Sequence[Axes]
@@ -159,3 +194,14 @@ def plot_signal_neat(
     start, end = time_range
     time_span = end - start
     ax.set_xlim(start - 0.03 * time_span, end)
+
+
+def select_scalebar_time(time_range: TimeRange) -> int:
+    tspan = diff(time_range)
+    if tspan < 0.2:
+        bar = 10
+    elif tspan < 1:
+        bar = 50
+    else:
+        bar = 200
+    return bar

@@ -30,6 +30,10 @@ class LTIRippleFilter(ABC):
         return str(self.__class__.__name__)
 
     @property
+    def title(self):
+        return str(self)
+
+    @property
     def bandwidth(self):
         return diff(self.passband)
 

@@ -2,7 +2,7 @@ from typing import Sequence
 
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
-from numpy import ones_like, ndarray
+from numpy import ndarray, ones_like
 
 from fklab.plot.plots import plot_events, plot_segments
 from fklab.segments import Segment
@@ -26,13 +26,13 @@ def add_event_lines(ax: Axes, events: ndarray, lw=1, **kwargs):
     )
 
 
-def add_event_arrows(ax: Axes, events: ndarray, **kwargs):
+def add_event_arrows(ax: Axes, events: ndarray, size=3.5, **kwargs):
     """ Draw arrows beneath the plot, one for each (visible) event. """
     x = _get_visible_events(ax, events)
-    y = -0.1 * ones_like(x)
+    y = -0.12 * ones_like(x)
     trans = ax.get_xaxis_transform()
     arrows: Sequence[Line2D] = ax.plot(
-        x, y, "^", transform=trans, clip_on=False, **kwargs
+        x, y, "^", transform=trans, clip_on=False, markersize=size, **kwargs
     )
     # fig.tight_layout doesn't work when clip_on=False here. So we instruct
     # tight_layout to ignore the created artists

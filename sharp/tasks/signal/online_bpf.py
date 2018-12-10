@@ -5,7 +5,7 @@ from numpy import abs
 from scipy.signal import lfilter
 
 from sharp.data.hardcoded.filters.base import LTIRippleFilter
-from sharp.data.hardcoded.filters.search_best import FalconCheby2
+from sharp.data.hardcoded.filters.literature import FalconReplica
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import TaskParameter
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -15,10 +15,12 @@ log = getLogger(__name__)
 
 class ApplyOnlineBPF(EnvelopeMaker):
 
-    ripple_filter: LTIRippleFilter = TaskParameter(default=FalconCheby2())
+    ripple_filter: LTIRippleFilter = TaskParameter(default=FalconReplica())
     order: int = IntParameter(default=None)
 
-    title = "Single-channel BPF"
+    @property
+    def title(self):
+        return self.ripple_filter.title
 
     output_subdir = "online-BPF"
 
@@ -28,7 +30,9 @@ class ApplyOnlineBPF(EnvelopeMaker):
 
     def work(self):
         fs = self.input_signal.fs
-        b, a = self.ripple_filter.tf(self.order, fs)
+        self.ripple_filter.order = self.order
+        self.ripple_filter.fs = fs
+        b, a = self.ripple_filter.tf
         filtered = lfilter(b, a, self.input_signal)
         envelope = abs(filtered)
         self.output().write(Signal(envelope, fs))

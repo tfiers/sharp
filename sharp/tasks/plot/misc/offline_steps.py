@@ -48,7 +48,7 @@ annotation_text_size = 12
 
 class PlotOfflineStepsMultifig(SharpTask):
     def requires(self):
-        for time_range in config.offline_steps_segs:
+        for time_range in config.time_ranges:
             yield PlotOfflineSteps(time_range=time_range)
 
 

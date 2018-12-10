@@ -4,7 +4,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from numpy import arange, ndarray
 
-from sharp.data.types.aliases import subplots
+from sharp.data.types.aliases import subplots, Color
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.util import time_to_index
 
@@ -20,6 +20,8 @@ def plot_signal(
     zero_lines: bool = True,
     time_grid: bool = True,
     y_grid: Optional[bool] = None,
+    color: Color = "black",
+    lw: float = 0.9,
     ax: Optional[Axes] = None,
     **kwargs
 ) -> (Figure, Axes):
@@ -63,8 +65,6 @@ def plot_signal(
             y_grid = False
     if channels is None:
         channels = arange(signal.num_channels)
-    if ("color" not in kwargs) and ("c" not in kwargs):
-        kwargs["color"] = "black"
     ix = time_to_index(
         time_range, signal.fs, arr_size=signal.num_samples, clip=True
     )
@@ -77,6 +77,7 @@ def plot_signal(
     y_separated = y + y_offsets
     if zero_lines:
         ax.hlines(y_offsets, *time_range, colors="grey", lw=1)
+    kwargs.update(dict(color=color, lw=lw))
     ax.plot(t, y_separated, **kwargs)
     ax.set_xlim(time_range)
     if not tight_ylims:

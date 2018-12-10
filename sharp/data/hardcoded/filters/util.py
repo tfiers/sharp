@@ -1,6 +1,4 @@
-from numpy import unwrap, angle, diff, percentile, nan
-from numpy.core.multiarray import ndarray, where
-from numpy.core.umath import log10
+from numpy import angle, diff, log10, nan, ndarray, percentile, unwrap, where
 from scipy.signal import savgol_filter
 
 
