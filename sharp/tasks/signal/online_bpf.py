@@ -4,7 +4,8 @@ from luigi import IntParameter
 from numpy import abs
 from scipy.signal import lfilter
 
-from sharp.data.hardcoded.filters import FalconCheby2, LTIRippleFilter
+from sharp.data.hardcoded.filters.base import LTIRippleFilter
+from sharp.data.hardcoded.filters.search_best import FalconCheby2
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import TaskParameter
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -27,7 +28,7 @@ class ApplyOnlineBPF(EnvelopeMaker):
 
     def work(self):
         fs = self.input_signal.fs
-        b, a = self.ripple_filter.get_taps(self.order, fs)
+        b, a = self.ripple_filter.tf(self.order, fs)
         filtered = lfilter(b, a, self.input_signal)
         envelope = abs(filtered)
         self.output().write(Signal(envelope, fs))

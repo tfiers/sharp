@@ -1,49 +1,17 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from numpy import diff
-from numpy.core.multiarray import array, ndarray
-from scipy.signal import butter, cheb2ord, cheby1, cheby2, firwin, iirfilter
+from numpy.core.multiarray import array
+from scipy.signal import butter, cheby1, cheby2, firwin, cheb2ord, iirfilter
 
-
-class LTIRippleFilter(ABC):
-
-    passband = (100, 200)
-
-    @abstractmethod
-    def get_taps(self, order, fs) -> (ndarray, ndarray):
-        """
-        :param order:  Order N of a typical band-pass filter, created by
-                    convolution of a low-pass and a high-pass filter. (I.e.
-                    order N for which num_taps = 2 * N + 1).
-        :param fs:  Signal sampling frequency, in Hz.
-        :return: (b, a), i.e. coefficients of (numerator, denominator) of the
-        filter.
-        """
-
-    @property
-    def bandwidth(self):
-        return diff(self.passband)
-
-    def get_passband_normalized(self, fs):
-        f_nyq = fs / 2
-        return array(self.passband) / f_nyq
-
-    def __repr__(self):
-        return str(self.__class__.__name__)
-
-
-def num_taps_BPF(order: int) -> int:
-    return 2 * order + 1
-
-
-def num_delays_BPF(order: int) -> int:
-    return num_taps_BPF(order) - 1
+from sharp.data.hardcoded.filters.base import (
+    LTIRippleFilter,
+    LTIRippleFilterFIR,
+)
 
 
 class Butterworth(LTIRippleFilter):
-    def get_taps(self, order, fs):
-        return butter(order, self.get_passband_normalized(fs), "bandpass")
+    def tf(self, order, fs):
+        return butter(order, self.normalized_passband, "bandpass")
 
 
 @dataclass
@@ -54,12 +22,9 @@ class Cheby1(LTIRippleFilter):
 
     max_passband_atten: int = 4
 
-    def get_taps(self, order, fs):
+    def tf(self, order, fs):
         return cheby1(
-            order,
-            self.max_passband_atten,
-            self.get_passband_normalized(fs),
-            "bandpass",
+            order, self.max_passband_atten, self.normalized_passband, "bandpass"
         )
 
 
@@ -71,17 +36,14 @@ class Cheby2(LTIRippleFilter):
 
     min_stopband_atten: int = 40
 
-    def get_taps(self, order, fs):
+    def tf(self, order, fs):
         return cheby2(
-            order,
-            self.min_stopband_atten,
-            self.get_passband_normalized(fs),
-            "bandpass",
+            order, self.min_stopband_atten, self.normalized_passband, "bandpass"
         )
 
 
 @dataclass
-class WindowedSincFIR(LTIRippleFilter):
+class WindowedSincFIR(LTIRippleFilterFIR):
     """
     Uses a Kaiser window (via SciPy's `kaiser_atten` and `kaiser_beta`
     functions).
@@ -92,13 +54,15 @@ class WindowedSincFIR(LTIRippleFilter):
 
     transition_width: float = 0.1
 
-    def get_taps(self, order, fs):
+    def b(self):
         tw = self.transition_width * self.bandwidth
-        b = firwin(
-            num_taps_BPF(order), self.passband, tw, pass_zero=False, fs=fs
+        return firwin(
+            self.num_taps(self.order),
+            self.passband,
+            width=tw,
+            pass_zero=False,
+            fs=self.fs,
         )
-        a = 1
-        return b, a
 
 
 # kwargs for SearchLines_BPF
@@ -179,7 +143,7 @@ class FalconCheby2(LTIRippleFilter):
     passband_ripple = 1
     attenuation = 40
 
-    def get_taps(self, order, fs):
+    def tf(self, order, fs):
         """ `order` argument is ignored. """
         f_nyq = fs / 2
         wp = array((self.left_edge[1], self.right_edge[0])) / f_nyq
@@ -198,8 +162,8 @@ class FalconElliptic(LTIRippleFilter):
     https://bitbucket.org/kloostermannerflab/falcon/src/master/tests/filters/elliptic_rippleband.filter
     """
 
-    def get_taps(self, order, fs):
+    def tf(self, order, fs):
         """ `order` argument is ignored. """
         return iirfilter(
-            N=4, Wn=self.get_passband_normalized(fs), rp=1, rs=80, ftype="ellip"
+            N=4, Wn=self.normalized_passband, rp=1, rs=80, ftype="ellip"
         )

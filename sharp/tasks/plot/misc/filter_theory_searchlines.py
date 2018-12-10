@@ -31,7 +31,7 @@ class PlotFilterTheorySearchlines(
         ax_top.set_ylabel("Filter strength (dB)")
         ax_btm.set_ylabel("Median ripple-band\ngroup delay (ms)")
         for ripple_filter, color in zip(self.filters.values(), self.colors):
-            bas = [ripple_filter.get_taps(order, fs) for order in self.orders]
+            bas = [ripple_filter.tf(order, fs) for order in self.orders]
             fss = [filter_strength(ba, fs) for ba in bas]
             ax_top.plot(self.num_delays, fss, self.linestyle, color=color)
             mgds = [median_group_delay(ba, fs) for ba in bas]

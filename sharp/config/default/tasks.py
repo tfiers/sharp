@@ -35,10 +35,10 @@ def tasks_on_hold():
     from sharp.tasks.text.online_BPF_info import SaveBPFinfo
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
-    from sharp.data.hardcoded.filters import (
-        main_comp,
+    from sharp.data.hardcoded.filters.search_best import (
         cheby1_comp,
         cheby2_comp,
+        main_comp,
         sinc_FIR_comp,
     )
     from sharp.tasks.plot.misc.filter_theory_searchlines import (
@@ -61,10 +61,10 @@ def tasks_on_hold():
         ),
         *searchgrids(subdir="space-time-comp"),
         PlotIsoFlines(),
-        PlotOfflineStepsMultifig(),
         WriteOfflineInfo(),
         WriteEvalInfo(),
         PlotSearchLines_GEVec(),
+        PlotOfflineStepsMultifig(),
         PlotFilterTheorySearchlines(**main_comp),
         PlotSearchLines_BPF(**main_comp),
         PlotSearchLines_BPF(**sinc_FIR_comp),

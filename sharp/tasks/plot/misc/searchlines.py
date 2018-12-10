@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
 from numpy import arange
 
-from sharp.data.hardcoded.filters import num_delays_BPF, LTIRippleFilter
+from sharp.data.hardcoded.filters.base import num_delays_BPF, LTIRippleFilter
 from sharp.data.types.aliases import subplots
 from sharp.data.hardcoded.style import paperfig
 from sharp.tasks.base import CustomParameter
