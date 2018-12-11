@@ -8,8 +8,8 @@ class OurButter(HighpassLowpassCombi):
 
     @property
     def tf_high(self):
-        return butter(2, self.normalized_passband[0], "high")
+        return butter(6, self.normalized_passband[0], "high")
 
     @property
     def tf_low(self):
-        return butter(0, self.normalized_passband[1], "low")
+        return butter(1, self.normalized_passband[1], "low")
