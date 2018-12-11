@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from numpy import array, diff, ndarray, pi
-from scipy.signal import freqs, freqz
+from numpy import array, diff, ndarray, pi, polymul
+from scipy.signal import freqs, freqz, normalize
 
 
 class LTIRippleFilter(ABC):
@@ -87,3 +87,23 @@ class LTIRippleFilterFIR(LTIRippleFilter, ABC):
     @abstractmethod
     def b(self):
         """ Coefficients of the convolution kernel. """
+
+
+class HighpassLowpassCombi(LTIRippleFilter, ABC):
+    @property
+    def tf(self):
+        b_hi, a_hi = self.tf_high
+        b_lo, a_lo = self.tf_low
+        b = polymul(b_hi, b_lo)
+        a = polymul(a_hi, a_lo)
+        return normalize(b, a)
+
+    @property
+    @abstractmethod
+    def tf_high(self):
+        """ (b, a) of high-pass filter"""
+
+    @property
+    @abstractmethod
+    def tf_low(self):
+        """ (b, a) of low-pass filter"""

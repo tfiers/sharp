@@ -1,15 +1,15 @@
-from numpy import array, pi, polymul, tan
+from numpy import array, pi, tan
 from scipy.signal import (
     butter,
     cheb2ord,
     cheby2,
     cont2discrete,
     firwin,
-    normalize,
     sosfreqz,
 )
 
 from sharp.data.hardcoded.filters.base import (
+    HighpassLowpassCombi,
     LTIRippleFilter,
     LTIRippleFilterFIR,
 )
@@ -19,16 +19,16 @@ class EgoStengelFilter(LTIRippleFilter):
     passband = (100, 400)
 
 
-class EgoStengelOriginal(EgoStengelFilter):
+class EgoStengelOriginal(EgoStengelFilter, HighpassLowpassCombi):
     fs = None
 
     @property
-    def tf(self):
-        b_high, a_high = butter(8, self.passband[0], "high", analog=True)
-        b_low, a_low = butter(8, self.passband[1], "low", analog=True)
-        b = polymul(b_high, b_low)
-        a = polymul(a_high, a_low)
-        return normalize(b, a)
+    def tf_high(self):
+        return butter(8, self.passband[0], "high", analog=True)
+
+    @property
+    def tf_low(self):
+        return butter(8, self.passband[1], "low", analog=True)
 
 
 class EgoStengelDiscretized(EgoStengelFilter):
@@ -51,17 +51,16 @@ class EgoStengelDiscretized(EgoStengelFilter):
         return 2 * pi / self.fs
 
 
-class EgoStengelReplica(EgoStengelFilter):
+class EgoStengelReplica(EgoStengelFilter, HighpassLowpassCombi):
     title = "Ego-Stengel et al."
 
     @property
-    def tf(self):
-        band = self.normalized_passband
-        b_high, a_high = butter(8, band[0], "high")
-        b_low, a_low = butter(2, band[1], "low")
-        b = polymul(b_high, b_low)
-        a = polymul(a_high, a_low)
-        return normalize(b, a)
+    def tf_high(self):
+        return butter(8, self.normalized_passband[0], "high")
+
+    @property
+    def tf_low(self):
+        return butter(2, self.normalized_passband[1], "low")
 
 
 class DuttaFilter(LTIRippleFilterFIR):
@@ -133,7 +132,7 @@ class FalconReplica(LTIRippleFilter):
     left_edge = (125, 135)
     right_edge = (278, 300)
 
-    title = "Falcon"
+    title = "Falcon, default"
 
     @property
     def tf(self):
@@ -143,3 +142,9 @@ class FalconReplica(LTIRippleFilter):
             wp, ws, self.max_passband_atten, self.min_stopband_atten
         )
         return cheby2(order, self.min_stopband_atten, Wn, "bandpass")
+
+
+class FalconReplica100(FalconReplica):
+    left_edge = (95, 105)
+    right_edge = (190, 210)
+    title = "Falcon, 100–200 Hz"

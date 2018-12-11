@@ -1,21 +1,17 @@
-from typing import Sequence
-
 from luigi import DictParameter, FloatParameter
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.pyplot import subplots
-from numpy import argmax, array
+from numpy import argmax
+
 from seaborn import set_hls_values
 from sharp.data.files.figure import FigureTarget
+from sharp.data.hardcoded.style import fraction, paperfig
+from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
-from sharp.tasks.plot.results.base import (
-    MultiEnvelopeFigureMaker,
-)
-from sharp.data.hardcoded.style import fraction
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend
 
-DISCRETE = dict(lw=2, marker=".", ms=10)
-CONTINUOUS = dict(lw=4)
+DISCRETE = dict(lw=0.8, marker=".", ms=6)
+CONTINUOUS = dict(lw=1.5)
 
 
 class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
@@ -26,7 +22,7 @@ class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
 
     zoom_from: float = FloatParameter(0)
     # Precision and recall will be plotted in the ranges [zoom_from, 1].
-    margin: float = FloatParameter(0.05)
+    margin: float = FloatParameter(0.04)
     # Margin around the axes, as a percentage of (1 - zoom_from)
     line_kwargs: dict = DictParameter(CONTINUOUS)
 
@@ -38,12 +34,13 @@ class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
         fig, axes = subplots(
             nrows=2,
             ncols=2,
-            figsize=1.1 * array([9.8, 9]),
+            # figsize=1.1 * array([9.8, 9]),
+            figsize=paperfig(1, 0.82),
             gridspec_kw=dict(width_ratios=[1.63, 1], height_ratios=[1, 1.63]),
-        )  # type: Figure, Sequence[Axes]
-        ax_PR = axes[1, 0]
-        ax_delay_P = axes[1, 1]
-        ax_delay_R = axes[0, 0]
+        )
+        ax_PR: Axes = axes[1, 0]
+        ax_delay_P: Axes = axes[1, 1]
+        ax_delay_R: Axes = axes[0, 0]
         axes[0, 1].remove()
         self.setup_axes(ax_PR, ax_delay_P, ax_delay_R)
         self.plot_PR_curves(ax_PR)
@@ -95,7 +92,7 @@ class PlotLatencyAndPR(MultiEnvelopeFigureMaker):
     def mark_cutoffs(self, ax_PR: Axes, ax_delay_P: Axes, ax_delay_R: Axes):
         for sweep, color in zip(self.threshold_sweeps, self.colors):
             kwargs = dict(
-                marker=".", ms=18, color=color, markeredgecolor="black"
+                marker=".", ms=8, color=color, markeredgecolor="black"
             )
             d = PR_divider(sweep)
             ax_PR.plot(sweep.recall[d], sweep.precision[d], **kwargs)

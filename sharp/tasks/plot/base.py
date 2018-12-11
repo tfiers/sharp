@@ -106,7 +106,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         fig, axes = subplots(
             nrows=nrows,
             sharex=True,
-            figsize=paperfig(width=0.5, height=0.5),
+            figsize=paperfig(width=0.55, height=0.55),
             gridspec_kw=dict(height_ratios=axheights),
         )
         input_ax = axes[0]

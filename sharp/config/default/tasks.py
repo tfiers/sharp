@@ -2,23 +2,24 @@ from sharp.data.hardcoded.filters.literature import (
     DuttaReplica,
     EgoStengelReplica,
     FalconReplica,
+    FalconReplica100,
 )
+from sharp.data.hardcoded.filters.search_best import OurButter
+from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.plot.results.envelopes import PlotEnvelopes
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
 
 
 def multi_envelope_plots(**em_kwargs):
     from sharp.tasks.plot.results.PR_and_latency import PlotLatencyAndPR
-    from sharp.tasks.plot.results.envelopes import PlotEnvelopes
-    from sharp.tasks.plot.results.latency_scatter import PlotLatencyScatter
-    from sharp.tasks.plot.results.weights import PlotWeights
 
     return (
-        PlotWeights(**em_kwargs),
+        # PlotWeights(**em_kwargs),
+        # PlotLatencyScatter(**em_kwargs),
+        #
         PlotEnvelopes(**em_kwargs),
-        PlotLatencyScatter(**em_kwargs),
         PlotLatencyAndPR(**em_kwargs),
-        PlotLatencyAndPR(zoom_from=0.65, **em_kwargs),
+        PlotLatencyAndPR(zoom_from=0.70, **em_kwargs),
     )
 
 
@@ -81,12 +82,16 @@ def tasks_on_hold():
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    PlotEnvelopes(
+    ApplyOnlineBPF(ripple_filter=OurButter()),
+    ThresholdSweeper(envelope_maker=ApplyOnlineBPF(ripple_filter=OurButter())),
+    *multi_envelope_plots(
         subdir="online-BPF",
         envelope_makers=(
             ApplyOnlineBPF(ripple_filter=EgoStengelReplica()),
             ApplyOnlineBPF(ripple_filter=DuttaReplica()),
             ApplyOnlineBPF(ripple_filter=FalconReplica()),
+            ApplyOnlineBPF(ripple_filter=FalconReplica100()),
+            ApplyOnlineBPF(ripple_filter=OurButter()),
         ),
     ),
 )

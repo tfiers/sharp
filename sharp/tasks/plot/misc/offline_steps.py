@@ -90,7 +90,7 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         start, stop = self.time_range
         return FigureTarget(
             directory=self.output_dir / "steps-offline-SWR-detection",
-            filename=f"{start:.1f}--{stop:.1f}".replace(".", "_"),
+            filename=f"{start:.1f}--{stop:.1f}",
         )
 
     def requires(self):

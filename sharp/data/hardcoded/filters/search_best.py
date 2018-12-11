@@ -6,7 +6,20 @@ from scipy.signal import butter, cheby1, cheby2, firwin, cheb2ord, iirfilter
 from sharp.data.hardcoded.filters.base import (
     LTIRippleFilter,
     LTIRippleFilterFIR,
+    HighpassLowpassCombi,
 )
+
+
+class OurButter(HighpassLowpassCombi):
+    title = "Bread-n-butter"
+
+    @property
+    def tf_high(self):
+        return butter(2, self.normalized_passband[0], "high")
+
+    @property
+    def tf_low(self):
+        return butter(0, self.normalized_passband[1], "low")
 
 
 class Butterworth(LTIRippleFilter):
