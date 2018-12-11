@@ -4,7 +4,7 @@ from sharp.data.hardcoded.filters.literature import (
     FalconReplica,
     FalconReplica100,
 )
-from sharp.data.hardcoded.filters.search_best import OurButter
+from sharp.data.hardcoded.filters.best import OurButter
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.plot.results.envelopes import PlotEnvelopes
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
@@ -42,7 +42,7 @@ def tasks_on_hold():
     from sharp.tasks.text.online_BPF_info import WriteOnlineBPFInfo
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
-    from sharp.data.hardcoded.filters.search_best import (
+    from sharp.data.hardcoded.filters.best import (
         cheby1_comp,
         cheby2_comp,
         main_comp,
