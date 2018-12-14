@@ -25,6 +25,8 @@ class PlotIsoFlines(FigureMaker):
             ax.set_aspect("equal")
             ax.plot(R, R, "grey", lw=0.5)
             ax.set_xlabel("Recall")
+            ax.set_xticks([0, 0.25, 0.50, 0.75, 1])
+            ax.set_yticks([0, 0.25, 0.50, 0.75, 1])
             if i == 0:
                 ax.set_ylabel("Precision")
             ax.xaxis.set_major_formatter(fraction)
