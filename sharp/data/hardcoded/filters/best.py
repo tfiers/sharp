@@ -3,8 +3,8 @@ from scipy.signal import butter
 from sharp.data.hardcoded.filters.base import HighpassLowpassCombi
 
 
-class OurButter(HighpassLowpassCombi):
-    title = "Bread-n-butter"
+class ProposedOnlineBPF(HighpassLowpassCombi):
+    title = "Proposed online BPF"
 
     @property
     def tf_high(self):

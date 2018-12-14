@@ -5,7 +5,7 @@ from numpy import abs
 from scipy.signal import lfilter
 
 from sharp.data.hardcoded.filters.base import LTIRippleFilter
-from sharp.data.hardcoded.filters.literature import FalconReplica
+from sharp.data.hardcoded.filters.best import ProposedOnlineBPF
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import TaskParameter
 from sharp.tasks.signal.base import EnvelopeMaker
@@ -15,7 +15,7 @@ log = getLogger(__name__)
 
 class ApplyOnlineBPF(EnvelopeMaker):
 
-    ripple_filter: LTIRippleFilter = TaskParameter(default=FalconReplica())
+    ripple_filter: LTIRippleFilter = TaskParameter(default=ProposedOnlineBPF())
     order: int = IntParameter(default=None)
 
     @property

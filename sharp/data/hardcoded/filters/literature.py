@@ -132,7 +132,7 @@ class FalconReplica(LTIRippleFilter):
     left_edge = (125, 135)
     right_edge = (278, 300)
 
-    title = "Falcon, default"
+    title = "Falcon default"
 
     @property
     def tf(self):
@@ -147,4 +147,4 @@ class FalconReplica(LTIRippleFilter):
 class FalconReplica100(FalconReplica):
     left_edge = (95, 105)
     right_edge = (190, 210)
-    title = "Falcon, 100–200 Hz"
+    title = "Falcon default, 100–200 Hz"

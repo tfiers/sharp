@@ -103,10 +103,11 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         if not self.reference_channel_only:
             num_channels = self.multichannel_test.num_channels
             axheights[0] = 1 + num_channels / 6
+        figheight = 0.25 + 0.10 * len(self.extra_signals)
         fig, axes = subplots(
             nrows=nrows,
             sharex=True,
-            figsize=paperfig(width=0.55, height=0.55),
+            figsize=paperfig(width=0.55, height=0.9 * figheight),
             gridspec_kw=dict(height_ratios=axheights),
         )
         input_ax = axes[0]
