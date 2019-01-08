@@ -131,5 +131,5 @@ class TrainRNN(SharpTask, NeuralNetMixin):
     @cached
     def num_training_chunks(self) -> int:
         """ Total number of training chunks, over all traininig IO tuples."""
-        num_training_samples = self.input_signal_train_proper.size
+        num_training_samples = self.input_signal_train_proper.num_samples
         return int(num_training_samples // self.chunk_size)
