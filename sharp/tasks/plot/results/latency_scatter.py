@@ -19,14 +19,14 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
         df_dicts = (
             {
                 swr_duration: 1000
-                * sweep.at_recall().detected_reference_segs.duration,
-                delay: 1000 * sweep.at_recall().abs_delays,
+                * sweep.at_max_F1().detected_reference_segs.duration,
+                delay: 1000 * sweep.at_max_F1().abs_delays,
                 algo: title,
             }
             for sweep, title in zip(self.threshold_sweeps, self.titles)
         )
         df: DataFrame = concat(DataFrame(dic) for dic in df_dicts)
-        grid = JointGrid(x=swr_duration, y=delay, data=df, height=8)
+        grid = JointGrid(x=swr_duration, y=delay, data=df, height=6)
         kde_kwargs = dict(legend=False, lw=3)
         scatter_kwargs = dict(
             linestyle="none", marker=".", markeredgecolor="none", markersize=6

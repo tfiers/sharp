@@ -47,12 +47,12 @@ class SharpConfigBase:
     raw_data_dir: str = MANDATORY_SETTING
     # Directory containing raw NeuraLynx recordings (*.ncs files).
 
-    output_dir: str = MANDATORY_SETTING
+    output_dir: str = "output"  # MANDATORY_SETTING
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to your custom `config.py`
     # file; i.e. relative to the "sharp config dir" env var).
 
-    reference_channel: str = MANDATORY_SETTING
+    reference_channel: str = "L2 - E13"  # MANDATORY_SETTING
     # Name of the NCS file (without extension) that will be used for
     # single-channel detection algorithms and for defining reference SWR
     # segments.
@@ -98,14 +98,19 @@ class SharpConfigBase:
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 
-    time_ranges: Sequence[Tuple[float, float]] = [(0.68, 1.2)]
+    time_ranges: Sequence[Tuple[float, float]] = [
+        (107.2, 107.8),
+        (107.69, 107.79),  # Zoom-in
+        (349.2, 349.8),  # Clean & strong ripples
+        (132.6, 133.2),  # Lotsa ripply & merging
+    ]
     # Segments of data to use for time-range plots. In seconds, relative to the
     # start of the evaluation (AKA test) slice.
 
     #
     # RNN architecture
     # ----------------
-    num_layers: int = 2
+    num_layers: int = 1
     num_units_per_layer: int = 20
 
     #
@@ -123,7 +128,7 @@ class SharpConfigBase:
     p_dropout: float = 0.4
     # Probability that a random hidden unit's activation is set to 0 during a
     # training step. Should improve generalisation performance. Only relevant
-    # for num_layers > 1.
+    # for num_layers >= 2.
 
     num_epochs: int = 10
     # How many times to pass over the training data when training an RNN.

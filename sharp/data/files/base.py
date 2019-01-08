@@ -46,6 +46,7 @@ class FileTarget(PathlibPath, Target, ABC):
     def __new__(cls, directory: Union[Path, str], filename: str):
         dirr = Path(directory)
         dirr.mkdir(parents=True, exist_ok=True)
+        # LaTeX includes can't have dots in filenames.
         filename_clean = filename.replace(".", "_")
         path = dirr / (filename_clean + cls.extension)
         return PathlibPath.__new__(cls, path)

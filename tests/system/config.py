@@ -17,6 +17,7 @@ class SharpConfig(SharpConfigBase):
         "sr": (2,),
         "pyr+sr": (0, 2),
     }
+    time_ranges = [(0.68, 1.2)]
 
     # [NeuralNet]
     num_layers = 1

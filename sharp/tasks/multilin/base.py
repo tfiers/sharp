@@ -37,9 +37,9 @@ class GEVecMixin:
     @property
     def _channels_str(self):
         if self.num_channels == 1:
-            return f"{self.channel_combo_name} channel"
+            return f"{self.channel_combo_name} ch."
         else:
-            return f"{self.channel_combo_name} channels"
+            return f"{self.channel_combo_name} ch."
 
     @property
     def filename(self):

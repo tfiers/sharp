@@ -3,9 +3,10 @@ from typing import Callable, Tuple
 
 import numpy as np
 import torch
+from numpy import ndarray
 
 from fklab.segments import Segment
-from sharp.config.load import intermediate_output_dir, config
+from sharp.config.load import config, intermediate_output_dir
 from sharp.data.types.aliases import TorchArray
 from sharp.data.types.neuralnet import RNN
 from sharp.data.types.signal import BinarySignal, Signal
@@ -60,7 +61,7 @@ class NeuralNetMixin(InputDataMixin):
         Initialises a new RNN with random weights.
         """
         model = RNN(
-            num_input_channels=1,
+            num_input_channels=16,
             num_layers=config.num_layers,
             num_units_per_layer=config.num_units_per_layer,
             p_dropout=config.p_dropout,
@@ -88,21 +89,38 @@ class NeuralNetMixin(InputDataMixin):
         segs = self.reference_segs_train.scale(
             1 + config.reference_seg_extension, reference=1
         )
-        return self.to_binary_signal(segs)
-
-    def to_binary_signal(self, segs: Segment) -> BinarySignal:
-        """
-        Convert segment times to a binary signal (in a one-column matrix) that
-        is as long as the full training input signal.
-        """
         N = self.reference_channel_train.shape[0]
         sig = np.zeros(N)
+        # Convert segment times to a binary signal (in a one-column matrix) that
+        # is as long as the full training input signal.
+        # return self.add_rects(segs)
+        # return self.add_triangles(segs)
+        self.add_start_rects(sig, segs)
+        return Signal(sig, self.reference_channel_train.fs).as_matrix()
+
+    def add_rects(self, sig: ndarray, segs: Segment):
         for seg in segs:
             ix = time_to_index(
-                seg, self.reference_channel_train.fs, N, clip=True
+                seg, self.reference_channel_train.fs, sig.size, clip=True
             )
             sig[slice(*ix)] = 1
-        return BinarySignal(sig, self.reference_channel_train.fs).as_matrix()
+
+    def add_triangles(self, sig: ndarray, segs: Segment):
+        for seg in segs:
+            ix = time_to_index(
+                seg, self.reference_channel_train.fs, sig.size, clip=True
+            )
+            sig[slice(*ix)] = np.linspace(1, 0, np.diff(ix))
+
+    def add_start_rects(self, sig: ndarray, segs: Segment):
+        for start, stop in segs:
+            ix = time_to_index(
+                [start - 0.045, start + 0.045],
+                self.reference_channel_train.fs,
+                sig.size,
+                clip=True,
+            )
+            sig[slice(*ix)] = 1
 
     @property
     def io_tuple_train(self) -> IOTuple:
@@ -121,12 +139,12 @@ class NeuralNetMixin(InputDataMixin):
     @property
     def input_signal_train_proper(self):
         return TrainValidSplit(
-            self.reference_channel_train
+            self.multichannel_train
         ).train_proper_slice.signal
 
     @property
     def input_signal_valid(self):
-        return TrainValidSplit(self.reference_channel_train).valid_slice.signal
+        return TrainValidSplit(self.multichannel_train).valid_slice.signal
 
     @property
     def target_signal_train_proper(self):

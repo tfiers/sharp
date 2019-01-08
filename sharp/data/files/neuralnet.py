@@ -5,6 +5,7 @@ import torch
 
 from sharp.data.types.aliases import NeuralModel
 from sharp.data.files.base import FileTarget
+from sharp.tasks.neuralnet.base import device
 
 
 class NeuralModelFile(FileTarget):
@@ -20,7 +21,7 @@ class NeuralModelFile(FileTarget):
         return instance
 
     def read(self) -> NeuralModel:
-        state_dict = torch.load(self.path_string)
+        state_dict = torch.load(self.path_string, map_location=device)
         self._model.load_state_dict(state_dict)
         return self._model
 
