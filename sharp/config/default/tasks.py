@@ -9,7 +9,11 @@ def multi_envelope_plots(**em_kwargs):
         PlotLatencyScatter(**em_kwargs),
         WriteLatencyInfo(**em_kwargs),
         #
-        PlotEnvelopes(**em_kwargs),
+        PlotEnvelopes(
+            selected_time_ranges_only=False,
+            reference_channel_only=False,
+            **em_kwargs
+        ),
         PlotLatencyAndPR(**em_kwargs),
         PlotLatencyAndPR(zoom_from=0.70, **em_kwargs),
     )
@@ -23,7 +27,6 @@ def searchgrids(**kwargs):
 
 
 def tasks_on_hold():
-    from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
     from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
     from sharp.tasks.plot.misc.reference import PlotReferenceMaker
     from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultifig
@@ -37,13 +40,15 @@ def tasks_on_hold():
         EgoStengelReplica,
         FalconReplica,
     )
-    from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
     from sharp.tasks.plot.misc.F_score import PlotIsoFlines
+    from sharp.tasks.multilin.apply import SpatiotemporalConvolution
+    from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
+    from sharp.tasks.neuralnet.apply import ApplyRNN
+    from sharp.tasks.plot.misc.training import PlotValidLoss
 
     return (
         PlotGEVecPrinciple(),
         PlotReferenceMaker(),
-        PlotRecordingSummaries(),
         *searchgrids(subdir="space-time-comp"),
         WriteOnlineBPFInfo(),
         WriteOfflineInfo(),
@@ -68,24 +73,22 @@ def tasks_on_hold():
             ),
         ),
         PlotIsoFlines(),
+        *multi_envelope_plots(
+            subdir="conclusion",
+            envelope_makers=(
+                ApplyOnlineBPF(),
+                SpatiotemporalConvolution(num_delays=10),
+                # SpatiotemporalConvolution(num_delays=10, channel_combo_name="pyr"),
+                ApplyRNN(),
+            ),
+        ),
+        PlotValidLoss(),
     )
 
 
-from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
-from sharp.tasks.neuralnet.apply import ApplyRNN
-from sharp.tasks.plot.misc.training import PlotValidLoss
+from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    *multi_envelope_plots(
-        subdir="conclusion",
-        envelope_makers=(
-            ApplyOnlineBPF(),
-            SpatiotemporalConvolution(num_delays=10),
-            # SpatiotemporalConvolution(num_delays=10, channel_combo_name="pyr"),
-            ApplyRNN(),
-        ),
-    ),
-    PlotValidLoss(),
+    PlotRecordingSummaries(),
 )

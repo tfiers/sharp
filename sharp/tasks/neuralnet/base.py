@@ -61,7 +61,7 @@ class NeuralNetMixin(InputDataMixin):
         Initialises a new RNN with random weights.
         """
         model = RNN(
-            num_input_channels=16,
+            num_input_channels=len(self.channels),
             num_layers=config.num_layers,
             num_units_per_layer=config.num_units_per_layer,
             p_dropout=config.p_dropout,
@@ -69,6 +69,10 @@ class NeuralNetMixin(InputDataMixin):
         # Module.to() is in place (Tensor.to() is not).
         model.to(device)
         return model
+
+    @property
+    def channels(self):
+        return config.channel_combinations[config.RNN_channel_combo_name]
 
     @property
     def cost_function(self) -> Callable[[TorchArray, TorchArray], TorchArray]:
@@ -93,9 +97,11 @@ class NeuralNetMixin(InputDataMixin):
         sig = np.zeros(N)
         # Convert segment times to a binary signal (in a one-column matrix) that
         # is as long as the full training input signal.
-        # return self.add_rects(segs)
-        # return self.add_triangles(segs)
-        self.add_start_rects(sig, segs)
+        if config.target_fullrect:
+            self.add_rects(sig, segs)
+        else:
+            self.add_start_rects(sig, segs)
+        # self.add_triangles(sig, segs)
         return Signal(sig, self.reference_channel_train.fs).as_matrix()
 
     def add_rects(self, sig: ndarray, segs: Segment):
@@ -115,7 +121,10 @@ class NeuralNetMixin(InputDataMixin):
     def add_start_rects(self, sig: ndarray, segs: Segment):
         for start, stop in segs:
             ix = time_to_index(
-                [start - 0.045, start + 0.045],
+                [
+                    start - config.target_start_pre,
+                    start + config.target_start_post,
+                ],
                 self.reference_channel_train.fs,
                 sig.size,
                 clip=True,
@@ -139,12 +148,14 @@ class NeuralNetMixin(InputDataMixin):
     @property
     def input_signal_train_proper(self):
         return TrainValidSplit(
-            self.multichannel_train
+            self.multichannel_train[:, self.channels]
         ).train_proper_slice.signal
 
     @property
     def input_signal_valid(self):
-        return TrainValidSplit(self.multichannel_train).valid_slice.signal
+        return TrainValidSplit(
+            self.multichannel_train[:, self.channels]
+        ).valid_slice.signal
 
     @property
     def target_signal_train_proper(self):

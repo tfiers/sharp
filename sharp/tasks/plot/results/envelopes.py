@@ -36,9 +36,9 @@ class PlotEnvelopes(MultiEnvelopeFigureMaker, TimeRangesPlotter):
         return self._contains_any_detection(time_range)
 
     def _contains_any_detection(self, time_range: TimeRange) -> bool:
+        seg = Segment(time_range)
         for sweep in self.threshold_sweeps:
-            seg = Segment(time_range)
-            te = sweep.at_recall()
+            te = sweep.at_max_F1()
             if _contains_at_least_one(
                 seg, te.correct_detections
             ) or _contains_at_least_one(seg, te.incorrect_detections):

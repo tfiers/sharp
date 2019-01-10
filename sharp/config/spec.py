@@ -107,19 +107,21 @@ class SharpConfigBase:
     # Segments of data to use for time-range plots. In seconds, relative to the
     # start of the evaluation (AKA test) slice.
 
+    eval_start_extension: float = 0 / 1000
+    # How many seconds to extend the leading edge of reference SWR segments
+    # with when evaluating detections. Allows early detections (i.e. shortly
+    # before the reference segment starts) to count as correct detections.
+
     #
     # RNN architecture
     # ----------------
     num_layers: int = 1
     num_units_per_layer: int = 20
+    RNN_channel_combo_name: str = "all"
 
     #
     # RNN training settings
     # -----------------
-    reference_seg_extension: float = 0
-    # Reference segments are expanded at their leading edge, by the given
-    # fraction of total segment duration (= approximate SWR duration). This
-    # should encourage SWR 'prediction' in the optimisation procedure.
 
     chunk_duration: float = 0.3
     # Length of a chunk, in seconds. Network weights are updated after each
@@ -136,7 +138,19 @@ class SharpConfigBase:
     valid_fraction: float = 0.22
     # How much of the training data to use for validation (estimation of
     # generalisation performance -- to choose net of epoch where this was
-    # at_recall). The rest of the data is used for training proper.
+    # maximal). The rest of the data is used for training proper.
+
+    target_fullrect: bool = True
+    target_start_pre: float = 45 / 1000
+    target_start_post: float = 45 / 1000
+    # Shape of target function. Either binary on full reference segments,
+    # or a rectangle at refseg_start + [-pre, +post].
+
+    reference_seg_extension: float = 0
+    # Reference segments are expanded at their leading edge, by the given
+    # fraction of total segment duration (= approximate SWR duration) before
+    # calculating the target signal. This should encourage SWR 'prediction' in
+    # the optimisation procedure.
 
     #
     # Internals

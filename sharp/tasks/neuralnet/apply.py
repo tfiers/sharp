@@ -26,7 +26,7 @@ class ApplyRNN(EnvelopeMaker, NeuralNetMixin):
 
     def work(self):
         envelope_chunks = []
-        inputt = self.multichannel_full.as_matrix()
+        inputt = self.multichannel_full.as_matrix()[:, self.channels]
         # Full input signal is too big for GPU memory.
         # Thus: split input, pass through h, concatenate results
         num_chunks = inputt.duration // self.seconds_per_chunk

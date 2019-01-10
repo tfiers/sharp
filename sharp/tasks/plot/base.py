@@ -100,10 +100,11 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
     def make_figure(self, time_range):
         nrows = 1 + len(self.extra_signals)
         axheights = ones(nrows)
+        figheight = 0.30 + 0.14 * len(self.extra_signals)
         if not self.reference_channel_only:
             num_channels = self.multichannel_test.num_channels
-            axheights[0] = 1 + num_channels / 6
-        figheight = 0.25 + 0.10 * len(self.extra_signals)
+            axheights[0] = 1 + num_channels / 4
+            figheight *= 1.2
         fig, axes = subplots(
             nrows=nrows,
             sharex=True,

@@ -3,6 +3,7 @@ from logging import getLogger
 from numpy import empty, int32, ndarray, array
 
 from fklab.segments import Segment
+from sharp.config.load import config
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.data.types.intersection import SegmentEventIntersection
 from sharp.data.types.signal import Signal
@@ -41,7 +42,8 @@ def evaluate_threshold(
         envelope.astype(float), float(threshold), lockout_samples.astype(int)
     )
     detections = detection_ix / envelope.fs
-    intersection = SegmentEventIntersection(reference_segs, detections)
+    eval_segs = Segment(reference_segs._data - [config.eval_start_extension, 0])
+    intersection = SegmentEventIntersection(eval_segs, detections)
     detection_is_correct = intersection.event_is_in_seg
     reference_seg_is_detected = intersection.num_events_in_seg > 0
     if intersection.first_event_in_seg.size > 0:

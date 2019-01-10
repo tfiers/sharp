@@ -38,7 +38,7 @@ class TrainRNN(SharpTask, NeuralNetMixin):
             return TrainRNN(epoch=self.epoch - 1)
 
     def requires(self):
-        dependencies = super().requires()
+        dependencies = self.input_data_makers
         if not self.is_initial_epoch:
             dependencies += (self.prev_epoch_trainer,)
         return dependencies
