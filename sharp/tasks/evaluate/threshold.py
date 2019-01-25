@@ -37,12 +37,8 @@ def evaluate_threshold(
     :return:  Initalized ThresholdEvaluation object.
     """
     log.info(f"Evaluating threshold {threshold:.3g}")
-    lockout_samples = time_to_index(lockout_time, envelope.fs)
-    detection_ix = calc_detection_indices(
-        envelope.astype(float), float(threshold), lockout_samples.astype(int)
-    )
-    detections = detection_ix / envelope.fs
     eval_segs = Segment(reference_segs._data - [config.eval_start_extension, 0])
+    detections = calc_detections(envelope, threshold, lockout_time)
     intersection = SegmentEventIntersection(eval_segs, detections)
     detection_is_correct = intersection.event_is_in_seg
     reference_seg_is_detected = intersection.num_events_in_seg > 0
@@ -57,7 +53,27 @@ def evaluate_threshold(
         incorrect_detections=detections[~detection_is_correct],
         detected_reference_segs=reference_segs[reference_seg_is_detected],
         undetected_reference_segs=reference_segs[~reference_seg_is_detected],
+        detections=detections,
+        detection_is_correct=detection_is_correct,
+        reference_seg_is_detected=reference_seg_is_detected,
     )
+
+
+def calc_detections(
+    envelope: Signal, threshold: float, lockout_time: float
+) -> ndarray:
+    """
+    :param envelope:
+    :param threshold:
+    :param lockout_time: In seconds
+    :return: Array of detection times, in seconds.
+    """
+    lockout_samples = time_to_index(lockout_time, envelope.fs)
+    detection_ix = calc_detection_indices(
+        envelope.astype(float), float(threshold), lockout_samples.astype(int)
+    )
+    detections = detection_ix / envelope.fs
+    return detections
 
 
 @compiled

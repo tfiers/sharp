@@ -26,13 +26,23 @@ def add_event_lines(ax: Axes, events: ndarray, lw=1, **kwargs):
     )
 
 
-def add_event_arrows(ax: Axes, events: ndarray, size=3.5, **kwargs):
+def add_event_arrows(ax: Axes, events: ndarray, y=-0.12, size=3.5, **kwargs):
     """ Draw arrows beneath the plot, one for each (visible) event. """
-    x = _get_visible_events(ax, events)
-    y = -0.12 * ones_like(x)
+    xs = _get_visible_events(ax, events)
+    ys = y * ones_like(xs)
     trans = ax.get_xaxis_transform()
+    if y > 0.5:
+        marker = "v"
+    else:
+        marker = "^"
     arrows: Sequence[Line2D] = ax.plot(
-        x, y, "^", transform=trans, clip_on=False, markersize=size, **kwargs
+        xs,
+        ys,
+        marker,
+        transform=trans,
+        clip_on=False,
+        markersize=size,
+        **kwargs
     )
     # fig.tight_layout doesn't work when clip_on=False here. So we instruct
     # tight_layout to ignore the created artists

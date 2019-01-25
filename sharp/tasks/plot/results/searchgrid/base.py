@@ -17,9 +17,7 @@ from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-from sharp.tasks.plot.results.base import (
-    MultiEnvelopeFigureMaker,
-)
+from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.data.hardcoded.style import fraction
 from sharp.tasks.plot.util.channelmap import draw_channelmap
 from sharp.tasks.plot.util.legend import add_colored_legend
@@ -45,7 +43,7 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
     rowheight = 1.7
     text_kwargs = dict(x=0.04, y=0.04)
     text_format = "{summary_measure:.0%}"
-    col_pad = 1.08
+    col_pad = 0.99
     color_range: Tuple[float, float] = (28, 97)
     # As percentiles of `summary_measure` for all convolver sweeps.
     GEVec_color = "black"
@@ -94,11 +92,14 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         self.plot_colorbar()
 
     def plot_grid(self):
+        downscale = 1.65
+        self.rowheight /= downscale
+        self.col_pad /= downscale
         num_gridrows = len(self.num_delays)
         nrows = num_gridrows + 1
         ncols = len(self.channel_combo_names)
-        figwidth = 1 + 1.8 * ncols
-        figheight = 1 + self.rowheight * nrows
+        figwidth = 1 / downscale + 1.8 * ncols / downscale
+        figheight = 1 / downscale + self.rowheight * nrows
         rel_rowheight = SearchGrid.rowheight / self.rowheight
         channelmap_rel_height = 2.5 * rel_rowheight
         fig, axes = subplots(
@@ -172,11 +173,11 @@ class SearchGrid(MultiEnvelopeFigureMaker, ABC):
         for col, name in enumerate(self.channel_combo_names):
             ax = axes[-1, col]
             draw_channelmap(
-                ax, active_channels=config.channel_combinations[name]
+                ax, active_channels=config.channel_combinations[name], ms=3.2
             )
 
     def plot_colorbar(self):
-        fig, ax = subplots(figsize=(2, 4))
+        fig, ax = subplots(figsize=(1, 2))
         cbar = ColorbarBase(
             ax=ax,
             label=self.colorbar_label,

@@ -100,14 +100,15 @@ class SharpConfigBase:
 
     time_ranges: Sequence[Tuple[float, float]] = [
         (107.2, 107.8),
-        (107.69, 107.79),  # Zoom-in
+        # (107.69, 107.79),  # Zoom-in
+        (107.33, 107.45),  # Zoom-in
         (349.2, 349.8),  # Clean & strong ripples
         (132.6, 133.2),  # Lotsa ripply & merging
     ]
     # Segments of data to use for time-range plots. In seconds, relative to the
     # start of the evaluation (AKA test) slice.
 
-    eval_start_extension: float = 0 / 1000
+    eval_start_extension: float = 14 / 1000
     # How many seconds to extend the leading edge of reference SWR segments
     # with when evaluating detections. Allows early detections (i.e. shortly
     # before the reference segment starts) to count as correct detections.

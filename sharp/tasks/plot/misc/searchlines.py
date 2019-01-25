@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
 from numpy import arange
 
-from sharp.data.hardcoded.filters.base import num_delays_BPF, LTIRippleFilter
+from sharp.data.hardcoded.filters.base import LTIRippleFilter
 from sharp.data.types.aliases import subplots
 from sharp.data.hardcoded.style import paperfig
 from sharp.tasks.base import CustomParameter
@@ -38,11 +38,11 @@ class PlotSearchLines(FigureMaker):
         ax_top, ax_btm = axes
         ax_btm.set_xlabel("Number of delays")
         self.plot_on_axes(ax_top, ax_btm)
-        self.add_legend(fig)
+        self.add_legend(ax_top)
         fig.tight_layout()
         self.output().write(fig)
 
-    def add_legend(self, fig):
+    def add_legend(self, ax):
         if self.legend_outside:
             loc_kwargs = dict(loc="center left", bbox_to_anchor=(0.98, 0.5))
         else:
@@ -50,10 +50,10 @@ class PlotSearchLines(FigureMaker):
         labels = self.labels
         colors = self.colors
         if self.with_reference:
-            labels += ["Reference"]
+            labels += ["Proposed online BPF"]
             colors += [self.reference_color]
         add_colored_legend(
-            parent=fig,
+            parent=ax,
             labels=labels,
             colors=colors,
             title=self.legend_title,
@@ -69,7 +69,7 @@ class BPF_SearchLines_Mixin:
     filename = Parameter()
     filters: Dict[str, LTIRippleFilter] = CustomParameter()
     orders = arange(14)
-    num_delays = num_delays_BPF(orders)
+    num_delays = orders + 1
 
     @property
     def labels(self):

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from numpy import median, ndarray, percentile
 
@@ -36,6 +37,12 @@ class ThresholdEvaluation:
     detected_reference_segs: Segment
 
     undetected_reference_segs: Segment
+
+    detections: Optional[ndarray] = None
+    detection_is_correct: Optional[ndarray] = None
+    reference_seg_is_detected: Optional[ndarray] = None
+    # Optional raw data, for use in the mini-paper notebook
+    # (to split detected segments by type: SW-only, ripple-only, SWR-complex)
 
     #
     # ------
@@ -129,6 +136,14 @@ class ThresholdEvaluation:
     @property
     def abs_delays_median(self):
         return median(self.abs_delays)
+
+    @property
+    def abs_delays_Q1(self):
+        return percentile(self.abs_delays, 25)
+
+    @property
+    def abs_delays_Q3(self):
+        return percentile(self.abs_delays, 75)
 
     @property
     def rel_delays_median(self):

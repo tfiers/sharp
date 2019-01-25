@@ -29,7 +29,6 @@ def group_delay(H, f):
     df = diff(f[:2])
     phi = phase(H)
     tau = -savgol_filter(phi, 5, 3, deriv=1, delta=df)  # In seconds (1/Hz)
-    mt = min(tau)
     remove_outliers(tau)
     return 1000 * tau
 

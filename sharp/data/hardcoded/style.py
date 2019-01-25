@@ -29,7 +29,7 @@ readable = {
     
     # DPI (pixels-per-inch) is irrelevant for PDF's. But it does matter for
     # Jupyter Notebooks ('figure.dpi') and saved PNG's ('savefig.dpi').
-    'figure.dpi': 80,
+    'figure.dpi': 150,
     'savefig.dpi': 300,
 
     'font.size': 8.5,
