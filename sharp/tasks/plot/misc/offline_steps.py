@@ -158,8 +158,8 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             self.e_t, ax=ax_main, color=envelope_color, lw=thicc_lw
         )
         rm = self.reference_maker
-        ax_main.hlines(rm.threshold_high, *self.time_range, lw=thin_lw)
-        ax_main.hlines(rm.threshold_low, *self.time_range, lw=thin_lw)
+        ax_main.hlines(rm.ripple_threshold_high, *self.time_range, lw=thin_lw)
+        ax_main.hlines(rm.ripple_threshold_low, *self.time_range, lw=thin_lw)
         add_scalebar(ax_main)
         add_title(ax_main, "Thresholds $T$", threshold_color, y=0.58)
         segs = self.reference_segs_test
@@ -168,15 +168,15 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             xranges=[
                 tup for tup in zip(visible_segs.start, visible_segs.duration)
             ],
-            yrange=(0, rm.threshold_low),
+            yrange=(0, rm.ripple_threshold_low),
             facecolors=segment_color,
             alpha=segment_alpha,
         )
         ax_main.add_collection(bars)
         # Find and plot crossings of lower threshold
-        crossings_ix = nonzero(diff(self.e_t > rm.threshold_low))[0]
+        crossings_ix = nonzero(diff(self.e_t > rm.ripple_threshold_low))[0]
         crossings_t = crossings_ix / self.fs
-        crossings_y = [rm.threshold_low] * len(crossings_t)
+        crossings_y = [rm.ripple_threshold_low] * len(crossings_t)
         ax_main.plot(crossings_t, crossings_y, ".", c="black")
         logger.info("Done")
         logger.info("Plotting envelope density..")
@@ -276,8 +276,8 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             lw=thin_lw,
             clip_on=False,
         )
-        ax.axhline(rm.threshold_high, **kwargs)
-        ax.axhline(rm.threshold_low, **kwargs)
+        ax.axhline(rm.ripple_threshold_high, **kwargs)
+        ax.axhline(rm.ripple_threshold_low, **kwargs)
         ax.axhline(rm.envelope_median, linestyle=":", **kwargs)
         ax.set_xticks([])
         ax.set_yticks([])
@@ -291,8 +291,8 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
             fontsize=0.69 * annotation_text_size,
             va="center",
         )
-        ax.text(y=rm.threshold_high, s="$T_{high}$", **text_kwargs)
-        ax.text(y=rm.threshold_low, s="$T_{low}$", **text_kwargs)
+        ax.text(y=rm.ripple_threshold_high, s="$T_{high}$", **text_kwargs)
+        ax.text(y=rm.ripple_threshold_low, s="$T_{low}$", **text_kwargs)
         ax.text(y=rm.envelope_median, s="Median", **text_kwargs)
 
     @property

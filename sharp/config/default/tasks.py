@@ -29,7 +29,6 @@ def searchgrids(**kwargs):
 
 def tasks_on_hold():
     from sharp.tasks.plot.misc.gevec_principle import PlotGEVecPrinciple
-    from sharp.tasks.plot.misc.reference import PlotReferenceMaker
     from sharp.tasks.plot.misc.offline_steps import PlotOfflineStepsMultifig
     from sharp.tasks.text.offline_steps_info import WriteOfflineInfo
     from sharp.tasks.text.online_BPF_info import WriteOnlineBPFInfo
@@ -46,10 +45,10 @@ def tasks_on_hold():
         EgoStengelReplica,
         FalconReplica,
     )
+    from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
 
     return (
         PlotGEVecPrinciple(),
-        PlotReferenceMaker(),
         WriteOnlineBPFInfo(),
         WriteOfflineInfo(),
         WriteEvalInfo(),
@@ -85,14 +84,15 @@ def tasks_on_hold():
                 ApplyOnlineBPF(ripple_filter=ProposedOnlineBPF()),
             ),
         ),
+        PlotSearchLines_GEVec(),
+        *searchgrids(subdir="space-time-comp"),
     )
 
 
-from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
+from sharp.tasks.plot.misc.reference import PlotReferenceMaker
 
 
 tasks_to_run = (
     # *tasks_on_hold(),
-    PlotSearchLines_GEVec(),
-    *searchgrids(subdir="space-time-comp"),
+    PlotReferenceMaker(),
 )

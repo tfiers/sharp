@@ -52,6 +52,12 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
     window_size: float = 0.6
     # Duration of each time slice (and thus of each plot). In seconds.
 
+    figwidth = 0.55
+
+    @property
+    def colors(self):
+        return ["black"] * len(self.extra_signals)
+
     def requires(self):
         return self.input_data_makers
 
@@ -108,7 +114,7 @@ class TimeRangesPlotter(FigureMaker, InputDataMixin):
         fig, axes = subplots(
             nrows=nrows,
             sharex=True,
-            figsize=paperfig(width=0.55, height=0.9 * figheight),
+            figsize=paperfig(width=self.figwidth, height=0.9 * figheight),
             gridspec_kw=dict(height_ratios=axheights),
         )
         input_ax = axes[0]

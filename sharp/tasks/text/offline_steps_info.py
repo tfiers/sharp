@@ -33,8 +33,8 @@ class WriteOfflineInfo(SharpTask, InputDataMixin):
     def _threshold_info(self):
         rm = self.reference_maker
         median = float(rm.envelope_median)
-        T_high = float(rm.threshold_high)
-        T_low = float(rm.threshold_low)
+        T_high = float(rm.ripple_threshold_high)
+        T_low = float(rm.ripple_threshold_low)
         env_mean = float(mean(rm.envelope))
         env_std = float(std(rm.envelope))
         beta_high = (T_high - env_mean) / env_std

@@ -4,6 +4,7 @@ from textwrap import fill
 from typing import Dict, Iterable, Optional, Sequence, Tuple, TypeVar, Union
 from warnings import warn
 
+from numpy import linspace
 from typeguard import check_type
 
 from sharp.config.default.channels import (
@@ -60,6 +61,10 @@ class SharpConfigBase:
     bitmap_versions: bool = False
     # If True, save PNG versions of figures, in addition to the PDF versions.
 
+    toppyr_channel_ix: int = 15
+    sr_channel_ix: int = 6
+    # These channels are used for offline sharp wave detection
+
     #
     # Main settings
     # -----------------
@@ -69,6 +74,21 @@ class SharpConfigBase:
     # config file) in parallel. Each such pipeline / config file corresponds to
     # a different `config_id`. By default, takes the value of the
     # "sharp config dir" env var.
+
+    mult_detect_SW = tuple(linspace(1, 3, num=5))
+    mult_detect_ripple = tuple(linspace(1, 3, num=5))
+
+    # Product of the above lists, with only above-diagonal combinations:
+    @property
+    def make_reference_args(self):
+        return [
+            dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
+            for i, mult_SW in enumerate(self.mult_detect_SW)
+            for j, mult_ripple in enumerate(self.mult_detect_ripple)
+            if i / (len(self.mult_detect_SW) - 1)
+            + j / (len(self.mult_detect_ripple) - 1)
+            >= 1
+        ]
 
     channel_combinations: Dict[str, Sequence[int]] = L2_channel_combinations
 

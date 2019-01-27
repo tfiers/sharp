@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from colorsys import rgb_to_hls
 from itertools import product
 from logging import getLogger
-from typing import Optional, Tuple, Sequence
+from typing import Optional, Sequence, Tuple
 
 from matplotlib.axes import Axes
 from matplotlib.cm import get_cmap
@@ -11,14 +11,15 @@ from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 from matplotlib.text import Text
 from matplotlib.transforms import Bbox
-from numpy import percentile, mean
+from numpy import mean, percentile
+
 from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
+from sharp.data.hardcoded.style import fraction
 from sharp.data.types.aliases import subplots
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.multilin.apply import SpatiotemporalConvolution
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
-from sharp.data.hardcoded.style import fraction
 from sharp.tasks.plot.util.channelmap import draw_channelmap
 from sharp.tasks.plot.util.legend import add_colored_legend
 from sharp.tasks.signal.online_bpf import ApplyOnlineBPF

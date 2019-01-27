@@ -7,6 +7,8 @@ class SharpConfig(SharpConfigBase):
     raw_data_dir = "data/raw"
     output_dir = "data/processed"
     reference_channel = "L2 - E13_extract"
+    toppyr_channel_ix = 2
+    sr_channel_ix = 0
 
     # [Main]
     config_id = "test"
