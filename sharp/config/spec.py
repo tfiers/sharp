@@ -1,3 +1,4 @@
+from itertools import product
 from os import environ
 from pathlib import Path
 from textwrap import fill
@@ -75,20 +76,12 @@ class SharpConfigBase:
     # a different `config_id`. By default, takes the value of the
     # "sharp config dir" env var.
 
-    mult_detect_SW = tuple(linspace(1, 3, num=5))
-    mult_detect_ripple = tuple(linspace(1, 3, num=5))
-
-    # Product of the above lists, with only above-diagonal combinations:
-    @property
-    def make_reference_args(self):
-        return [
-            dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
-            for i, mult_SW in enumerate(self.mult_detect_SW)
-            for j, mult_ripple in enumerate(self.mult_detect_ripple)
-            if i / (len(self.mult_detect_SW) - 1)
-            + j / (len(self.mult_detect_ripple) - 1)
-            >= 1
-        ]
+    mult_detect_ripple = tuple(linspace(0.4, 4, num=7))
+    mult_detect_SW = tuple(linspace(0.9, 5, num=7))
+    make_reference_args = [
+        dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
+        for mult_SW, mult_ripple in product(mult_detect_SW, mult_detect_ripple)
+    ]
 
     channel_combinations: Dict[str, Sequence[int]] = L2_channel_combinations
 

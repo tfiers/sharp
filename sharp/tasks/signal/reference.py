@@ -24,8 +24,8 @@ class MakeReference(SharpTask):
     mult_detect_ripple: float = FloatParameter(default=3.6)
     mult_detect_SW: float = FloatParameter(default=5)
 
-    mult_support_ripple: float = 0.5
-    mult_support_SW: float = 0.5
+    mult_support_ripple: float = 0.3
+    mult_support_SW: float = 0.3
 
     min_duration: float = 25e-3
     min_separation: Optional[float] = None
@@ -33,7 +33,7 @@ class MakeReference(SharpTask):
 
     ripple_band: Tuple[float, float] = (100, 250)
     ripple_filter_options = dict(transition_width="10%", attenuation=40)
-    ripple_smooth_options = dict(kernel="gaussian", bandwidth=7.5e-3)
+    ripple_smooth_options = dict(kernel="gaussian", bandwidth=4e-3)
     SW_cutoff: float = 20  # Hz
 
     downsampler = Downsample()
@@ -72,10 +72,11 @@ class MakeReference(SharpTask):
         # Corresponding segments:
         SW_segs_in_SWR = SW_segs[SW_in_SWR_bool]
         ripple_segs_in_SWR = ripple_segs[ripple_in_SWR_bool]
-        # Join both (OR)
-        SWR_segs = SW_segs_in_SWR | ripple_segs_in_SWR
+        # Use the ripple segments to define SWR-complex extent.
+        SWR_segs = ripple_segs_in_SWR
         return SWR_segs
 
+    @cached
     def calc_ripple_segments(self) -> Segment:
         return detect_mountains(
             self.ripple_envelope,
@@ -86,6 +87,7 @@ class MakeReference(SharpTask):
             allowable_gap=self.min_separation,
         )
 
+    @cached
     def calc_SW_segments(self) -> Segment:
         return detect_mountains(
             self.SW_envelope,
