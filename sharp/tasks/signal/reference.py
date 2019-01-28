@@ -21,8 +21,8 @@ from sharp.util.misc import cached, ignore
 
 class MakeReference(SharpTask):
 
-    mult_detect_ripple: float = FloatParameter(default=3.6)
-    mult_detect_SW: float = FloatParameter(default=5)
+    mult_detect_ripple: float = FloatParameter(default=3)
+    mult_detect_SW: float = FloatParameter(default=4)
 
     mult_support_ripple: float = 0.3
     mult_support_SW: float = 0.3
@@ -41,10 +41,13 @@ class MakeReference(SharpTask):
     def requires(self):
         return self.downsampler
 
+    @property
+    def output_filename(self):
+        return f"SW {self.mult_detect_SW}, ripple {self.mult_detect_ripple}"
+
     def output(self):
         directory = intermediate_output_dir / "reference-segments"
-        filename = f"SW {self.mult_detect_SW}, ripple {self.mult_detect_ripple}"
-        return SegmentsFile(directory, filename)
+        return SegmentsFile(directory, self.output_filename)
 
     def work(self):
         SWR_segs = self.calc_SWR_segments()
@@ -82,7 +85,7 @@ class MakeReference(SharpTask):
             self.ripple_envelope,
             self.ripple_envelope.time,
             low=threshold(self.ripple_envelope, self.mult_support_ripple),
-            high=threshold(self.ripple_envelope, self.mult_detect_ripple),
+            high=self.threshold_detect_ripple,
             minimum_duration=self.min_duration,
             allowable_gap=self.min_separation,
         )
@@ -93,7 +96,7 @@ class MakeReference(SharpTask):
             self.SW_envelope,
             self.SW_envelope.time,
             low=threshold(self.SW_envelope, self.mult_support_SW),
-            high=threshold(self.SW_envelope, self.mult_detect_SW),
+            high=self.threshold_detect_SW,
             minimum_duration=self.min_duration,
             allowable_gap=self.min_separation,
         )
@@ -146,6 +149,14 @@ class MakeReference(SharpTask):
     @property
     def sr_channel(self) -> Signal:
         return self.downsampler.get_multichannel()[:, config.sr_channel_ix]
+
+    @property
+    def threshold_detect_SW(self):
+        return threshold(self.SW_envelope, self.mult_detect_SW)
+
+    @property
+    def threshold_detect_ripple(self):
+        return threshold(self.ripple_envelope, self.mult_detect_ripple)
 
 
 def threshold(signal, zscore):

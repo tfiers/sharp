@@ -81,6 +81,10 @@ class ThresholdSweep:
         if len(self.threshold_evaluations) > 0:
             return self.threshold_evaluations[argmax(self.F1)]
 
+    def at_max_F2(self) -> ThresholdEvaluation:
+        if len(self.threshold_evaluations) > 0:
+            return self.threshold_evaluations[argmax(self.F2)]
+
     def add_threshold_evaluation(self, new: ThresholdEvaluation):
         """
         Inserts the given object into `self.threshold_evaluations`, such that

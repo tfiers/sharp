@@ -46,6 +46,7 @@ def tasks_on_hold():
         FalconReplica,
     )
     from sharp.tasks.plot.results.searchlines.GEVec import PlotSearchLines_GEVec
+    from sharp.tasks.plot.misc.reference import PlotReferenceMaker
 
     return (
         PlotGEVecPrinciple(),
@@ -86,13 +87,22 @@ def tasks_on_hold():
         ),
         PlotSearchLines_GEVec(),
         *searchgrids(subdir="space-time-comp"),
+        PlotReferenceMaker(),
     )
 
 
-from sharp.tasks.plot.misc.reference import PlotReferenceMaker
+def get_tasks_to_run():
+    from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
+    from sharp.tasks.neuralnet.apply import ApplyRNN
+    from sharp.tasks.plot.papergrid.base import AccuracyGrid, LatencyGrid
+
+    return (
+        # *tasks_on_hold(),
+        AccuracyGrid(envelope_maker=ApplyRNN()),
+        AccuracyGrid(envelope_maker=ApplyOnlineBPF()),
+        LatencyGrid(envelope_maker=ApplyRNN()),
+        LatencyGrid(envelope_maker=ApplyOnlineBPF()),
+    )
 
 
-tasks_to_run = (
-    # *tasks_on_hold(),
-    PlotReferenceMaker(),
-)
+tasks_to_run = get_tasks_to_run()

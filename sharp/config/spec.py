@@ -89,7 +89,10 @@ class SharpConfigBase:
     electrodes_x: Sequence[float] = [ch.x for ch in L2_channels]
     electrodes_y: Sequence[float] = [ch.y for ch in L2_channels]
 
-    lockout_percentile: float = 25
+    lockout_time: float = 34e-3
+    # In seconds. Based on the 25-percentile refseg length lockout of earlier.
+
+    # lockout_percentile: float = 25
     # Event detectios are threshold crossings of an algorithm's output
     # envelope, given that a certain "lockout" time has passed after the
     # previous detection. This lockout time is based on the durations of all
