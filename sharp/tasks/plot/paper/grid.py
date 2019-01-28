@@ -14,6 +14,7 @@ from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.tasks.base import TaskParameter
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.plot.base import FigureMaker
+from sharp.tasks.plot.paper import output_dir
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.tasks.signal.reference import MakeReference
 from sharp.util.misc import cached
@@ -24,7 +25,6 @@ class PaperGridPlotter(FigureMaker):
     reference_makers = [
         MakeReference(**args) for args in config.make_reference_args
     ]
-    output_dir = FigureMaker.output_dir / "minipaper"
     cmap = get_cmap("viridis")
     colorbar_label: str = ...
     fstring: str = ...
@@ -46,11 +46,11 @@ class PaperGridPlotter(FigureMaker):
 
     @property
     def output_grid(self):
-        return FigureTarget(self.output_dir, self.filename)
+        return FigureTarget(output_dir, self.filename)
 
     @property
     def output_colorbar(self):
-        return FigureTarget(self.output_dir / "cbar", self.filename)
+        return FigureTarget(output_dir / "cbar", self.filename)
 
     @property
     def filename(self):

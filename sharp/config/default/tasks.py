@@ -95,13 +95,16 @@ def get_tasks_to_run():
     from sharp.tasks.plot.paper.grid import AccuracyGrid, LatencyGrid
     from sharp.tasks.plot.misc.training import PlotValidLoss
 
+    from sharp.tasks.plot.paper.PR_curve import Plot_PR_Curve
+
     return (
         # *tasks_on_hold(),
-        AccuracyGrid(envelope_maker=ApplyRNN()),
-        AccuracyGrid(envelope_maker=ApplyOnlineBPF()),
-        LatencyGrid(envelope_maker=ApplyRNN()),
-        LatencyGrid(envelope_maker=ApplyOnlineBPF()),
+        # AccuracyGrid(envelope_maker=ApplyRNN()),
+        # AccuracyGrid(envelope_maker=ApplyOnlineBPF()),
+        # LatencyGrid(envelope_maker=ApplyRNN()),
+        # LatencyGrid(envelope_maker=ApplyOnlineBPF()),
         # PlotValidLoss(),
+        Plot_PR_Curve(),
     )
 
 
