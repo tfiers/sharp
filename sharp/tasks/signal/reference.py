@@ -21,11 +21,11 @@ from sharp.util.misc import cached, ignore
 
 class MakeReference(SharpTask):
 
-    mult_detect_ripple: float = FloatParameter(default=3)
-    mult_detect_SW: float = FloatParameter(default=4)
+    mult_detect_SW: float = FloatParameter(default=3)
+    mult_detect_ripple: float = FloatParameter(default=2.2)
 
-    mult_support_ripple: float = 0.3
     mult_support_SW: float = 0.3
+    mult_support_ripple: float = 0.3
 
     min_duration: float = 25e-3
     min_separation: Optional[float] = None

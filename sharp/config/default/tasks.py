@@ -35,7 +35,6 @@ def tasks_on_hold():
     from sharp.tasks.text.evaluation_info import WriteEvalInfo
     from sharp.tasks.plot.misc.F_score import PlotIsoFlines
     from sharp.tasks.multilin.apply import SpatiotemporalConvolution
-    from sharp.tasks.plot.misc.training import PlotValidLoss
     from sharp.tasks.plot.misc.data_summary import PlotRecordingSummaries
     from sharp.tasks.neuralnet.apply import ApplyRNN
     from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
@@ -66,7 +65,6 @@ def tasks_on_hold():
             ),
         ),
         PlotIsoFlines(),
-        PlotValidLoss(),
         PlotRecordingSummaries(),
         *multi_envelope_plots(
             subdir="LSM-main",
@@ -94,7 +92,8 @@ def tasks_on_hold():
 def get_tasks_to_run():
     from sharp.tasks.signal.online_bpf import ApplyOnlineBPF
     from sharp.tasks.neuralnet.apply import ApplyRNN
-    from sharp.tasks.plot.papergrid.base import AccuracyGrid, LatencyGrid
+    from sharp.tasks.plot.paper.grid import AccuracyGrid, LatencyGrid
+    from sharp.tasks.plot.misc.training import PlotValidLoss
 
     return (
         # *tasks_on_hold(),
@@ -102,6 +101,7 @@ def get_tasks_to_run():
         AccuracyGrid(envelope_maker=ApplyOnlineBPF()),
         LatencyGrid(envelope_maker=ApplyRNN()),
         LatencyGrid(envelope_maker=ApplyOnlineBPF()),
+        # PlotValidLoss(),
     )
 
 

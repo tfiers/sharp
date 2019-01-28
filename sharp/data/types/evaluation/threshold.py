@@ -96,6 +96,14 @@ class ThresholdEvaluation:
     def F2(self):
         return self.get_F_score(2)
 
+    @property
+    def F3(self):
+        return self.get_F_score(3)
+
+    @property
+    def F4(self):
+        return self.get_F_score(4)
+
     def get_F_score(self, beta):
         """
         Weighted harmonic mean of recall and precision.

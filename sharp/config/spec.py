@@ -132,8 +132,8 @@ class SharpConfigBase:
     #
     # RNN architecture
     # ----------------
-    num_layers: int = 1
-    num_units_per_layer: int = 20
+    num_layers: int = 2
+    num_units_per_layer: int = 40
     RNN_channel_combo_name: str = "all"
 
     #
@@ -149,7 +149,7 @@ class SharpConfigBase:
     # training step. Should improve generalisation performance. Only relevant
     # for num_layers >= 2.
 
-    num_epochs: int = 10
+    num_epochs: int = 15
     # How many times to pass over the training data when training an RNN.
 
     valid_fraction: float = 0.22
@@ -157,9 +157,9 @@ class SharpConfigBase:
     # generalisation performance -- to choose net of epoch where this was
     # maximal). The rest of the data is used for training proper.
 
-    target_fullrect: bool = True
-    target_start_pre: float = 45 / 1000
-    target_start_post: float = 45 / 1000
+    target_fullrect: bool = False
+    target_start_pre: float = 14 / 1000
+    target_start_post: float = 25 / 1000
     # Shape of target function. Either binary on full reference segments,
     # or a rectangle at refseg_start + [-pre, +post].
 

@@ -50,6 +50,8 @@ class ThresholdSweep:
     FDR: ndarray = vectorizing_property("FDR")
     F1: ndarray = vectorizing_property("F1")
     F2: ndarray = vectorizing_property("F2")
+    F3: ndarray = vectorizing_property("F3")
+    F4: ndarray = vectorizing_property("F4")
     abs_delays_median: ndarray = vectorizing_property("abs_delays_median")
     rel_delays_median: ndarray = vectorizing_property("rel_delays_median")
     rel_delays_Q1: ndarray = vectorizing_property("rel_delays_Q1")
@@ -84,6 +86,14 @@ class ThresholdSweep:
     def at_max_F2(self) -> ThresholdEvaluation:
         if len(self.threshold_evaluations) > 0:
             return self.threshold_evaluations[argmax(self.F2)]
+
+    def at_max_F3(self) -> ThresholdEvaluation:
+        if len(self.threshold_evaluations) > 0:
+            return self.threshold_evaluations[argmax(self.F3)]
+
+    def at_max_F4(self) -> ThresholdEvaluation:
+        if len(self.threshold_evaluations) > 0:
+            return self.threshold_evaluations[argmax(self.F4)]
 
     def add_threshold_evaluation(self, new: ThresholdEvaluation):
         """
