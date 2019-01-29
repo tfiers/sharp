@@ -28,7 +28,7 @@ class Plot_PR_Curve(FigureMaker):
         return sweepers
 
     def work(self):
-        fig, ax = subplots(figsize=paperfig(0.60, 0.58))
+        fig, ax = subplots(figsize=paperfig(0.59, 0.497))
         self.setup_ax(ax)
         self.plot_PR(ax)
         self.shade_under_PR_curves(ax)
@@ -38,7 +38,7 @@ class Plot_PR_Curve(FigureMaker):
             ax,
             labels + ("Iso-$F_2$-curves",),
             colors + (iso_F_color,),
-            loc=(0.07, 0.07),
+            loc=(0.03, 0.03),
         )
         fig.tight_layout()
         self.output().write(fig)
@@ -49,7 +49,7 @@ class Plot_PR_Curve(FigureMaker):
 
     def plot_iso_F_curves(self, ax):
         R = linspace(0, 1, 1000)
-        for F in (0.65, 0.75, 0.85, 0.90, 0.95):
+        for F in (0.75, 0.80, 0.85, 0.90, 0.95):
             P = iso_F_line(R, F, beta=2)
             dom = (P > 0) & (P < 1)
             ax.plot(
@@ -58,9 +58,7 @@ class Plot_PR_Curve(FigureMaker):
                 color=iso_F_color,
                 lw=0.8 * readable["lines.linewidth"],
             )
-            ax.text(
-                s=f"{F:.0%}", color=iso_F_color, x=1.02, y=P[-1], va="center"
-            )
+            ax.text(s=f"{F:.0%}", color=iso_F_color, x=1.01, y=P[-1], va="top")
 
     def plot_PR(self, ax):
         for sweep, color in zip(get_sweeps(), colors):
@@ -74,9 +72,8 @@ class Plot_PR_Curve(FigureMaker):
             ax.fill_between(sweep.recall, sweep.precision, color=fc)
 
     def setup_ax(self, ax):
-        # lims = (0.69, 1.01)
-        # ax.set_xlim(lims)
-        # ax.set_ylim(lims)
+        ax.set_xlim(0.17, 1)
+        ax.set_ylim(0.17, 1)
         ax.set_xlabel("Recall")
         ax.set_ylabel("Precision")
         ax.xaxis.set_major_formatter(fraction)

@@ -1,5 +1,8 @@
+from typing import Tuple
+
 from sharp.config.load import config
 from sharp.data.hardcoded.style import blue, pink
+from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.neuralnet.apply import ApplyRNN
 from sharp.tasks.plot.base import FigureMaker
@@ -10,7 +13,8 @@ output_dir = FigureMaker.output_dir / "minipaper"
 
 rm = MakeReference(
     mult_detect_SW=config.mult_detect_SW[3],
-    mult_detect_ripple=config.mult_detect_ripple[4],
+    mult_detect_ripple=config.mult_detect_ripple[3],
+    # mult_detect_ripple=config.mult_detect_ripple[4],
 )
 
 sweeper_rnn = ThresholdSweeper(reference_maker=rm, envelope_maker=ApplyRNN())
@@ -25,9 +29,9 @@ colors = (color_bpf, color_rnn)
 labels = ("Band-pass filter", "Recurrent neural net")
 
 
-def get_sweeps():
-    return [sweeper.output().read() for sweeper in sweepers]
+def get_sweeps() -> Tuple[ThresholdSweeper, ...]:
+    return tuple([sweeper.output().read() for sweeper in sweepers])
 
 
-def get_tes():
-    return [sweep.at_max_F2() for sweep in get_sweeps()]
+def get_tes() -> Tuple[ThresholdEvaluation, ...]:
+    return tuple([sweep.at_max_F2() for sweep in get_sweeps()])

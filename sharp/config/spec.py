@@ -89,7 +89,8 @@ class SharpConfigBase:
     electrodes_x: Sequence[float] = [ch.x for ch in L2_channels]
     electrodes_y: Sequence[float] = [ch.y for ch in L2_channels]
 
-    lockout_time: float = 34e-3
+    # lockout_time: float = 34e-3
+    lockout_time: float = 60e-3
     # In seconds. Based on the 25-percentile refseg length lockout of earlier.
 
     # lockout_percentile: float = 25
