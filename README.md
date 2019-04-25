@@ -12,7 +12,7 @@ in the thesis.
 
 Docstrings are provided for most modules, classes, and methods.
 
-Care is taken to organize the code and name objects in a logical way.
+Care is taken to organize the code, and to name objects in a logical way.
 
 Also see the _Usage_ section below.
 
