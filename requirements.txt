@@ -4,5 +4,4 @@ git+https://github.com/tfiers/seaborn#seaborn
 git+https://github.com/tfiers/raincloud#raincloud
 
 # Closed source for now - download and install manually
-# git+https://bitbucket.org/kloostermannerflab/fklab-python-core/src/master
-#fklab
+# git+https://bitbucket.org/kloostermannerflab/fklab-python-core/src/master#fklab

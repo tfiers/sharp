@@ -2,6 +2,7 @@ from typing import Tuple
 
 from sharp.config.load import config
 from sharp.data.hardcoded.style import blue, pink
+from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.tasks.evaluate.sweep import ThresholdSweeper
 from sharp.tasks.neuralnet.apply import ApplyRNN
@@ -29,7 +30,7 @@ colors = (color_bpf, color_rnn)
 labels = ("Band-pass filter", "Recurrent neural net")
 
 
-def get_sweeps() -> Tuple[ThresholdSweeper, ...]:
+def get_sweeps() -> Tuple[ThresholdSweep, ...]:
     return tuple([sweeper.output().read() for sweeper in sweepers])
 
 

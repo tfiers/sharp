@@ -1,10 +1,11 @@
 from colorsys import rgb_to_hls
+from logging import getLogger
 
 from matplotlib.cm import get_cmap
 from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import Normalize
 from matplotlib.ticker import StrMethodFormatter
-from numpy import arange, max
+from numpy import arange, max, mean, percentile
 
 from sharp.config.load import config
 from sharp.data.files.figure import FigureTarget
@@ -18,6 +19,8 @@ from sharp.tasks.plot.paper import output_dir
 from sharp.tasks.signal.base import EnvelopeMaker
 from sharp.tasks.signal.reference import MakeReference
 from sharp.util.misc import cached
+
+log = getLogger(__name__)
 
 
 class PaperGridPlotter(FigureMaker):
@@ -57,6 +60,13 @@ class PaperGridPlotter(FigureMaker):
         return f"{self.__class__.__name__} -- {self.envelope_maker.title}"
 
     def work(self):
+        log.info(
+            (
+                self.filename,
+                mean(self.data_matrix),
+                percentile(self.data_matrix, [25, 50, 100]),
+            )
+        )
         self.plot_grid()
         self.plot_colorbar()
 
@@ -182,7 +192,6 @@ class AccuracyGrid(PaperGridPlotter):
 
 
 class LatencyGrid(PaperGridPlotter):
-    # cmap_range = (0.15, 0.48)
     cmap_range = (8, 32)
     cmap = get_cmap("viridis_r")
     colorbar_label = "Detection latency (ms)"
@@ -190,3 +199,13 @@ class LatencyGrid(PaperGridPlotter):
 
     def get_data(self, sweep):
         return sweep.at_max_F2().abs_delays_median * 1000
+
+
+class RelativeLatencyGrid(PaperGridPlotter):
+    cmap_range = (0.15, 0.48)
+    cmap = get_cmap("viridis_r")
+    colorbar_label = "Detection latency"
+    fstring = "{x:.0%}"
+
+    def get_data(self, sweep):
+        return sweep.at_max_F2().rel_delays_median

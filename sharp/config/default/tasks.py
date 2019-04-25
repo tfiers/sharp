@@ -99,6 +99,7 @@ def get_tasks_to_run():
     from sharp.tasks.plot.misc.training import PlotValidLoss
     from sharp.tasks.plot.paper.PR_curve import Plot_PR_Curve
     from sharp.tasks.plot.paper.signals import PlotSignals
+    from sharp.tasks.plot.paper.grid import RelativeLatencyGrid
 
     return (
         # *tasks_on_hold(),
@@ -107,9 +108,11 @@ def get_tasks_to_run():
         # AccuracyGrid(envelope_maker=ApplyOnlineBPF()),
         # LatencyGrid(envelope_maker=ApplyRNN()),
         # LatencyGrid(envelope_maker=ApplyOnlineBPF()),
-        Plot_PR_Curve(),
+        # RelativeLatencyGrid(envelope_maker=ApplyRNN()),
+        # RelativeLatencyGrid(envelope_maker=ApplyOnlineBPF()),
+        # Plot_PR_Curve(),
         PlotLatency(),
-        PlotSignals(),
+        # PlotSignals(),
     )
 
 
