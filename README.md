@@ -1,4 +1,5 @@
-# _sharp_
+![logo for Sharp project](logo.png)
+*Logo design by [@zuurw](https://github.com/zuurw).*
 
 Software written for my [master's thesis](https://github.com/tfiers/master-thesis).
 
