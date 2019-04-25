@@ -6,7 +6,7 @@ Algorithms and evaluation code for real-time sharp wave-ripple detection.
 
 setup(
     name="sharp",
-    version="0.1",
+    version="1.0",
     description=description,
     author="Tomas Fiers",
     author_email="tomas.fiers@gmail.com",
