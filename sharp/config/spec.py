@@ -13,6 +13,7 @@ from sharp.config.default.channels import (
     L2_channels,
     L_probe_outline,
 )
+from sharp.config.default.raw_data_paths import flat_recordings_list, RecordingFile
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 
@@ -24,6 +25,7 @@ config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).absolute()
 # Therefore make a dummy Luigi.Task type.
 LuigiTask = TypeVar("LuigiTask")
 
+# A semantic alias for `NotImplemented`
 MANDATORY_SETTING = NotImplemented
 
 
@@ -45,6 +47,8 @@ class SharpConfigBase:
     #
     # Data settings
     # -------------
+
+    raw_data_paths: Sequence[RecordingFile] = flat_recordings_list
 
     raw_data_dir: str = MANDATORY_SETTING
     # Directory containing raw NeuraLynx recordings (*.ncs files).
@@ -72,9 +76,9 @@ class SharpConfigBase:
 
     config_id: Optional[str] = None
     # This setting allows to run multiple pipelines (each with a different
-    # config file) in parallel. Each such pipeline / config file corresponds to
-    # a different `config_id`. By default, takes the value of the
-    # "sharp config dir" env var.
+    # config.py file) in parallel. Each such pipeline / config file corresponds
+    # to a different `config_id`. By default, takes the value of the "sharp
+    # config dir" env var.
 
     mult_detect_ripple = tuple(linspace(0.4, 4, num=7))
     mult_detect_SW = tuple(linspace(0.9, 5, num=7))
