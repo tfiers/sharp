@@ -22,6 +22,14 @@ class FigureTarget(OutputFileTarget):
     Saves both bitmap and vector versions of a Matplotlib Figure to disk.
     """
 
+    @property
+    def bitmap_version(self):
+        return BitmapFigureFile(self.parent / "_png", self.filename)
+
+    @property
+    def vector_version(self) -> VectorFigureFile:
+        return VectorFigureFile(self.parent, self.filename)
+
     def exists(self):
         if config.bitmap_versions:
             return self.vector_version.exists() and self.bitmap_version.exists()
@@ -37,14 +45,6 @@ class FigureTarget(OutputFileTarget):
         self.vector_version.delete()
         if config.bitmap_versions:
             self.bitmap_version.delete()
-
-    @property
-    def bitmap_version(self):
-        return BitmapFigureFile(self.parent / "_png", self.filename)
-
-    @property
-    def vector_version(self) -> VectorFigureFile:
-        return VectorFigureFile(self.parent, self.filename)
 
     @property
     def filename(self) -> str:

@@ -22,6 +22,9 @@ RGBA_tup = Tuple[float, float, float, float]
 Color = Union[str, RGB_tup, RGBA_tup, ndarray]
 
 
+# Add return types to plt.subplots:
+
+
 def subplots(
     nrows=1,
     ncols=1,

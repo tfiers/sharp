@@ -17,14 +17,22 @@ class SharpTask(Task, ABC):
     """
 
     config_id = Parameter(default=config.config_id)
-    # (This `default` trick is an ugly but necessary luigi hack).
+    # Add a constant "parameter" to each task, so the Luigi task scheduler is
+    # able to distinguish between tasks started from different python
+    # processes, each with a different `config.py` file.
+    # (This `default=` trick is an ugly but necessary luigi hack).
 
+    # Caching this function avoids many spurious task completion checks. It
+    # requires invalidation of a task's cache after the task has run,
+    # though. Caching complete() will probably not work for
+    # multiprocessing. In that case, we could maybe use a time-based cache
+    # (?).
     @cached
     def complete(self) -> bool:
-        # Caching avoids many spurious checks. It requires invalidation of a
-        # task's cache after the function is run though.
-        # Caching complete() will probably not work for multiprocessing. In that
-        # case, we could maybe use a time-based cache (?).
+        """
+        Whether this tasks's output exists, and its dependencies have
+        completed.
+        """
         return all(
             dependency.complete() for dependency in self._dependencies
         ) and all(output.exists() for output in self._outputs)
@@ -64,7 +72,7 @@ class TaskParameter(CustomParameter):
     be named "TaskTypeParameter").
 
     Only to be used programatically. (We do not implement the parse() method to
-    convert a string to an instance).
+    convert a string from the command line to an instance).
     """
 
 

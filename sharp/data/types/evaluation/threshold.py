@@ -9,8 +9,9 @@ from fklab.segments import Segment
 @dataclass
 class ThresholdEvaluation:
     """
-    Inputs are detections, classified into {correct, incorrect},
-    and reference segments, classified into {detected, not_detected}.
+    Inputs are detections (already classified into {correct, incorrect}),
+    reference segments (already classified into {detected, not_detected}),
+    and first detection times.
 
     Calculates detection delays and summarising performance measures based on
     these classifications.

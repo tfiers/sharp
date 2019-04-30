@@ -9,6 +9,9 @@ from sharp.util.misc import cached
 
 def vectorizing_property(name: str):
     """
+    A class instance property that automatically gathers a scalar measure from
+    different threshold evaluations.
+    
     :param name: Name of a scalar attribute of a ThresholdEvaluation instance.
     """
 
@@ -27,8 +30,9 @@ def vectorizing_property(name: str):
 
 class ThresholdSweep:
     """
-    Evaluates an algorithm output envelope, for a range of different detection
-    thresholds.
+    Evaluates the performance of an SWR detection algorithm, based on its
+    output envelope, for a range of different detection thresholds on the
+    envelope.
     """
 
     threshold_evaluations: List[ThresholdEvaluation]
@@ -113,6 +117,10 @@ class ThresholdSweep:
         Succesive calls yield a sequence of thresholds within `threshold_range`
         that cover the [0, 1] domains of `recall` and `precision` well. Assumes
         a reasonably smooth PR-curve.
+        
+        (Tries to eliminate gaps in the number of detected reference SWR
+        segments and the number of correct detections between different
+        thresholds).
         """
         if len(self.thresholds) == 0:
             return max(threshold_range)

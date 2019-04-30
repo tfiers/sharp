@@ -6,7 +6,7 @@ from fklab.segments import Segment
 
 class SegmentEventIntersection:
     """
-    Named & typed wrapper for fklab's Segment.contains():
+    Named & typed wrapper for fklab's `Segment.contains()`:
     """
 
     def __init__(self, segs: Segment, events: ndarray):

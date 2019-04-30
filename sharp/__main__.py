@@ -64,11 +64,11 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     from sharp.util.startup import clear_all_output, clear_output, init_log
 
     log = init_log()
+    if clear_all:
+        clear_all_output()
     log.info("Importing tasks to run...")
     tasks_to_run = config.get_tasks_tuple()
     log.info("Done importing tasks to run.")
-    if clear_all:
-        clear_all_output()
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)

@@ -4,13 +4,14 @@ from sharp.data.files.figure import FigureTarget
 from sharp.data.types.aliases import subplots
 from sharp.data.hardcoded.style import paperfig, fraction
 from sharp.tasks.plot.base import FigureMaker
-
+from matplotlib.pyplot import subplots
 
 class PlotIsoFlines(FigureMaker):
     def output(self):
         return FigureTarget(self.output_dir, "iso-F-lines")
 
     def work(self):
+        
         fig, axes = subplots(ncols=2, figsize=paperfig(1.1, 0.5))
         eps = 0.001
         lims = (-eps, 1 + eps)

@@ -7,6 +7,8 @@ from scipy.signal import freqs, freqz, normalize
 
 class LTIRippleFilter(ABC):
     """
+    Base class for all linear time invariant ripple filters in this package.
+    
     :param: order:  Order N of a typical band-pass filter, created by
                 convolution of a low-pass and a high-pass filter. (I.e.
                 order N for which num_taps = 2 * N + 1).
