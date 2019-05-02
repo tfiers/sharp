@@ -29,8 +29,7 @@ def P1_file(date: str, probe_name: str) -> File:
 
 def P2_file(probe_name: str) -> File:
     return File(
-        ID=probe_name,
-        path_part=f"{probe_name}/Klusta_T7-3.5/{probe_name}.raw.kwd",
+        ID=probe_name, path_part=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat"
     )
 
 
@@ -108,7 +107,7 @@ raw_data_paths = {
             P2_file("L2"),
             P2_file("D15"),
         ),
-        Day(3, f"{FRED}/P2/31_08_2014/Nlx/"): (
+        Day(3, f"{FRED}/P2/31_08_2014/"): (
             P2_file("D24"),
             P2_file("D27"),
             P2_file("L1"),
