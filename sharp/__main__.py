@@ -7,6 +7,12 @@ Usage:
     $ python -m sharp --help
 """
 
+# Flag when we have entered our own code.
+import toml
+
+print("Welcome to the sharp CLI.")
+
+
 from os import environ
 
 from click import command, option
@@ -53,9 +59,12 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
         ) from err
 
     luigi_config_path = config_dir / "luigi.toml"
-    if luigi_config_path.exists():
-        environ["LUIGI_CONFIG_PARSER"] = "toml"
-        environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)
+    luigi_config = config.luigi
+    luigi_config["logging"] = config.logging
+    with open(luigi_config_path, "w") as f:
+        toml.dump(luigi_config, f)
+    environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)
+    environ["LUIGI_CONFIG_PARSER"] = "toml"
 
     # Now we can import from luigi (and from sharp.util.startup, which imports
     # luigi):

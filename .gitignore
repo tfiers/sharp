@@ -1,5 +1,3 @@
-tests/system/data/processed/
-*.log
 _build/
 docs/api/
 

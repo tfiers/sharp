@@ -1,14 +1,13 @@
 from datetime import date
-from logging import getLogger, Logger
-from logging.config import fileConfig
+from logging import Logger, getLogger
+from logging.config import dictConfig
 from shutil import rmtree
 from typing import Iterable, Union
 
 from luigi import Task
-from luigi.interface import core
 from luigi.task import flatten
 
-from sharp.config.load import output_root
+from sharp.config.load import config, output_root
 from sharp.config.spec import config_dir
 from sharp.data.files.base import FileTarget
 
@@ -48,15 +47,10 @@ def _clear(target: Union[FileTarget, Iterable[FileTarget]]):
 
 def init_log() -> Logger:
     # Luigi hasn't initalised logging yet when this is called in __main__.py,
-    # so we apply the config file ourselves.
-    try:
-        fileConfig(core().logging_conf_file, disable_existing_loggers=False)
-    except Exception as err:
-        raise UserWarning(
-            "The `logging_conf_file` setting may be incorrect in your `luigi.toml` file."
-        ) from err
+    # so we apply the logging config ourselves.
+    dictConfig(config.logging)
     log = getLogger("sharp")
-    log.info(f"Hello, it's {date.today():%b %d, %Y}.")
+    log.info(f"It's {date.today():%b %d, %Y}.")
     log.info(f"Config directory: {config_dir}")
     log.info(f"Output root directory: {output_root}")
     return log

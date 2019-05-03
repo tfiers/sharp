@@ -25,9 +25,4 @@ class SharpConfig(SharpConfigBase):
     num_layers = 1
     num_units_per_layer = 8
     num_epochs = 2
-
-    # def get_tasks(self):
-    #     # from sharp.tasks.neuralnet.apply import ApplyRNN
-    #     # from sharp.tasks.plot.misc.training import PlotValidLoss
-    #     #
-    #     # return super().get_tasks() + (ApplyRNN(), PlotValidLoss())
+    RNN_channel_combo_name = "pyr"

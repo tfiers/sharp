@@ -2,7 +2,16 @@ from itertools import product
 from os import environ
 from pathlib import Path
 from textwrap import fill
-from typing import Dict, Iterable, Optional, Sequence, Tuple, TypeVar, Union
+from typing import (
+    Dict,
+    Iterable,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    Any,
+)
 from warnings import warn
 
 from numpy import linspace
@@ -13,12 +22,12 @@ from sharp.config.default.channels import (
     L2_channels,
     L_probe_outline,
 )
-from sharp.config.default.raw_data import flat_recordings_list, RecordingFile
+from sharp.config.default.logging import LOGGING_CONFIG
+from sharp.config.default.raw_data import RecordingFile, flat_recordings_list
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
-
 config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).absolute()
-
+ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
 
 # We do not want to import from luigi yet. (As it executes initalization code on
 # import. We want to control this initialization by setting env vars, later).
@@ -35,7 +44,7 @@ class SharpConfigBase:
         Return instantiated tasks, which will be passed to luigi.build().
         The necessary import statements should be contained in this method's
         body (not at the top of the config.py file). This avoids circular
-        imports, as Tasks in sharp use config data.
+        imports (see config/README.md).
         
         Developer note: should not be called before the `sharp.config.load`
         script has run (e.g. after an object from it is imported).
@@ -69,6 +78,24 @@ class SharpConfigBase:
     toppyr_channel_ix: int = 15
     sr_channel_ix: int = 6
     # These channels are used for offline sharp wave detection
+
+    #
+    # Logging and Luigi worker config
+    # -----------------
+
+    logging: ConfigDict = LOGGING_CONFIG
+
+    luigi: ConfigDict = dict(
+        core=dict(scheduler_host="nerfcluster-fs"),
+        worker=dict(
+            keep_alive=True,
+            task_process_context="",  # Suppress a luigi bug warning.
+        ),
+    )
+    # A dictionary of dictionaries that will be written to a `luigi.toml` file.
+    # See https://luigi.readthedocs.io/en/stable/configuration.html for what
+    # options are possible, and what they mean.
+    # The logging config will be automatically added to the luigi config.
 
     #
     # Main settings
