@@ -125,6 +125,14 @@ class SharpConfigBase:
         (107.33, 107.45),  # Zoom-in
         (349.2, 349.8),  # Clean & strong ripples
         (132.6, 133.2),  # Lotsa ripply & merging
+        # from plot/paper/signals.py:
+        (19.8, 20.8),
+        (606.4, 607.5),
+        (552.6, 553.2),  # early rnn ok visible. But one late SW
+        (369.14, 369.65),  # three clean SPWR, early SW. But RNN not convincing
+        (183.06, 184.5),
+        (343.36, 344.3),  # nah, too weak SWs
+        (183.09, 183.84),  # nice early RNN. Take me.
     ]
     # Segments of data to use for time-range plots. In seconds, relative to the
     # start of the evaluation (AKA test) slice.
