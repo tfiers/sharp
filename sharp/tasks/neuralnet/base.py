@@ -98,27 +98,27 @@ class NeuralNetMixin(InputDataMixin):
         # Convert segment times to a binary signal (in a one-column matrix) that
         # is as long as the full training input signal.
         if config.target_fullrect:
-            self.add_rects(sig, segs)
+            self._add_rects(sig, segs)
         else:
-            self.add_start_rects(sig, segs)
-        # self.add_triangles(sig, segs)
+            self._add_start_rects(sig, segs)
+        # self._add_triangles(sig, segs)
         return Signal(sig, self.reference_channel_train.fs).as_matrix()
 
-    def add_rects(self, sig: ndarray, segs: Segment):
+    def _add_rects(self, sig: ndarray, segs: Segment):
         for seg in segs:
             ix = time_to_index(
                 seg, self.reference_channel_train.fs, sig.size, clip=True
             )
             sig[slice(*ix)] = 1
 
-    def add_triangles(self, sig: ndarray, segs: Segment):
+    def _add_triangles(self, sig: ndarray, segs: Segment):
         for seg in segs:
             ix = time_to_index(
                 seg, self.reference_channel_train.fs, sig.size, clip=True
             )
             sig[slice(*ix)] = np.linspace(1, 0, np.diff(ix))
 
-    def add_start_rects(self, sig: ndarray, segs: Segment):
+    def _add_start_rects(self, sig: ndarray, segs: Segment):
         for start, stop in segs:
             ix = time_to_index(
                 [
