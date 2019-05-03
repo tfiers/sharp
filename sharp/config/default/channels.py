@@ -63,4 +63,5 @@ L2_channel_combinations = {
     # "sr-clust": (2, 3, 4, 5, 6),
     "sr-only-clust": (1, 2, 3, 4),
     "tetr": (10, 11, 12, 13),
+    "low-pyr-with-SPW": (9,),
 }

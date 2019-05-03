@@ -13,7 +13,7 @@ from sharp.config.default.channels import (
     L2_channels,
     L_probe_outline,
 )
-from sharp.config.default.raw_data_paths import flat_recordings_list, RecordingFile
+from sharp.config.default.raw_data import flat_recordings_list, RecordingFile
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 
