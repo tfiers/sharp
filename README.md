@@ -4,7 +4,8 @@
   <sub>Logo by <a href="https://github.com/zuurw">@zuurw</a>.</sub>
 </p>
 
-Software written for my [master's thesis](https://github.com/tfiers/master-thesis).
+Software written for my [master's thesis](https://github.com/tfiers/master-thesis) 
+and for the related [journal paper](https://github.com/tfiers/neural-network-paper).
 
 The name of this Python package, `sharp`, comes from the _sharp wave-ripple_,
 the electrical brain motif related to memories and learning that is studied 
@@ -13,7 +14,8 @@ in the thesis.
 
 ## Documentation
 
-Docstrings are provided for most modules, classes, and methods.
+README's are provided for most sub-packages,
+and docstrings are provided for most modules, classes, and methods.
 
 Care is taken to organize the code, and to name objects in a logical way.
 
@@ -21,6 +23,8 @@ Also see the _Usage_ section below.
 
 
 ## Installation
+
+*(Also see the installation __Notes__ below).*
 
 The software is written in Python 3.7, and requires recent installations of
 [SciPy](https://scipy.org/) and [PyTorch](https://pytorch.org/).
