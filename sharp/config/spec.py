@@ -170,6 +170,12 @@ class SharpConfigBase:
     # generalisation performance -- to choose net of epoch where this was
     # maximal). The rest of the data is used for training proper.
 
+    pos_weight: float = 1.0
+    # When calculating the cost function for training the RNN, weight applied
+    # to positive training samples, i.e. where the desired output is "1" (SWR
+    # present). `pos_weight > 1` increases the recall, `pos_weight < 1`
+    # increases the precision.
+
     target_fullrect: bool = False
     target_start_pre: float = 14 / 1000
     target_start_post: float = 25 / 1000
