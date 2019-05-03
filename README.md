@@ -1,4 +1,4 @@
-![logo for Sharp project](logo.png)
+![logo for this project: a stylized rat and the name "Sharp"](logo.png)  
 *Logo design by [@zuurw](https://github.com/zuurw).*
 
 Software written for my [master's thesis](https://github.com/tfiers/master-thesis).
