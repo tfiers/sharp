@@ -85,17 +85,9 @@ class SharpConfigBase:
 
     logging: ConfigDict = LOGGING_CONFIG
 
-    luigi: ConfigDict = dict(
-        core=dict(scheduler_host="nerfcluster-fs"),
-        worker=dict(
-            keep_alive=True,
-            task_process_context="",  # Suppress a luigi bug warning.
-        ),
-    )
-    # A dictionary of dictionaries that will be written to a `luigi.toml` file.
-    # See https://luigi.readthedocs.io/en/stable/configuration.html for what
-    # options are possible, and what they mean.
-    # The logging config will be automatically added to the luigi config.
+    luigi_scheduler_host: str = "nerfcluster-fs"
+    # Hostname where the remote luigi task scheduler is running (useful when
+    # running multiple workers in parallel).
 
     #
     # Main settings

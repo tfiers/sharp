@@ -48,6 +48,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     --workers 2`) in this command, as this yields multiprocessing bugs in luigi
     / PyTorch / Python. See the ReadMe for how to run tasks in parallel.
     """
+    # Try to load the user specified config.
     try:
         from sharp.config.load import config
         from sharp.config.spec import config_dir
@@ -58,9 +59,16 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
             "SharpConfig class (and not at the top of the file)."
         ) from err
 
+    # Auto-generate a luigi.toml file to configure Luigi.
     luigi_config_path = config_dir / "luigi.toml"
-    luigi_config = config.luigi
-    luigi_config["logging"] = config.logging
+    luigi_config = dict(
+        core=dict(scheduler_host=config.luigi_scheduler_host),
+        worker=dict(
+            keep_alive=True,
+            task_process_context="",  # Suppress a luigi bug warning.
+        ),
+        logging=config.logging,
+    )
     with open(luigi_config_path, "w") as f:
         toml.dump(luigi_config, f)
     environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)

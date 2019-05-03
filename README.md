@@ -99,11 +99,8 @@ In the new directory, create a file named `config.py`, containing a class named
 `SharpConfig` that subclasses `SharpConfigBase` from [`sharp.config.spec`](sharp/config/spec.py).
 Change some or all of the parent attributes to suit your needs.
 
-(You may also optionally place a [Luigi run configuration file](https://luigi.readthedocs.io/en/stable/configuration.html)
-named `luigi.toml` in this directory.)
-
-See the test [`config.py`](tests/system/config.py) and [`luigi.toml`](tests/system/luigi.toml)
-files from this repository for examples.
+See the test [`config.py`](tests/system/config.py) file from this repository
+for an example.
 
 > On Windows, make sure to either use forward slashes in paths, or to escape
 backslashes. Examples:
@@ -130,5 +127,6 @@ To run subtasks in parallel, a central Luigi task scheduler should be used
 instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
 for instructions.
 
-When the central scheduler is running, simply start multiple `python -m sharp`
-processes.
+When the central scheduler is running, and when you have correctly set the
+`luigi_scheduler_host` setting in your `config.py` file, simply start multiple
+`python -m sharp` processes.
