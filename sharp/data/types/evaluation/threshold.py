@@ -60,7 +60,11 @@ class ThresholdEvaluation:
 
     @property
     def recall(self) -> float:
-        return self.num_detected / (self.num_detected + self.num_undetected)
+        total_refsegs = self.num_detected + self.num_undetected
+        if total_refsegs > 0:
+            return self.num_detected / total_refsegs
+        else:
+            return 0
 
     #
     # ---------
