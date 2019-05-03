@@ -86,7 +86,7 @@ class NeuralNetMixin(InputDataMixin):
         entropy between them.
         """
         return torch.nn.BCEWithLogitsLoss(
-            reduction="sum", pos_weight=torch.Tensor(config.pos_weight)
+            reduction="sum", pos_weight=torch.Tensor([config.pos_weight])
         )
 
     @property
