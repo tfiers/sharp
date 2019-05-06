@@ -1,10 +1,14 @@
 from sharp.config.spec import SharpConfigBase
+from sharp.data.types.config import RecordingFile
 
 
 class SharpConfig(SharpConfigBase):
 
     # [Data]
     raw_data_dir = "data/raw"
+    raw_data_paths = (
+        RecordingFile(rat=1, day=1, probe="Waluigi", path="test.kak"),
+    )
     output_dir = "data/processed"
     reference_channel = "L2 - E13_extract"
     toppyr_channel_ix = 2

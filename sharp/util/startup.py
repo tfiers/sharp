@@ -27,8 +27,6 @@ def validate_config():
 
 
 def init_log() -> Logger:
-    # Luigi hasn't initalised logging yet when this is called in __main__.py,
-    # so we apply the logging config ourselves.
     from sharp.config.load import config, output_root
 
     dictConfig(config.logging)

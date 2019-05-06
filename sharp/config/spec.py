@@ -1,8 +1,8 @@
 from itertools import product
 from os import environ
 from pathlib import Path
-from textwrap import fill
 from typing import (
+    Any,
     Dict,
     Iterable,
     Optional,
@@ -10,7 +10,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    Any,
 )
 from warnings import warn
 
@@ -23,7 +22,8 @@ from sharp.config.default.channels import (
     L_probe_outline,
 )
 from sharp.config.default.logging import LOGGING_CONFIG
-from sharp.config.default.raw_data import RecordingFile, flat_recordings_list
+from sharp.config.default.raw_data import flat_recordings_list
+from sharp.data.types.config import ConfigError, RecordingFile
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).absolute()
@@ -59,7 +59,7 @@ class SharpConfigBase:
 
     raw_data_paths: Sequence[RecordingFile] = flat_recordings_list
 
-    raw_data_dir: str = MANDATORY_SETTING
+    raw_data_dir: str = "obsolete"
     # Directory containing raw NeuraLynx recordings (*.ncs files).
 
     output_dir: str = "output"  # MANDATORY_SETTING
@@ -257,18 +257,3 @@ class SharpConfigBase:
             return tuple(tasks)
         except TypeError:
             return (tasks,)
-
-
-class ConfigError(Exception):
-    """
-    Raised when the environment is not configured properly to run `sharp`
-    tasks.
-    """
-
-    def __init__(self, message: str):
-        # Make sure the complete error message fits nice & square in the
-        # terminal.
-        future_prefix = f"{self.__class__}: "
-        square_text = fill(future_prefix + message, width=80)
-        square_text_with_prefix_sized_hole = square_text[len(future_prefix) :]
-        super().__init__(square_text_with_prefix_sized_hole)

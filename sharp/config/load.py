@@ -10,12 +10,11 @@ from pathlib import Path
 from sys import path
 
 from sharp.config.spec import (
-    ConfigError,
     CONFIG_DIR_ENV_VAR,
     SharpConfigBase,
     config_dir,
 )
-
+from sharp.data.types.config import ConfigError
 
 path.insert(0, str(config_dir))
 

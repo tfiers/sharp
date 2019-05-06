@@ -8,7 +8,7 @@ Usage:
 """
 
 # Flag when we have entered our own code.
-print("Welcome to the sharp CLI.")
+print("Welcome to the sharp CLI.", flush=True)
 
 from click import command, option
 from sharp.util.startup import (
@@ -52,9 +52,8 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     """
     config = validate_config()
     log = init_log()
-    log.info("Generating luigi config..")
     setup_luigi_config()
-    log.info("Done")
+    log.info("Generated luigi config.")
     # Now we can import from luigi.
 
     if clear_all:
@@ -66,6 +65,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)
+
     from luigi import build
 
     build(tasks_to_run, local_scheduler=local_scheduler)
