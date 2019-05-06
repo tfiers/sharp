@@ -8,14 +8,15 @@ Usage:
 """
 
 # Flag when we have entered our own code.
-import toml
-
 print("Welcome to the sharp CLI.")
 
-
-from os import environ
-
 from click import command, option
+from sharp.util.startup import (
+    clear_all_output,
+    clear_output,
+    init_log,
+    setup_luigi_config,
+)
 
 
 @command()
@@ -51,7 +52,6 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     # Try to load the user specified config.
     try:
         from sharp.config.load import config
-        from sharp.config.spec import config_dir
     except ImportError as err:
         raise UserWarning(
             "Possible circular import. Make sure the Tasks you want to run are "
@@ -59,29 +59,14 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
             "SharpConfig class (and not at the top of the file)."
         ) from err
 
-    # Auto-generate a luigi.toml file to configure Luigi.
-    luigi_config_path = config_dir / "luigi.toml"
-    luigi_config = dict(
-        core=dict(scheduler_host=config.luigi_scheduler_host),
-        worker=dict(
-            keep_alive=True,
-            task_process_context="",  # Suppress a luigi bug warning.
-        ),
-        logging=config.logging,
-    )
-    with open(luigi_config_path, "w") as f:
-        toml.dump(luigi_config, f)
-    environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)
-    environ["LUIGI_CONFIG_PARSER"] = "toml"
-
-    # Now we can import from luigi (and from sharp.util.startup, which imports
-    # luigi):
-
-    from luigi import build
-    from sharp.util.startup import clear_all_output, clear_output, init_log
-
     log = init_log()
+    log.info("Generating luigi config..")
+    setup_luigi_config()
+    log.info("Done")
+    # Now we can import from luigi.
+
     if clear_all:
+        log.info("Clearing entire output directory, if it exists.")
         clear_all_output()
     log.info("Importing tasks to run...")
     tasks_to_run = config.get_tasks_tuple()
@@ -89,6 +74,8 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)
+    from luigi import build
+
     build(tasks_to_run, local_scheduler=local_scheduler)
 
 

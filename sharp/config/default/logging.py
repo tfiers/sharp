@@ -14,7 +14,7 @@ LOGGING_CONFIG = dict(
     },
     loggers={
         "root": {
-            # break you black
+            # [Linebreak for auto-code formatter Black]
             "qualname": "root",
             "level": "INFO",
             "handlers": ["console"],
