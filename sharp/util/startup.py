@@ -13,6 +13,19 @@ from sharp.config.spec import config_dir
 log = getLogger(__name__)
 
 
+def validate_config():
+    """ Try to load the user specified config. """
+    try:
+        from sharp.config.load import config
+    except ImportError as err:
+        raise UserWarning(
+            "Possible circular import. Make sure the Tasks you want to run are "
+            "imported *inside* the `get_tasks` method of your config.py > "
+            "SharpConfig class (and not at the top of the file)."
+        ) from err
+    return config
+
+
 def init_log() -> Logger:
     # Luigi hasn't initalised logging yet when this is called in __main__.py,
     # so we apply the logging config ourselves.

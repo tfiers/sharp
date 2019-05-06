@@ -16,6 +16,7 @@ from sharp.util.startup import (
     clear_output,
     init_log,
     setup_luigi_config,
+    validate_config,
 )
 
 
@@ -49,16 +50,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     --workers 2`) in this command, as this yields multiprocessing bugs in luigi
     / PyTorch / Python. See the ReadMe for how to run tasks in parallel.
     """
-    # Try to load the user specified config.
-    try:
-        from sharp.config.load import config
-    except ImportError as err:
-        raise UserWarning(
-            "Possible circular import. Make sure the Tasks you want to run are "
-            "imported *inside* the `get_tasks` method of your config.py > "
-            "SharpConfig class (and not at the top of the file)."
-        ) from err
-
+    config = validate_config()
     log = init_log()
     log.info("Generating luigi config..")
     setup_luigi_config()
