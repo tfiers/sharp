@@ -10,7 +10,7 @@ from sharp.tasks.base import SharpTask
 log = getLogger(__name__)
 
 
-def file_size(path: str):
+def file_size(path: str) -> str:
     if exists(path):
         bytes = stat(path).st_size
         return f"{bytes / 1E9:.1f} GB"

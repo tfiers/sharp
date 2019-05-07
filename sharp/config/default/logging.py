@@ -8,13 +8,12 @@ LOGGING_CONFIG = dict(
         # When using the "time_only" formatter, make sure to log the full date
         # at the start of the log.
         "time_only": {
-            "format": "%(asctime)s | %(name)s | %(message)s",
+            "format": "%(asctime)s | (%(name)s) %(message)s",
             "datefmt": "%H:%M:%S",
         },
     },
     root={
-        # Root logger needs to be specified separately.
-        "qualname": "root",
+        # Root logger neds to be specified separately.
         "level": "INFO",
         "handlers": ["console"],
     },
@@ -33,7 +32,6 @@ LOGGING_CONFIG = dict(
         },
         # For logging in our own package.
         "sharp": {
-            "qualname": "sharp",
             "level": "INFO",
             "propagate": True,
             "handlers": ["file_sharp"],
