@@ -9,11 +9,7 @@ from os import environ
 from pathlib import Path
 from sys import path
 
-from sharp.config.spec import (
-    CONFIG_DIR_ENV_VAR,
-    SharpConfigBase,
-    config_dir,
-)
+from sharp.config.spec import CONFIG_DIR_ENV_VAR, SharpConfigBase, config_dir
 from sharp.data.types.config import ConfigError
 
 path.insert(0, str(config_dir))
@@ -28,7 +24,7 @@ except ModuleNotFoundError as err:
     if CONFIG_DIR_ENV_VAR in environ:
         msg = (
             f"Could not find file `config.py` in the directory set by the "
-            f"{CONFIG_DIR_ENV_VAR} environment variable ({config_dir})."
+            f"{CONFIG_DIR_ENV_VAR} environment variable (which is {config_dir})."
         )
     else:
         msg = (

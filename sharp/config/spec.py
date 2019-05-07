@@ -26,7 +26,7 @@ from sharp.config.default.raw_data import flat_recordings_list
 from sharp.data.types.config import ConfigError, RecordingFile
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
-config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).absolute()
+config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().absolute()
 ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
 
 # We do not want to import from luigi yet. (As it executes initalization code on
