@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from sharp.data.types.config import RecordingFile
@@ -22,10 +23,10 @@ class File(RawDataPathPart):
     ID: str
 
 
-def P1_kwd_file(date: str, probe_name: str) -> File:
+def P1_dat_file(date: str, probe_name: str) -> File:
     return File(
         ID=probe_name,
-        path_part=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.raw.kwd",
+        path_part=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
     )
 
 
@@ -42,40 +43,40 @@ JJ = "/mnt/nerffs01/ratlab/Projects/Subiculum/Raw"
 raw_data_paths = {
     Rat(1, f"{FRED}/P1/"): {
         Day(1): (
-            P1_kwd_file("16052014", "D1"),
-            P1_kwd_file("16052014", "D4"),
-            P1_kwd_file("16052014", "D10"),
-            P1_kwd_file("16052014", "D13"),
+            P1_dat_file("16052014", "D1"),
+            P1_dat_file("16052014", "D4"),
+            P1_dat_file("16052014", "D10"),
+            P1_dat_file("16052014", "D13"),
         ),
         Day(2): (
-            P1_kwd_file("18052014", "D1"),
-            P1_kwd_file("18052014", "D4"),
-            P1_kwd_file("18052014", "D10"),
-            P1_kwd_file("18052014", "D13"),
+            P1_dat_file("18052014", "D1"),
+            P1_dat_file("18052014", "D4"),
+            P1_dat_file("18052014", "D10"),
+            P1_dat_file("18052014", "D13"),
         ),
         Day(3): (
-            P1_kwd_file("20052014", "D1"),
-            P1_kwd_file("20052014", "D4"),
-            P1_kwd_file("20052014", "D10"),
-            P1_kwd_file("20052014", "D13"),
+            P1_dat_file("20052014", "D1"),
+            P1_dat_file("20052014", "D4"),
+            P1_dat_file("20052014", "D10"),
+            P1_dat_file("20052014", "D13"),
         ),
         Day(4): (
-            P1_kwd_file("22052014", "D1"),
-            P1_kwd_file("22052014", "D4"),
-            P1_kwd_file("22052014", "D10"),
-            P1_kwd_file("22052014", "D13"),
+            P1_dat_file("22052014", "D1"),
+            P1_dat_file("22052014", "D4"),
+            P1_dat_file("22052014", "D10"),
+            P1_dat_file("22052014", "D13"),
         ),
         Day(5): (
-            P1_kwd_file("24052014", "D1"),
-            P1_kwd_file("24052014", "D4"),
-            P1_kwd_file("24052014", "D10"),
-            P1_kwd_file("24052014", "D13"),
+            P1_dat_file("24052014", "D1"),
+            P1_dat_file("24052014", "D4"),
+            P1_dat_file("24052014", "D10"),
+            P1_dat_file("24052014", "D13"),
         ),
         Day(6): (
-            P1_kwd_file("26052014", "D1"),
-            P1_kwd_file("26052014", "D4"),
-            P1_kwd_file("26052014", "D10"),
-            P1_kwd_file("26052014", "D13"),
+            P1_dat_file("26052014", "D1"),
+            P1_dat_file("26052014", "D4"),
+            P1_dat_file("26052014", "D10"),
+            P1_dat_file("26052014", "D13"),
         ),
     },
     Rat(2): {
@@ -124,7 +125,7 @@ raw_data_paths = {
             P2_dat_file("L2"),
             P2_dat_file("D15"),
         ),
-        Day(4, f"{JJ}/S001E000/2014-09-05_14-09-04/FP"): (
+        Day(4, f"{JJ}/S001E000/2014-09-05_14-09-04/FP/"): (
             File("D24", "p1.moz"),
             File("D27", "p2.moz"),
             File("L1", "p3.moz"),
@@ -173,7 +174,7 @@ flat_recordings_list = tuple(
         rat.ID,
         day.ID,
         file.ID,
-        path=rat.path_part + day.path_part + file.path_part,
+        path=Path(rat.path_part) / Path(day.path_part) / Path(file.path_part),
     )
     for rat, day_dict in raw_data_paths.items()
     for day, files in day_dict.items()

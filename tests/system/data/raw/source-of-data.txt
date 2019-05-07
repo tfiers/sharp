@@ -1,6 +1,16 @@
-Extracts from:
-nerffs01/ratlab/Frederic/organized/Long Flexible Probes/For the paper/data/P2/30_08_2014/Nlx/L2
+- sig.moz
+    This is the header (16384 bytes) + first 2*19 bytes of
+    /mnt/nerffs01/ratlab/Projects/Subiculum/Raw/S001E000/2014-09-11_16-41-18/FP/p10.moz
+    (i.e. rat 2, day 5, probe D29)
 
-Neuraview 'timestamps' of extract:
-4881128425 -- 4891296341
-(~ 60 seconds in)
+- sig.dat
+    First 2*19 bytes of
+    '/mnt/nerffs01/ratlab/Frederic/organized/Long Flexible Probes/For the paper/data/P2/30_08_2014/Nlx/L2/Klusta_T7-3.5/L2.dat'
+    (i.e. rat 2, day 2, probe L2)
+
+- sig.raw.kwd
+    First 10_000 rows of
+    '/mnt/nerffs01/ratlab/Projects/Subiculum/Raw/S001E015/2015-12-15_14-52-03/FP/experiment0_100.raw.kwd'
+    (i.e. rat 3, day 1)
+
+(These small test files have been generated in /mnt/nerfhf01/kloostermanwip/Tomas/notebooks/Read raw data.ipynb).

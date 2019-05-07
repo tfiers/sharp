@@ -5,6 +5,7 @@ import from anywhere else in `sharp`.
 """
 
 from dataclasses import dataclass
+from pathlib import Path
 from textwrap import fill
 
 
@@ -13,7 +14,7 @@ class RecordingFile:
     rat: int
     day: int
     probe: str
-    path: str
+    path: Path
 
     def __repr__(self):
         return f"RecordingFile(rat {self.rat}, day {self.day}, {self.probe})"

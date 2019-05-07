@@ -1,5 +1,5 @@
-Allow the user to create custom `config.py` files, to specify different run
-configurations.
+Allow the user to create custom `config.py` files, with which she can specify
+different run configurations.
 
 - `spec.py` specifies what this config file should look like, and provides
 sensible defaults for most all options.
