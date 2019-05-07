@@ -64,17 +64,10 @@ import sharp
 - If no GPU acceleration is desired, the significantly smaller CPU-only 
   version of PyTorch may be installed (i.e. `pytorch-cpu`, which corresponds 
   to `CUDA = None` on the PyTorch "get-started" page).
-- On succesfully installing `fklab-python-core`:
-     - The install might fail when trying to build the `radonc` extension.
-       This extension is not used in my thesis, and can be excluded from
-       the install: edit `fklab-python-core/setup.py`, and remove the line
-       `ext_modules = [radon_ext]` in the `setup()` call.
-     - Additionally, the dependency `spectrum` might fail to build
-       (especially on Windows). Again, this dependency is not necessary,
-       and can be removed from `fklab-python-core` as follows:
-       in the `setup()` call in `setup.py`, remove `spectrum` from the
-       `install_requires` list; and in `fklab/plot/core/artists.py`,
-       remove the `import fklab.signals.multitaper` line.
+- The installation of `fklab-python-core` might fail while trying to build its
+  `radonc` extension (especially on Windows). This extension is not used in my
+  thesis, and can be excluded from the install: edit `fklab-python-core/setup.py`, 
+  and remove the line `ext_modules = [radon_ext]` in the `setup()` call.
 
 
 
