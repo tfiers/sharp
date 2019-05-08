@@ -5,7 +5,6 @@ from seaborn import JointGrid, kdeplot
 from sharp.data.files.figure import FigureTarget
 from sharp.tasks.plot.results.base import MultiEnvelopeFigureMaker
 from sharp.tasks.plot.util.legend import add_colored_legend
-from sharp.util.misc import ignore
 
 
 class PlotLatencyScatter(MultiEnvelopeFigureMaker):
@@ -33,11 +32,10 @@ class PlotLatencyScatter(MultiEnvelopeFigureMaker):
         )
         for title in self.titles:
             data = df[getattr(df, algo) == title]
-            with ignore(FutureWarning):
-                kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
-                kdeplot(
-                    data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs
-                )
+            kdeplot(data[swr_duration], ax=grid.ax_marg_x, **kde_kwargs)
+            kdeplot(
+                data[delay], ax=grid.ax_marg_y, vertical=True, **kde_kwargs
+            )
             grid.ax_joint.plot(
                 data[swr_duration], data[delay], **scatter_kwargs
             )

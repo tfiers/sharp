@@ -308,10 +308,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
     def o_t(self):
         logger.info("Band-pass-filtering signal..")
         rm = self.reference_maker
-        with ignore(FutureWarning):
-            filter_output = apply_filter(
-                self.x_t, rm.band, fs=self.fs, **rm.filter_options
-            )
+        filter_output = apply_filter(
+            self.x_t, rm.band, fs=self.fs, **rm.filter_options
+        )
         logger.info("Done")
         return Signal(filter_output, self.fs)
 
@@ -331,10 +330,9 @@ class PlotOfflineSteps(FigureMaker, InputDataMixin):
         logger.info("Smoothing envelope..")
         unsmoothed = abs(self.analytic)
         rm = self.reference_maker
-        with ignore(FutureWarning):
-            envelope = smooth1d(
-                self.envelope_unsmoothed, delta=1 / self.fs, **rm.smooth_options
-            )
+        envelope = smooth1d(
+            self.envelope_unsmoothed, delta=1 / self.fs, **rm.smooth_options
+        )
         logger.info("Done")
         return Signal(envelope, self.fs)
 
@@ -349,8 +347,7 @@ def hilbert_fast(sig: Signal):
     # computation
     exponents = ceil(log(sig.num_samples) / log([2, 3]))
     N = int(min(array([2, 3]) ** exponents))
-    with ignore(FutureWarning):
-        analytic = hilbert(sig, N)
+    analytic = hilbert(sig, N)
     return Signal(analytic[: sig.num_samples], sig.fs)
 
 

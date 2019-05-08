@@ -67,8 +67,7 @@ def filter_strength(ba, fs) -> float:
     We choose mean over median because "outliers" are important.
     """
     N_freqs = 1000
-    with ignore(FutureWarning):
-        w, h = freqz(*ba, N_freqs)
+    w, h = freqz(*ba, N_freqs)
     f_nyq = fs / 2
     f = f_nyq * w / pi
     passband = (band[0] <= f) & (f < band[1])

@@ -16,7 +16,7 @@ from sharp.data.files.numpy import SegmentsFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.downsample import Downsample
-from sharp.util.misc import cached, ignore
+from sharp.util.misc import cached
 
 
 class MakeReference(SharpTask):
@@ -105,15 +105,13 @@ class MakeReference(SharpTask):
     @cached
     def ripple_envelope(self) -> Signal:
         """ Offline and ripple-only algorithm. """
-        # FutureWarning will be fixed in SciPy 1.2, due nov 9 2018
-        with ignore(FutureWarning):
-            ripple_envelope = compute_envelope(
-                self.ripple_channel,
-                self.ripple_band,
-                fs=self.ripple_channel.fs,
-                filter_options=self.ripple_filter_options,
-                smooth_options=self.ripple_smooth_options,
-            )
+        ripple_envelope = compute_envelope(
+            self.ripple_channel,
+            self.ripple_band,
+            fs=self.ripple_channel.fs,
+            filter_options=self.ripple_filter_options,
+            smooth_options=self.ripple_smooth_options,
+        )
         return Signal(ripple_envelope, self.ripple_channel.fs)
 
     @property
@@ -138,8 +136,7 @@ class MakeReference(SharpTask):
         fn = signal.fs / 2
         order = 5
         ba = butter(order, self.SW_cutoff / fn, "low")
-        with ignore(FutureWarning):
-            out = filtfilt(*ba, signal)
+        out = filtfilt(*ba, signal)
         return Signal(out, signal.fs)
 
     @property
