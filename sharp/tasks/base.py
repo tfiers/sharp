@@ -24,9 +24,7 @@ class SharpTask(Task, ABC):
 
     # Caching this function avoids many spurious task completion checks. It
     # requires invalidation of a task's cache after the task has run,
-    # though. Caching complete() will probably not work for
-    # multiprocessing. In that case, we could maybe use a time-based cache
-    # (?).
+    # though.
     @cached
     def complete(self) -> bool:
         """
@@ -38,8 +36,8 @@ class SharpTask(Task, ABC):
         ) and all(output.exists() for output in self._outputs)
 
     def run(self):
-        self.complete.cache_clear()
         self.work()
+        self.complete.cache_clear()
 
     def work(self):
         pass
