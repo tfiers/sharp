@@ -18,4 +18,7 @@ minipaper = (
     LatencyGrid(envelope_maker=ApplyOnlineBPF()),
 )
 
-tasks_to_run = (PrintFileSizes(),)
+tasks_to_run = (
+    PrintFileSizes(),
+    
+)

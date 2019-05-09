@@ -51,5 +51,6 @@ except Exception as err:
 
 # Some more global config objects
 output_root: Path = config.output_dir
+shared_output_root: Path = config.shared_output_dir
 intermediate_output_dir: Path = output_root / "intermediate"
 final_output_dir: Path = output_root / "final"

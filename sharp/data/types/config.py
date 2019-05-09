@@ -1,6 +1,6 @@
 """
 Data types used in sharp/config/
-As this file is at the top of the dependency DAG for `sharp`, it should not
+As this file is at the top of the dependency graph for `sharp`, it should not
 import from anywhere else in `sharp`.
 """
 
@@ -10,14 +10,18 @@ from textwrap import fill
 
 
 @dataclass
-class RecordingFile:
+class RecordingFileID:
     rat: int
     day: int
     probe: str
     path: Path
 
+    @property
+    def ID(self) -> str:
+        return f"rat_{self.rat}_day_{self.day}_{self.probe}"
+
     def __repr__(self):
-        return f"RecordingFile(rat {self.rat}, day {self.day}, {self.probe})"
+        return f"RecordingFileID(rat {self.rat}, day {self.day}, {self.probe})"
 
 
 class ConfigError(Exception):

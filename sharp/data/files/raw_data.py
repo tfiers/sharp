@@ -2,15 +2,11 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 from typing import TypeVar
 
-from luigi import IntParameter
 from numpy import int16, memmap
 
 from fklab.io.common import BinaryFileReader
 from fklab.io.neuralynx import NlxOpen
-from sharp.config.load import config
 from sharp.data.files.base import HDF5Target, InputFileTarget
-from sharp.data.types.config import RecordingFile
-from sharp.tasks.base import ExternalTask
 from sharp.util.misc import cached
 
 log = getLogger(__name__)
@@ -18,7 +14,7 @@ log = getLogger(__name__)
 OpenedFile = TypeVar("OpenedFile")
 
 
-class RawDataFile(InputFileTarget, ABC):
+class RawRecording(InputFileTarget, ABC):
     def read(self):
         return self.signal
 
@@ -60,7 +56,7 @@ class RawDataFile(InputFileTarget, ABC):
         """
 
 
-class TahitiFile(RawDataFile):
+class TahitiFile(RawRecording):
     extension = ".moz"
 
     def _open(self) -> BinaryFileReader:
@@ -79,7 +75,7 @@ class TahitiFile(RawDataFile):
     to_microvolts = 1
 
 
-class RawKwikFile(RawDataFile, HDF5Target):
+class RawKwikFile(RawRecording, HDF5Target):
     """
     A custom HDF5 file created by the KlustaKwik spike sorting software.
     Specification: https://github.com/klusta-team/kwiklib/wiki/Kwik-format
@@ -121,7 +117,7 @@ class RawKwikFile(RawDataFile, HDF5Target):
         return values[0]
 
 
-class RawDATFile(RawDataFile):
+class RawDATFile(RawRecording):
     extension = ".dat"
     fs = 32000  # Taken from the corresponding .prm file.
     to_microvolts = 0.183_111_06
@@ -135,16 +131,3 @@ class RawDATFile(RawDataFile):
 
     def signal(self):
         return self.opened_file
-
-
-class RecordingFileMixin:
-    file_index: int = IntParameter()
-
-    @property
-    def file(self) -> RecordingFile:
-        return config.raw_data_paths[self.file_index]
-
-
-class RawDataFile_ExistenceCheck(ExternalTask, RecordingFileMixin):
-    def output(self):
-        ...

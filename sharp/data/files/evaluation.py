@@ -1,21 +1,8 @@
-from abc import ABC
-
 from fklab.segments import Segment
-from h5py import File as HDF5File
-from sharp.data.files.base import FileTarget
+from sharp.data.files.base import HDF5Target
 from sharp.data.types.evaluation.sweep import ThresholdSweep
 from sharp.data.types.evaluation.threshold import ThresholdEvaluation
 from sharp.util.misc import cached
-
-
-class HDF5Target(FileTarget, ABC):
-    extension = ".hdf5"
-
-    def open_file_for_write(self):
-        return HDF5File(self.path_string, "w")
-
-    def open_file_for_read(self):
-        return HDF5File(self.path_string, "r")
 
 
 class ThresholdSweepFile(HDF5Target):

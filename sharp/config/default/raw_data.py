@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from sharp.data.types.config import RecordingFile
+from sharp.data.types.config import RecordingFileID
 
 
 @dataclass(frozen=True)
@@ -170,7 +170,7 @@ raw_data_paths = {
 
 
 flat_recordings_list = tuple(
-    RecordingFile(
+    RecordingFileID(
         rat.ID,
         day.ID,
         file.ID,

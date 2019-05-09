@@ -23,10 +23,10 @@ from sharp.config.default.channels import (
 )
 from sharp.config.default.logging import LOGGING_CONFIG
 from sharp.config.default.raw_data import flat_recordings_list
-from sharp.data.types.config import ConfigError, RecordingFile
+from sharp.data.types.config import ConfigError, RecordingFileID
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
-config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().absolute()
+config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().resolve()
 ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
 
 # We do not want to import from luigi yet. (As it executes initalization code on
@@ -57,7 +57,7 @@ class SharpConfigBase:
     # Data settings
     # -------------
 
-    raw_data_paths: Sequence[RecordingFile] = flat_recordings_list
+    raw_data_paths: Sequence[RecordingFileID] = flat_recordings_list
 
     raw_data_dir: str = "obsolete"
     # Directory containing raw NeuraLynx recordings (*.ncs files).
@@ -66,6 +66,15 @@ class SharpConfigBase:
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to your custom `config.py`
     # file; i.e. relative to the "sharp config dir" env var).
+
+    shared_output_dir: str = "/home/ratlab/tomas/data/shared"
+    # Absolute path to a directory where the code may store processed data
+    # that is shared between different run configurations; i.e. data for which
+    # these different config.py files have the same values for all relevant
+    # options.
+
+    fs_target: float = 1000
+    # Target sampling frequency after downsampling. In hertz.
 
     reference_channel: str = "L2 - E13"  # MANDATORY_SETTING
     # Name of the NCS file (without extension) that will be used for
@@ -241,14 +250,16 @@ class SharpConfigBase:
             self.config_id = str(config_dir)
 
         def _as_absolute_Path(path: str) -> Path:
-            ppath = Path(path)
+            ppath = Path(path).expanduser()
             if ppath.is_absolute():
-                return ppath
+                out = ppath
             else:
-                return config_dir / ppath
+                out = config_dir / ppath
+            return out.resolve()
 
-        self.output_dir = _as_absolute_Path(self.output_dir)
         self.raw_data_dir = _as_absolute_Path(self.raw_data_dir)
+        self.output_dir = _as_absolute_Path(self.output_dir)
+        self.shared_output_dir = _as_absolute_Path(self.shared_output_dir)
 
     def get_tasks_tuple(self) -> Tuple[LuigiTask, ...]:
         tasks = self.get_tasks()
