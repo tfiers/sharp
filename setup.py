@@ -19,7 +19,7 @@ setup(
         "typeguard",
         # Version pin necessary to make luigi install work on Windows:
         "python-daemon==2.1.2",
-        "luigi[toml]==2.8.3",
+        "luigi[toml]==2.8.5",
         "scikit-learn",
         # All from requirements.txt:
         "seaborn==0.9.0+tomas",
