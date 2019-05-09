@@ -4,6 +4,7 @@ from logging import getLogger
 from pathlib import Path, PosixPath, WindowsPath
 from typing import TypeVar, Union
 
+from h5py import File as HDF5File
 from luigi import Target
 from sharp.config.load import output_root
 from sharp.util.misc import cached
@@ -66,7 +67,20 @@ class InputFileTarget(FileTarget, ABC):
     def write(self, object):
         """ Initial input files do not need to implement `write`. """
 
+    def delete(self):
+        log.warning(f"Not deleting an external input file ({self})")
+
 
 class OutputFileTarget(FileTarget, ABC):
     def read(self):
         """ Final output files do not need to implement `read`. """
+
+
+class HDF5Target(FileTarget, ABC):
+    extension = ".hdf5"
+
+    def open_file_for_write(self) -> HDF5File:
+        return HDF5File(self.path_string, "w")
+
+    def open_file_for_read(self) -> HDF5File:
+        return HDF5File(self.path_string, "r")
