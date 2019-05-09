@@ -3,6 +3,8 @@ from os import stat
 from os.path import exists
 from pprint import pformat
 
+from numpy import nan, nansum
+
 from sharp.config.load import config, final_output_dir
 from sharp.data.files.stdlib import DictFile
 from sharp.tasks.base import SharpTask
@@ -10,12 +12,13 @@ from sharp.tasks.base import SharpTask
 log = getLogger(__name__)
 
 
-def file_size(path: str) -> str:
+def file_size(path: str) -> float:
+    """ In gigabytes. NaN if file does not exist. """
     if exists(path):
         bytes = stat(path).st_size
-        return f"{bytes / 1E9:.1f} GB ({path})"
+        return bytes / 1e9
     else:
-        return f"NOPE ({path})"
+        return nan
 
 
 class PrintFileSizes(SharpTask):
@@ -26,9 +29,16 @@ class PrintFileSizes(SharpTask):
         return self.out_file
 
     def work(self):
-        data = {
-            str(rec_file): file_size(rec_file.path)
-            for rec_file in config.raw_data_paths
+        rec_files = config.raw_data_paths
+        file_sizes = [file_size(r.path) for r in rec_files]
+        size_strings = [
+            f"{size:.1f} GB" if size is not nan else "file not found"
+            for size in file_sizes
+        ]
+        output = {
+            str(rec_file): f"{size} ({rec_file.path})"
+            for rec_file, size in zip(rec_files, size_strings)
         }
-        log.info(pformat(data))
-        self.out_file.write(data)
+        output["Total"] = f"{nansum(file_sizes):.1f} GB"
+        log.info(pformat(output))
+        self.out_file.write(output)
