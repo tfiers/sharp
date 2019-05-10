@@ -5,7 +5,7 @@ from typing import Any
 from sharp.data.types.config import RecordingFileID
 
 
-@dataclass(frozen=True)
+@dataclass
 class RawDataPathPart:
     ID: Any
     path_part: str = ""
@@ -163,7 +163,7 @@ raw_data_paths = {
     },
     Rat(4, f"{JJ}/S001E021/"): {
         Day(1, "2016-12-14_14-50-36/FP/"): (
-            File("1 probe", "experiment1_100.raw.kwd"),
+            File("1 good probe", "experiment1_100.raw.kwd"),
         )
     },
 }
