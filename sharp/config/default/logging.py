@@ -8,7 +8,7 @@ LOGGING_CONFIG = dict(
         # When using the "time_only" formatter, make sure to log the full date
         # at the start of the log.
         "time_only": {
-            "format": "%(asctime)s | (%(name)s) %(message)s",
+            "format": "%(asctime)s | %(name)s | %(levelname)s | %(message)s",
             "datefmt": "%H:%M:%S",
         },
     },
@@ -40,12 +40,11 @@ LOGGING_CONFIG = dict(
     handlers={
         "console": {
             "class": "logging.StreamHandler",
-            # Print to stdout instead of the default stderr, so we do not get
-            # an ugly red background for luigi output in PyCharm or Jupyter.
+            # Print to stdout instead of the default stderr, so that we do not
+            # get an ugly red background for luigi output in PyCharm or
+            # Jupyter.
             "stream": "ext://sys.stdout",
-            # Remove next line to log the message only.
-            # "formatter": "time_only",
-            "formatter": "time_only",
+            "formatter": "standard",
         },
         "file_luigi": {
             "class": "logging.FileHandler",
@@ -58,7 +57,7 @@ LOGGING_CONFIG = dict(
             "class": "logging.FileHandler",
             "filename": "sharp.log",
             "mode": "a",
-            "formatter": "time_only",
+            "formatter": "standard",
         },
     },
 )
