@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sharp.config.spec import SharpConfigBase
 from sharp.data.types.config import RecordingFileID
 
@@ -5,11 +7,19 @@ from sharp.data.types.config import RecordingFileID
 class SharpConfig(SharpConfigBase):
 
     # [Data]
-    raw_data_dir = "data/raw"
     raw_data_paths = (
-        RecordingFileID(rat=1, day=1, probe="Waluigi", path="test.bop"),
+        RecordingFileID(
+            rat=2, day=5, probe="D29", path=Path("data/raw/sig.moz")
+        ),
+        RecordingFileID(
+            rat=2, day=2, probe="L2", path=Path("data/raw/sig.dat")
+        ),
+        RecordingFileID(
+            rat=3, day=1, probe="Waluigi", path=Path("data/raw/sig.raw.kwd")
+        ),
     )
     output_dir = "data/processed"
+    shared_output_dir = "data/processed-shared"
     reference_channel = "L2 - E13_extract"
     toppyr_channel_ix = 2
     sr_channel_ix = 0

@@ -254,7 +254,6 @@ class SharpConfigBase:
                 out = config_dir / ppath
             return out.resolve()
 
-        self.raw_data_dir = _as_absolute_Path(self.raw_data_dir)
         self.output_dir = _as_absolute_Path(self.output_dir)
         self.shared_output_dir = _as_absolute_Path(self.shared_output_dir)
 
