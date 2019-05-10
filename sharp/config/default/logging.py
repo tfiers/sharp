@@ -3,12 +3,12 @@ LOGGING_CONFIG = dict(
     disable_existing_loggers=False,
     formatters={
         "standard": {
-            "format": "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+            "format": "%(asctime)s | %(name)s | %(levelname)s: %(message)s"
         },
         # When using the "time_only" formatter, make sure to log the full date
         # at the start of the log.
         "time_only": {
-            "format": "%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+            "format": "%(asctime)s | %(name)s | %(levelname)s: %(message)s",
             "datefmt": "%H:%M:%S",
         },
     },
