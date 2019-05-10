@@ -1,3 +1,4 @@
+from sharp.config.load import config
 from sharp.data.files.raw_data import (
     RawDATFile,
     RawKwikFile,
@@ -22,4 +23,12 @@ class RawRecording_ExistenceCheck(ExternalTask, SingleRecordingFileTask):
         )
         return FileClass(
             directory=path.parent, filename=path.name.split(".")[0]
+        )
+
+
+class CheckWhetherAllRawRecordingsExist(SharpTask):
+    def requires(self):
+        return (
+            RawRecording_ExistenceCheck(file_ID=rec_file)
+            for rec_file in config.raw_data_paths
         )
