@@ -5,7 +5,8 @@ from typing import Any
 from sharp.data.types.config import RecordingFileID
 
 
-@dataclass
+# `frozen` makes this class hashable; i.e. usable as dict key.
+@dataclass(frozen=True)
 class RawDataPathPart:
     ID: Any
     path_part: str = ""
