@@ -15,7 +15,7 @@ from sharp.config.load import config, intermediate_output_dir
 from sharp.data.files.numpy import SegmentsFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
-from sharp.tasks.signal.downsample import GatherDownsampledFiles
+from sharp.tasks.signal.downsample import DownsampleAllRecordings
 from sharp.util.misc import cached
 
 
@@ -36,7 +36,7 @@ class MakeReference(SharpTask):
     ripple_smooth_options = dict(kernel="gaussian", bandwidth=4e-3)
     SW_cutoff: float = 20  # Hz
 
-    downsampler = GatherDownsampledFiles()
+    downsampler = DownsampleAllRecordings()
 
     def requires(self):
         return self.downsampler

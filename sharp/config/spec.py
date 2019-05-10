@@ -59,13 +59,10 @@ class SharpConfigBase:
 
     raw_data_paths: Sequence[RecordingFileID] = flat_recordings_list
 
-    raw_data_dir: str = "obsolete"
-    # Directory containing raw NeuraLynx recordings (*.ncs files).
-
     output_dir: str = "output"  # MANDATORY_SETTING
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to your custom `config.py`
-    # file; i.e. relative to the "sharp config dir" env var).
+    # file; i.e. relative to the "SHARP_CONFIG_DIR" env var).
 
     shared_output_dir: str = "/home/ratlab/tomas/data/shared"
     # Absolute path to a directory where the code may store processed data

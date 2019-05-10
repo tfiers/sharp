@@ -17,7 +17,7 @@ class RecordingFileID:
     path: Path
 
     @property
-    def ID(self) -> str:
+    def short_str(self) -> str:
         return f"rat_{self.rat}_day_{self.day}_{self.probe}"
 
     def __repr__(self):

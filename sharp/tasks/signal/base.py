@@ -2,13 +2,13 @@ from sharp.config.load import intermediate_output_dir
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.split import TrainTestSplit
 from sharp.tasks.base import SharpTask
-from sharp.tasks.signal.downsample import GatherDownsampledFiles
+from sharp.tasks.signal.downsample import DownsampleAllRecordings
 from sharp.tasks.signal.reference import MakeReference
 from sharp.util.misc import cached
 
 
 class InputDataMixin:
-    downsampler = GatherDownsampledFiles()
+    downsampler = DownsampleAllRecordings()
     reference_maker = MakeReference()
 
     input_data_makers = (downsampler, reference_maker)

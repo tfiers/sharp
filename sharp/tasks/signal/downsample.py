@@ -1,69 +1,53 @@
 from logging import getLogger
 
 from fklab.signals.multirate import decimate_chunkwise
-from sharp.config.load import shared_output_root, config
+from sharp.config.load import config, shared_output_root
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.base import SharpTask
 from sharp.tasks.signal.raw import (
-    SingleRecordingFileTask,
     RawRecording_ExistenceCheck,
+    SingleRecordingFileTask,
 )
 
 log = getLogger(__name__)
 
 
-class DownsampleFile(SingleRecordingFileTask):
+class DownsampleRawRecording(SingleRecordingFileTask):
     output_dir = shared_output_root / "downsampled-recordings"
 
     def requires(self):
         return RawRecording_ExistenceCheck(file_ID=self.file_ID)
 
     def output(self):
-        return SignalFile(self.output_dir, self.file_ID.ID)
+        return SignalFile(self.output_dir, self.file_ID.short_str)
 
     def work(self):
         raw_recording = self.requires().output()
         fs_orig = raw_recording.fs
         q, remainder = divmod(fs_orig, config.fs_target)
+        fs_new = fs_orig / q
         if remainder > 0:
-            log.warning(f"")
-        decimate_chunkwise(raw_recording.signal, factor=q)
+            log.warning(
+                f"Original sampling rate of {self.file_ID} ({fs_orig} Hz) is"
+                f" not an integer multiple of the target sampling rate"
+                f" ({config.fs_target} Hz). Sampling rate after downsampling"
+                f" will instead be {fs_new} Hz."
+            )
+        log.info(
+            f"Downsampling {self.file_ID} ({self.file_ID.path}) of size"
+            f" {self.file_ID.path.stat().st_size / 1E9:.1f} GB by a factor {q}."
+        )
+        signal_down = decimate_chunkwise(raw_recording.signal, factor=q)
+        raw_recording.close()
+        self.output().write(Signal(signal_down, fs_new))
 
 
-class GatherDownsampledFiles(SharpTask):
-    """
-    Read in the Neuralynx continuous recording files in the input directory,
-    downsample them, and save the downsampled signals as NumPy arrays.
-    """
-
-    output_dir = shared_output_root / "downsampled-recordings"
+class DownsampleAllRecordings(SharpTask):
+    output_dir = shared_output_root
 
     def requires(self):
-        ...
-        # return self.raw_data_dir
-
-    def output(self):
-        ...
-
-    #
-    # def work(self):
-    #     for in_file, out_file in zip(self.raw_data_dir.output(), self.output()):
-    #         log.info(f"Downsampling {in_file.name}")
-    #         downsampled_data, fs = decimate_chunkwise(
-    #             str(in_file), self.fs_target
-    #         )
-    #         out_file.write(Signal(downsampled_data, fs))
-
-    # def get_multichannel(self):
-    #     channels = [file.read() for file in self.output()]
-    #     return Signal.from_channels(channels)
-    #
-    # def get_reference_channel(self) -> Signal:
-    #     for file in self.output():
-    #         if file.stem == config.reference_channel:
-    #             return file.read()
-    #     else:
-    #         raise ValueError(
-    #             f"Cannot find recording channel {config.reference_channel}"
-    #         )
+        return (
+            DownsampleRawRecording(file_ID=rec_file)
+            for rec_file in config.raw_data_paths
+        )
