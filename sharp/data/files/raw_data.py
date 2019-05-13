@@ -62,6 +62,7 @@ class TahitiFile(RawRecording):
     def _open(self) -> BinaryFileReader:
         return NlxOpen(self)
 
+    @property
     def signal(self):
         # fklab's BinaryFileReader creates NumPy memmap's internally. The disk
         # file opened can be closed by deleting the NumPy memmap objects.
@@ -86,12 +87,13 @@ class RawKwikFile(RawRecording, HDF5Target):
     def _open(self):
         return self.open_file_for_read()
 
-    def signal(self):
-        return self.opened_file["recordings/0/data"]
-
     def close(self):
         self.opened_file.close()
         super().close()
+
+    @property
+    def signal(self):
+        return self.opened_file["recordings/0/data"]
 
     @property
     @cached
@@ -112,7 +114,7 @@ class RawKwikFile(RawRecording, HDF5Target):
         values = self.opened_file[info_path].attrs[name]
         if not all(values == values[0]):
             log.warning(
-                f"Not all channels have the same {name} value in file {self}."
+                f"Not all channels have the same \"{name}\" value in file {self}."
             )
         return values[0]
 
@@ -127,7 +129,10 @@ class RawDATFile(RawRecording):
     NUM_CHANNELS = 16
 
     def _open(self) -> memmap:
-        return memmap(self, dtype=int16).reshape((-1, self.NUM_CHANNELS))
+        return memmap(self.path_string, dtype=int16).reshape(
+            (-1, self.NUM_CHANNELS)
+        )
 
+    @property
     def signal(self):
         return self.opened_file
