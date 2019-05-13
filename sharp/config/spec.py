@@ -2,15 +2,10 @@ from abc import ABC
 from itertools import product
 from os import environ
 from pathlib import Path
-from typing import Dict, Iterable, Optional, Sequence, Tuple, Union
+from typing import Iterable, Optional, Sequence, Tuple, Union
 
 from numpy import linspace
 
-from sharp.config.default.channels import (
-    L2_channel_combinations,
-    L2_channels,
-    L_probe_outline,
-)
 from sharp.config.default.logging import LOGGING_CONFIG
 from sharp.config.default.raw_data import flat_recordings_list
 from sharp.config.types import ConfigDict, LuigiTask, RecordingFileID
@@ -59,17 +54,8 @@ class SharpConfigBase(ABC):
     fs_target: float = 1000
     # Target sampling frequency after downsampling. In hertz.
 
-    reference_channel: str = "L2 - E13"
-    # Name of the NCS file (without extension) that will be used for
-    # single-channel detection algorithms and for defining reference SWR
-    # segments.
-
     bitmap_versions: bool = False
     # If True, save PNG versions of figures, in addition to the PDF versions.
-
-    toppyr_channel_ix: int = 15
-    sr_channel_ix: int = 6
-    # These channels are used for offline sharp wave detection
 
     #
     # Logging and Luigi worker config
@@ -97,12 +83,6 @@ class SharpConfigBase(ABC):
         dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
         for mult_SW, mult_ripple in product(mult_detect_SW, mult_detect_ripple)
     ]
-
-    channel_combinations: Dict[str, Sequence[int]] = L2_channel_combinations
-
-    probe_outline: Sequence[Tuple[float, float]] = L_probe_outline
-    electrodes_x: Sequence[float] = [ch.x for ch in L2_channels]
-    electrodes_y: Sequence[float] = [ch.y for ch in L2_channels]
 
     # lockout_time: float = 34e-3
     lockout_time: float = 60e-3
