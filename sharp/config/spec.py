@@ -13,7 +13,7 @@ from sharp.config.default.channels import (
 )
 from sharp.config.default.logging import LOGGING_CONFIG
 from sharp.config.default.raw_data import flat_recordings_list
-from sharp.data.types.config import ConfigDict, LuigiTask, RecordingFileID
+from sharp.config.types import ConfigDict, LuigiTask, RecordingFileID
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().resolve()

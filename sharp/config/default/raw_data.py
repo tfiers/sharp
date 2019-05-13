@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from sharp.data.types.config import RecordingFileID
+from sharp.config.types import RecordingFileID
 
 
 # `frozen` makes this class hashable; i.e. usable as dict key.

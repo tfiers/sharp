@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from sharp.config.spec import SharpConfigBase
-from sharp.data.types.config import RecordingFileID
+from sharp.config.types import RecordingFileID
 
 
 class SharpConfig(SharpConfigBase):

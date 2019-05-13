@@ -7,7 +7,7 @@ from sharp.data.files.raw_data import (
     RawRecording,
     TahitiFile,
 )
-from sharp.data.types.config import RecordingFileID
+from sharp.config.types import RecordingFileID
 from sharp.tasks.base import CustomParameter, ExternalTask, SharpTask
 
 log = getLogger(__name__)

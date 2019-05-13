@@ -9,9 +9,9 @@ from os import environ
 from pathlib import Path
 from sys import path
 
-from sharp.config.util import normalize, validate
 from sharp.config.spec import CONFIG_DIR_ENV_VAR, SharpConfigBase, config_dir
-from sharp.data.types.config import ConfigError
+from sharp.config.types import ConfigError
+from sharp.config.util import normalize, validate
 
 path.insert(0, str(config_dir))
 

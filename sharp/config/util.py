@@ -4,8 +4,8 @@ from warnings import warn
 
 from typeguard import check_type
 
-from sharp.config.spec import SharpConfigBase, config_dir, LuigiTask
-from sharp.data.types.config import ConfigError
+from sharp.config.spec import LuigiTask, SharpConfigBase, config_dir
+from sharp.config.types import ConfigError
 
 
 def validate(config: SharpConfigBase):
