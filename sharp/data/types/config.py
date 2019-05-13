@@ -9,7 +9,8 @@ from pathlib import Path
 from textwrap import fill
 
 
-@dataclass
+@dataclass(frozen=True)
+# Freeze to make class hashable (to be usable as a Luigi parameter)
 class RecordingFileID:
     rat: int
     day: int
@@ -20,8 +21,8 @@ class RecordingFileID:
     def short_str(self) -> str:
         return f"rat_{self.rat}_day_{self.day}_{self.probe}"
 
-    def __repr__(self):
-        return f"RecordingFileID(rat {self.rat}, day {self.day}, {self.probe})"
+    def __str__(self):
+        return f"rat {self.rat}, day {self.day}, {self.probe}, {self.path.name}"
 
 
 class ConfigError(Exception):

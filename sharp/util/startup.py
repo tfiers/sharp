@@ -59,13 +59,14 @@ def setup_luigi_config():
 
 
 def clear_all_output():
-    from sharp.config.load import output_root
+    from sharp.config.load import output_root, shared_output_root
 
-    if output_root.exists():
-        # Ignore the sporadic (and wrong)
-        # "OSError: [WinError 145] The directory is not empty: ..."
-        rmtree(output_root, ignore_errors=True)
-        log.info(f"Cleared directory {output_root}.")
+    for dir in (output_root, shared_output_root):
+        if dir.exists():
+            # Ignore the sporadic (and wrong)
+            # "OSError: [WinError 145] The directory is not empty: ..."
+            rmtree(dir, ignore_errors=True)
+            log.info(f"Cleared directory {dir}.")
 
 
 def clear_output(task):
