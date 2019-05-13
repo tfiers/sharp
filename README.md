@@ -1,7 +1,7 @@
 <p align="center">
   <img src="logo.png" alt="Logo for this project: a stylized rat and the name "Sharp">
   <br>
-  <sub>Logo by <a href="https://github.com/zuurw">@zuurw</a>.</sub>
+  <sub>Logo graciously furnished by <a href="https://github.com/zuurw">@zuurw</a>.</sub>
 </p>
 
 Software written for my [master's thesis](https://github.com/tfiers/master-thesis) 
