@@ -1,3 +1,4 @@
 data/processed/
+data/processed-shared/
 luigi.toml
 *.log
