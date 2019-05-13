@@ -22,21 +22,24 @@ from sharp.util.startup import (
 
 @command()
 @option(
+    "--local-scheduler",
+    default=False,
+    help="Use an in-memory central scheduler. Useful for testing.",
+    is_flag=True,
+)
+@option(
     "--clear-last",
     default=False,
-    help="Remove the output of the final tasks. Only works reliably if they exist.",
+    help=(
+        "Remove the output of the final tasks. Only works reliably if these"
+        " outputs already exist."
+    ),
     is_flag=True,
 )
 @option(
     "--clear-all",
     default=False,
-    help="Empty the entire `output_dir` directory.",
-    is_flag=True,
-)
-@option(
-    "--local-scheduler",
-    default=False,
-    help="Use an in-memory central scheduler. Useful for testing.",
+    help="Empty the entire `output_dir` and `shared_output_dir` directories.",
     is_flag=True,
 )
 def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
@@ -57,7 +60,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     # Now we can import from luigi.
 
     if clear_all:
-        log.info("Clearing entire output directory, if it exists.")
+        log.info("Clearing entire output directories, if they exist.")
         clear_all_output()
     log.info("Importing tasks to run...")
     tasks_to_run = config.get_tasks_tuple()
