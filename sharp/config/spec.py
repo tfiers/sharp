@@ -1,20 +1,10 @@
+from abc import ABC
 from itertools import product
 from os import environ
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-)
-from warnings import warn
+from typing import Dict, Iterable, Optional, Sequence, Tuple, Union
 
 from numpy import linspace
-from typeguard import check_type
 
 from sharp.config.default.channels import (
     L2_channel_combinations,
@@ -23,22 +13,18 @@ from sharp.config.default.channels import (
 )
 from sharp.config.default.logging import LOGGING_CONFIG
 from sharp.config.default.raw_data import flat_recordings_list
-from sharp.data.types.config import ConfigError, RecordingFileID
+from sharp.data.types.config import ConfigDict, LuigiTask, RecordingFileID
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().resolve()
-ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
-
-# We do not want to import from luigi yet. (As it executes initalization code on
-# import. We want to control this initialization by setting env vars, later).
-# Therefore make a dummy Luigi.Task type.
-LuigiTask = TypeVar("LuigiTask")
-
-# A semantic alias for `NotImplemented`
-MANDATORY_SETTING = NotImplemented
 
 
-class SharpConfigBase:
+class SharpConfigBase(ABC):
+    """
+    Overwrite `get_tasks` and any or all properties, to change the default
+    configuration.
+    """
+
     def get_tasks(self) -> Union[LuigiTask, Iterable[LuigiTask]]:
         """
         Return instantiated tasks, which will be passed to luigi.build().
@@ -59,7 +45,7 @@ class SharpConfigBase:
 
     raw_data_paths: Sequence[RecordingFileID] = flat_recordings_list
 
-    output_dir: str = "output"  # MANDATORY_SETTING
+    output_dir: str = "output"
     # Path to a directory where the code may store processed data and output
     # figures. (Absolute path, or path relative to your custom `config.py`
     # file; i.e. relative to the "SHARP_CONFIG_DIR" env var).
@@ -73,7 +59,7 @@ class SharpConfigBase:
     fs_target: float = 1000
     # Target sampling frequency after downsampling. In hertz.
 
-    reference_channel: str = "L2 - E13"  # MANDATORY_SETTING
+    reference_channel: str = "L2 - E13"
     # Name of the NCS file (without extension) that will be used for
     # single-channel detection algorithms and for defining reference SWR
     # segments.
@@ -212,55 +198,3 @@ class SharpConfigBase:
     # fraction of total segment duration (= approximate SWR duration) before
     # calculating the target signal. This should encourage SWR 'prediction' in
     # the optimisation procedure.
-
-    #
-    # Internals
-    # ---------
-
-    def __init__(self) -> None:
-        self._validate()
-        self._normalize()
-
-    def _validate(self):
-        settings = dir(SharpConfigBase)
-        for name in dir(self):
-            if name not in settings:
-                warn(f"SharpConfig attribute `{name}` is not a config setting.")
-            value = getattr(self, name)
-            if value == NotImplemented:
-                raise ConfigError(
-                    f"The mandatory config setting `{name}` is not set."
-                )
-            expected_type = self.__annotations__.get(name)
-            if expected_type:
-                try:
-                    check_type(name, value, expected_type)
-                except TypeError as e:
-                    raise ConfigError(
-                        f"The config setting `{name}` has an incorrect type. "
-                        f"Expected type: `{expected_type}`. "
-                        f"See preceding exception for details."
-                    ) from e
-
-    def _normalize(self):
-        if self.config_id is None:
-            self.config_id = str(config_dir)
-
-        def _as_absolute_Path(path: str) -> Path:
-            ppath = Path(path).expanduser()
-            if ppath.is_absolute():
-                out = ppath
-            else:
-                out = config_dir / ppath
-            return out.resolve()
-
-        self.output_dir = _as_absolute_Path(self.output_dir)
-        self.shared_output_dir = _as_absolute_Path(self.shared_output_dir)
-
-    def get_tasks_tuple(self) -> Tuple[LuigiTask, ...]:
-        tasks = self.get_tasks()
-        try:
-            iter(tasks)
-            return tuple(tasks)
-        except TypeError:
-            return (tasks,)

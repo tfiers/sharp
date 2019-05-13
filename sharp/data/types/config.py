@@ -7,7 +7,14 @@ import from anywhere else in `sharp`.
 from dataclasses import dataclass
 from pathlib import Path
 from textwrap import fill
+from typing import Dict, Union, Any, TypeVar
 
+ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
+
+# We do not want to import from luigi yet in config/spec.py. (As luigi executes
+# initalization code on import. We want to control this initialization by
+# setting env vars, later). Therefore make a dummy Luigi.Task type.
+LuigiTask = TypeVar("LuigiTask")
 
 @dataclass(frozen=True)
 # Freeze to make class hashable (to be usable as a Luigi parameter)

@@ -13,7 +13,7 @@ from sharp.config.spec import config_dir
 log = getLogger(__name__)
 
 
-def validate_config():
+def load_config():
     """ Try to load the user specified config. """
     try:
         from sharp.config.load import config

@@ -10,13 +10,15 @@ Usage:
 # Flag when we have entered our own code.
 print("Welcome to the sharp CLI.", flush=True)
 
+from sharp.config.util import get_tasks_tuple
+
 from click import command, option
 from sharp.util.startup import (
     clear_all_output,
     clear_output,
     init_log,
     setup_luigi_config,
-    validate_config,
+    load_config,
 )
 
 
@@ -53,7 +55,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
     --workers 2`) in this command, as this yields multiprocessing bugs in luigi
     / PyTorch / Python. See the ReadMe for how to run tasks in parallel.
     """
-    config = validate_config()
+    config = load_config()
     log = init_log()
     setup_luigi_config()
     log.info("Generated luigi config.")
@@ -63,7 +65,7 @@ def run(clear_last: bool, clear_all: bool, local_scheduler: bool):
         log.info("Clearing entire output directories, if they exist.")
         clear_all_output()
     log.info("Importing tasks to run...")
-    tasks_to_run = config.get_tasks_tuple()
+    tasks_to_run = get_tasks_tuple(config)
     log.info("Done importing tasks to run.")
     if clear_last:
         for task in tasks_to_run:

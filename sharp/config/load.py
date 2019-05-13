@@ -9,6 +9,7 @@ from os import environ
 from pathlib import Path
 from sys import path
 
+from sharp.config.util import normalize, validate
 from sharp.config.spec import CONFIG_DIR_ENV_VAR, SharpConfigBase, config_dir
 from sharp.data.types.config import ConfigError
 
@@ -42,6 +43,8 @@ except ImportError as err:
 try:
     # A global config object, for use in any Task:
     config: SharpConfigBase = SharpConfig()
+    validate(config)
+    normalize(config)
 except Exception as err:
     raise ConfigError(
         "Could not initialise config.SharpConfig. "
