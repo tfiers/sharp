@@ -127,7 +127,7 @@ raw_data_paths = {
             P2_dat_file("D15"),
         ),
         Day(4, f"{JJ}/S001E000/2014-09-05_14-09-04/FP/"): (
-            File("D24", "p1.moz"),
+            # File("D24", "p1.moz"),  # Error opening w/ NlxOpen
             File("D27", "p2.moz"),
             File("L1", "p3.moz"),
             File("D21", "p4.moz"),

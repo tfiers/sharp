@@ -1,4 +1,4 @@
-from tasks.signal.downsample import DownsampleAllRecordings
+from sharp.tasks.signal.downsample import DownsampleAllRecordings
 
 
 def minipaper():
