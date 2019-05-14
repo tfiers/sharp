@@ -50,6 +50,12 @@ def setup_luigi_config():
             "keep_alive": True,
             "task_process_context": "",  # Suppress a luigi bug warning.
         },
+        "scheduler": {
+            "rpc-retry-attempts": 2 * 60,
+            # When the network is down, retry connecting to the scheduler every
+            # 30 seconds for this many attempts (instead of the default 3
+            # attempts).
+        },
         "logging": config.logging,
     }
     with open(luigi_config_path, "w") as f:
