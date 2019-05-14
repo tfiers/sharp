@@ -2,39 +2,29 @@ from dataclasses import dataclass, field
 from itertools import product
 from os import environ
 from pathlib import Path
-from typing import Callable, Iterable, Optional, Sequence, Tuple, Union
+from typing import Callable, Optional, Sequence, Tuple
 
 from numpy import linspace
 
 from sharp.config.default.logging import LOGGING_CONFIG
 from sharp.config.default.raw_data import flat_recordings_list
-from sharp.config.types import ConfigDict, LuigiTask, RecordingFileID
+from sharp.config.default.tasks import get_default_tasks
+from sharp.config.types import ConfigDict, OneOrMoreLuigiTasks, RecordingFileID
 
 CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
-config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().resolve()
 
-
-def get_default_tasks():
-    """
-    Return instantiated tasks, which will be passed to luigi.build().
-    The necessary import statements should be contained in this method's
-    body (not at the top of the config.py file). This avoids circular
-    imports (see config/README.md).
-
-    Developer note: should not be called before the `sharp.config.load`
-    script has run (e.g. after an object from it is imported).
-    """
-    import sharp.config.default.tasks as default_tasks
-
-    return default_tasks.tasks_to_run
+config_dir_str = environ.get(CONFIG_DIR_ENV_VAR, ".")
+config_dir = Path(config_dir_str).expanduser().resolve()
 
 
 @dataclass
 class SharpConfig:
 
-    get_tasks: Callable[
-        [], Union[LuigiTask, Iterable[LuigiTask]]
-    ] = get_default_tasks
+    get_tasks: Callable[[], OneOrMoreLuigiTasks] = get_default_tasks
+    # Return instantiated tasks, which will be passed to luigi.build(). The
+    # necessary import statements should be contained in this method's body
+    # (not at the top of the config.py file). This avoids circular imports (see
+    # config/README.md).
 
     #
     # Data settings

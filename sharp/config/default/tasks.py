@@ -1,6 +1,3 @@
-from sharp.tasks.signal.downsample import DownsampleAllRecordings
-
-
 def minipaper():
     from sharp.tasks.neuralnet.apply import ApplyRNN
     from sharp.tasks.plot.misc.training import PlotValidLoss
@@ -22,4 +19,7 @@ def minipaper():
     )
 
 
-tasks_to_run = (DownsampleAllRecordings(),)
+def get_default_tasks():
+    from sharp.tasks.signal.downsample import DownsampleAllRecordings
+
+    return DownsampleAllRecordings()

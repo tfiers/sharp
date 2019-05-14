@@ -3,8 +3,8 @@ from typing import Tuple
 
 from typeguard import check_type
 
-from sharp.config.spec import LuigiTask, SharpConfig, config_dir
-from sharp.config.types import ConfigError
+from sharp.config.spec import SharpConfig, config_dir
+from sharp.config.types import ConfigError, LuigiTask
 
 
 def validate(config: SharpConfig):
@@ -23,7 +23,7 @@ def validate(config: SharpConfig):
                 ) from e
 
 
-def normalize(config: SharpConfig):
+def normalize(config: SharpConfig) -> SharpConfig:
     if config.config_id is None:
         config.config_id = str(config_dir)
     config.output_dir = as_absolute_Path(config.output_dir)
