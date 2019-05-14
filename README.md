@@ -121,7 +121,7 @@ In the new directory, create a file named `config.py`, and create a new instance
 of [`SharpConfig`](sharp/config/spec.py) named "`config`". Change some or all of 
 the default attributes to suit your needs.
 
-Example (`~/sharp-run/config.py`):
+Example `~/sharp-run/config.py`:
 ```py
 from sharp.config.spec import SharpConfig
 
@@ -149,9 +149,9 @@ When your `config.py` file is ready, run:
 ~/sharp-run$  python -m sharp --local-scheduler
 ```
 This will run the tasks specified in the `get_tasks` method of your 
-`SharpConfig` instance (typically generating figures), together with the 
-tasks on which they depend (typically processing raw data, training 
-neural networks, calculating evaluation metrics, ...).
+`config` object (these tasks typically generate figures), together with
+the tasks on which they depend (typically processing raw data, training neural
+networks, calculating evaluation metrics, ...).
 
 Task dependency resolution and scheduling is outsourced to the
 [Luigi](https://luigi.readthedocs.io) Python package.
