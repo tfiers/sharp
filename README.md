@@ -32,40 +32,46 @@ Also see the [_Usage_](#Usage) section below.
 
 *(Also see the installation __Notes__ below).*
 
-### 1. Requirements
+### 1. Download
+
+Clone this repository to your computer (e.g. to a directory `~/code/sharp` as
+in this example):
+```sh
+$ git clone git@github.com:tfiers/sharp.git ~/code/sharp
+```
+
+### 2. Dependencies
 
 The software is written in Python 3.7, and requires recent installations of
 [SciPy](https://scipy.org/) and [PyTorch](https://pytorch.org/).
 These are most easily installed with the [(mini)conda package manager](https://conda.io/docs/index.html).
 
-When these dependencies are installed, clone this repository to your computer
-(e.g. to a directory `~/code/sharp` as in this example):
-```sh
-$ git clone git@github.com:tfiers/sharp.git ~/code/sharp
-```
-
-Then, install custom-made dependencies from their respective git repositories:
+Next, install the required packages that are not publicly available on
+[PyPI](https://pypi.org/):
 ```sh
 ~/code/sharp$  pip install -r requirements.txt
 ```
+(This will fetch them automatically from their 
+respective git repositories).
 
 > For now the dependency `fklab-python-core` is closed source, and needs to be
-installed manually. Request access to its git repository by contacting
-[Kloosterman Lab](https://kloostermanlab.org/). Clone the repository and enter
-its directory, and install with `pip install .`. Verify that it is installed
-correctly by trying `import fklab` in Python. See also the notes below.
+downloaded and installed manually. Request access to its git repository by
+contacting [Kloosterman Lab](https://kloostermanlab.org/). Clone the
+repository, enter its directory, and install with `pip install .`. Verify that
+it is installed correctly by trying `import fklab` in Python. See also the
+notes below.
 
 
-### 2. Install
+### 3. Install
 
 Next, install this package (and its dependencies that are publicly available on
-[PyPI](https://pypi.org/)):
+PyPI):
 ```sh
 ~/code/sharp$  pip install -e .
 ```
 
 
-### 3. Test
+### 4. Test
 
 You can verify whether the installation was succesful by running Python and
 trying:
