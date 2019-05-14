@@ -9,50 +9,60 @@ from os import environ
 from pathlib import Path
 from sys import path
 
-from sharp.config.spec import CONFIG_DIR_ENV_VAR, SharpConfigBase, config_dir
+from sharp.config.spec import CONFIG_DIR_ENV_VAR, SharpConfig, config_dir
 from sharp.config.types import ConfigError
 from sharp.config.util import normalize, validate
 
 path.insert(0, str(config_dir))
 
 try:
-    # Try importing from a file named `config.py`.
-    #
-    # Instruction for the PyCharm editor:
-    # noinspection PyUnresolvedReferences
-    from config import SharpConfig
+    # Try importing an object named `config` from a file named `config.py`:
+    from config import config
+
 except ModuleNotFoundError as err:
     if CONFIG_DIR_ENV_VAR in environ:
         msg = (
-            f"Could not find file `config.py` in the directory set by the "
-            f"{CONFIG_DIR_ENV_VAR} environment variable (which is {config_dir})."
+            f"Could not find file `config.py` in the directory set by the"
+            f" {CONFIG_DIR_ENV_VAR} environment variable (which is {config_dir})."
         )
     else:
         msg = (
-            f"Could not find file `config.py` in the directory where the "
-            f"`python` process is run from ({config_dir}). You can specify an "
-            f"explicit directory to look for a `config.py` file by setting the "
-            f"{CONFIG_DIR_ENV_VAR} environment variable."
+            f"Could not find file `config.py` in the directory where the"
+            f" `python` process is run from ({config_dir}). You can specify an"
+            f" explicit directory to look for a `config.py` file by setting the"
+            f" {CONFIG_DIR_ENV_VAR} environment variable."
         )
     raise ConfigError(msg) from err
 except ImportError as err:
     raise ConfigError(
-        "Your custom `config.py` must define a class named `SharpConfig`."
+        "Your custom `config.py` file must define an object named `config`."
+        " See the 'Usage' section from the main README for details."
     ) from err
+except TypeError as err:
+    raise ConfigError(
+        "Your custom `config` object could not be initialized."
+        " See preceding exception for details."
+    ) from err
+
+if not isinstance(config, SharpConfig):
+    raise ConfigError(
+        "Your custom `config` object must be an instance of the `SharpConfig`"
+        " class from `sharp.config.spec`."
+        " See the 'Usage' section from the main README for details."
+    )
 
 try:
-    # A global config object, for use in any Task:
-    config: SharpConfigBase = SharpConfig()
     validate(config)
-    normalize(config)
 except Exception as err:
     raise ConfigError(
-        "Could not initialise config.SharpConfig. "
-        "See preceding exception for details."
+        "Your custom `config` object is not to specification."
+        " See preceding exception for details."
     ) from err
 
 
-# Some more global config objects
+# Define some globally usable config objects, for use in any task:
+
+config = normalize(config)
 output_root: Path = config.output_dir
 shared_output_root: Path = config.shared_output_dir
 intermediate_output_dir: Path = output_root / "intermediate"

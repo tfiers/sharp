@@ -1,8 +1,8 @@
-from abc import ABC
+from dataclasses import dataclass, field
 from itertools import product
 from os import environ
 from pathlib import Path
-from typing import Iterable, Optional, Sequence, Tuple, Union
+from typing import Callable, Iterable, Optional, Sequence, Tuple, Union
 
 from numpy import linspace
 
@@ -14,25 +14,27 @@ CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 config_dir = Path(environ.get(CONFIG_DIR_ENV_VAR, ".")).expanduser().resolve()
 
 
-class SharpConfigBase(ABC):
+def get_default_tasks():
     """
-    Overwrite `get_tasks` and any or all properties, to change the default
-    configuration.
+    Return instantiated tasks, which will be passed to luigi.build().
+    The necessary import statements should be contained in this method's
+    body (not at the top of the config.py file). This avoids circular
+    imports (see config/README.md).
+
+    Developer note: should not be called before the `sharp.config.load`
+    script has run (e.g. after an object from it is imported).
     """
+    import sharp.config.default.tasks as default_tasks
 
-    def get_tasks(self) -> Union[LuigiTask, Iterable[LuigiTask]]:
-        """
-        Return instantiated tasks, which will be passed to luigi.build().
-        The necessary import statements should be contained in this method's
-        body (not at the top of the config.py file). This avoids circular
-        imports (see config/README.md).
-        
-        Developer note: should not be called before the `sharp.config.load`
-        script has run (e.g. after an object from it is imported).
-        """
-        import sharp.config.default.tasks as default_tasks
+    return default_tasks.tasks_to_run
 
-        return default_tasks.tasks_to_run
+
+@dataclass
+class SharpConfig:
+
+    get_tasks: Callable[
+        [], Union[LuigiTask, Iterable[LuigiTask]]
+    ] = get_default_tasks
 
     #
     # Data settings
@@ -61,7 +63,7 @@ class SharpConfigBase(ABC):
     # Logging and Luigi worker config
     # -----------------
 
-    logging: ConfigDict = LOGGING_CONFIG
+    logging: ConfigDict = field(default_factory=lambda: LOGGING_CONFIG)
 
     luigi_scheduler_host: str = "nerfcluster-fs"
     # Hostname where the remote luigi task scheduler is running (useful when
@@ -79,10 +81,10 @@ class SharpConfigBase(ABC):
 
     mult_detect_ripple = tuple(linspace(0.4, 4, num=7))
     mult_detect_SW = tuple(linspace(0.9, 5, num=7))
-    make_reference_args = [
+    make_reference_args = tuple(
         dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
         for mult_SW, mult_ripple in product(mult_detect_SW, mult_detect_ripple)
-    ]
+    )
 
     # lockout_time: float = 34e-3
     lockout_time: float = 60e-3
@@ -110,7 +112,7 @@ class SharpConfigBase(ABC):
     #  - common set last event = 161 / 2040 = 0.0789
     #  - last labeller last event = 860 / 2040 = 0.4216
 
-    time_ranges: Sequence[Tuple[float, float]] = [
+    time_ranges: Sequence[Tuple[float, float]] = (
         (107.2, 107.8),
         # (107.69, 107.79),  # Zoom-in
         (107.33, 107.45),  # Zoom-in
@@ -124,7 +126,7 @@ class SharpConfigBase(ABC):
         (183.06, 184.5),
         (343.36, 344.3),  # nah, too weak SWs
         (183.09, 183.84),  # nice early RNN. Take me.
-    ]
+    )
     # Segments of data to use for time-range plots. In seconds, relative to the
     # start of the evaluation (AKA test) slice.
 

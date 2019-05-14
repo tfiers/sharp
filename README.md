@@ -92,39 +92,39 @@ directory.)
 
 ### 2. Configuration
 
-In the new directory, create a file named `config.py`, containing a class named
-`SharpConfig` that subclasses `SharpConfigBase` from [`sharp.config.spec`](sharp/config/spec.py).
-Change some or all of the parent class attributes to suit your needs.
+In the new directory, create a file named `config.py`, and define an object
+named `config`, as an instance of [`SharpConfig`](sharp/config/spec.py).
+Change some or all of the default attributes to suit your needs.
 
 Example (`~/sharp-run/config.py`):
 ```py
-from sharp.config.spec import SharpConfigBase
+from sharp.config.spec import SharpConfig
 
-class SharpConfig(SharpConfigBase):
-
-    output_dir = "subdir/of/your/sharp_config_dir"
-    shared_output_dir = "D:\\data\\sharp-shared\\"
-    
-    config_id = "deep-RNN"
-    num_layers = 5
-    num_units_per_layer = 16
+config = SharpConfig(
+    output_dir = "subdir/of/your/sharp_config_dir",
+    shared_output_dir = "D:\\data\\sharp-shared\\",
+    config_id = "deep-RNN",
+    num_layers = 8,
+    num_units_per_layer = 16,
+)
 ```
 
 > On Windows, make sure to either use forward slashes in paths, or to escape
 backslashes.
 
 See the test [`config.py`](tests/system/config.py) file from this repository
-for a more elaborate example, including raw input file configuration.
+for a more elaborate example, including specifying the location of raw input
+files.
 
 
 ### 3. Running tasks
 
-When the `config.py` file is ready, run:
+When your `config.py` file is ready, run:
 ```sh
 ~/sharp-run$  python -m sharp --local-scheduler
 ```
 This will run the tasks specified in the `get_tasks` method of your 
-`SharpConfig` class (typically generating figures), together with the 
+`SharpConfig` instance (typically generating figures), together with the 
 tasks on which they depend (typically processing raw data, training 
 neural networks, calculating evaluation metrics, ...).
 
@@ -140,8 +140,8 @@ $ python -m sharp --help
 
 ### 4. Parallelization
 
-To run subtasks in parallel, a central Luigi task scheduler should be used
-instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
+To run tasks in parallel, a central Luigi task scheduler should be used instead
+of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
 for instructions.
 
 When the central scheduler is running, and when you have correctly set the
@@ -149,4 +149,6 @@ When the central scheduler is running, and when you have correctly set the
 ```sh
 $ python -m sharp
 ```
-processes.
+processes, where the `SHARP_CONFIG_DIR` environment variable (or if not set,
+the current working directory) specifies which configuration this worker will
+use.
