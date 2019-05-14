@@ -153,8 +153,8 @@ This will run the tasks specified in the `get_tasks` method of your
 the tasks on which they depend (typically processing raw data, training neural
 networks, calculating evaluation metrics, ...).
 
-Task dependency resolution and scheduling is outsourced to the
-[Luigi](https://luigi.readthedocs.io) Python package.
+`sharp` internally outsources task dependency resolution and scheduling to
+the [Luigi](https://luigi.readthedocs.io) Python package.
 
 
 Show CLI documentation with:
