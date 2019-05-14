@@ -7,24 +7,32 @@
 Software written for my [master's thesis](https://github.com/tfiers/master-thesis) 
 and for the related [journal paper](https://github.com/tfiers/neural-network-paper).
 
+This code takes raw neural recordings as input, and generates the figures found
+in the papers (and more) as output. In between, it processes the raw
+recordings, trains neural networks, calculates detection performance metrics,
+etc.
+
 The name of this Python package, `sharp`, comes from the _sharp wave-ripple_,
-the electrical brain motif related to memories and learning that is studied 
-in the thesis.
+the electrical brain motif related to memories and learning that is studied
+in the thesis and the paper. More specifically, we seek to find new real-time
+algorithms that make earlier online sharp wave-ripple detections.
 
 
 ## Documentation
 
 README's are provided for most sub-packages,
 and docstrings are provided for most modules, classes, and methods.
-
 Care is taken to organize the code, and to name objects in a logical way.
 
-Also see the _Usage_ section below.
+Also see the [_Usage_](#Usage) section below.
+
 
 
 ## Installation
 
 *(Also see the installation __Notes__ below).*
+
+### 1. Requirements
 
 The software is written in Python 3.7, and requires recent installations of
 [SciPy](https://scipy.org/) and [PyTorch](https://pytorch.org/).
@@ -47,10 +55,17 @@ installed manually. Request access to its git repository by contacting
 its directory, and install with `pip install .`. Verify that it is installed
 correctly by trying `import fklab` in Python. See also the notes below.
 
-Next, install this package (and its dependencies from [PyPI](https://pypi.org/)):
+
+### 2. Install
+
+Next, install this package (and its dependencies that are publicly available on
+[PyPI](https://pypi.org/)):
 ```sh
 ~/code/sharp$  pip install -e .
 ```
+
+
+### 3. Test
 
 You can verify whether the installation was succesful by running Python and
 trying:
@@ -58,7 +73,8 @@ trying:
 import sharp
 ```
 
-#### Notes
+
+### Notes
 
 - This installation procedure has been tested on Windows 10 and Ubuntu 16.04.
 - If no GPU acceleration is desired, the significantly smaller CPU-only 
@@ -92,9 +108,9 @@ directory.)
 
 ### 2. Configuration
 
-In the new directory, create a file named `config.py`, and define an object
-named `config`, as an instance of [`SharpConfig`](sharp/config/spec.py).
-Change some or all of the default attributes to suit your needs.
+In the new directory, create a file named `config.py`, and create a new instance
+of [`SharpConfig`](sharp/config/spec.py) named "`config`". Change some or all of 
+the default attributes to suit your needs.
 
 Example (`~/sharp-run/config.py`):
 ```py
@@ -138,14 +154,14 @@ $ python -m sharp --help
 ```
 
 
-### 4. Parallelization
+### Parallelization
 
 To run tasks in parallel, a central Luigi task scheduler should be used instead
 of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
 for instructions.
 
 When the central scheduler is running, and when you have correctly set the
-`luigi_scheduler_host` setting in your `config.py` file, simply start multiple
+`luigi_scheduler_host` setting in your `config.py` file(s), simply start multiple
 ```sh
 $ python -m sharp
 ```
