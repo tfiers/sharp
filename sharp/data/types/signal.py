@@ -1,7 +1,9 @@
 from typing import Iterable, Sequence
 
-from fklab.segments import Segment
 from numpy import array, asarray, diff, linspace, ndarray, stack
+
+from fklab.segments import Segment
+from sharp.util.misc import format_duration
 from sharp.data.types.aliases import ArrayLike
 from sharp.tasks.signal.util import time_to_index
 
@@ -52,15 +54,7 @@ class Signal(ndarray):
     @property
     def duration_pretty(self) -> str:
         """ Length of signal, in human-readable format. """
-        seconds = self.duration
-        if seconds < 1:
-            return f"{seconds * 1e3:.3g} ms"
-        elif seconds < 60:
-            return f"{seconds:.3g} seconds"
-        elif seconds < 120:
-            return f"1 minute, {seconds % 60:.1f} seconds"
-        else:
-            return f"{seconds // 60:g} minutes, {seconds % 60:.1f} seconds"
+        return format_duration(self.duration)
 
     def as_matrix(self) -> "Signal":
         if self.ndim == 1:

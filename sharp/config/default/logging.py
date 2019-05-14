@@ -1,13 +1,37 @@
-MSG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s: %(message)s"
+from datetime import datetime
+from logging import Formatter, LogRecord
+from os import getenv
+from socket import gethostname
+
+from sharp.util.misc import format_duration
+
+hostname = gethostname()
+node_nr = getenv("SLURM_NODEID")
+
+LONG_MODULE_NAME = "sharp.data.hardcoded.filters.literature"
+
+
+class ClusterFormatter(Formatter):
+    def format(self, r: LogRecord):
+        rel_time = format_duration(r.relativeCreated / 1000, ms_digits=3)
+        metadata = (
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}",
+            rel_time,
+            f"{r.name: ^{len(LONG_MODULE_NAME)}}",
+        )
+        if node_nr is not None:
+            metadata += (hostname, f"node {node_nr:03d}")
+        return f"[  {'  |  '.join(metadata)}  ]\n{r.levelname}:\n{r.getMessage()}\n\n"
+
+
+lambda get_formatter: ClusterFormatter()
+
 
 LOGGING_CONFIG = dict(
     version=1,
     disable_existing_loggers=False,
     formatters={
-        "standard": {"format": MSG_FORMAT},
-        "time_only": {"format": MSG_FORMAT, "datefmt": "%H:%M:%S"},
-        # When using the "time_only" formatter, make sure to log the full date
-        # at the start of the log.
+        "cluster": {"()": "sharp.config.default.logging.get_formatter"}
     },
     root={
         # Root logger neds to be specified separately.
@@ -41,20 +65,20 @@ LOGGING_CONFIG = dict(
             # get an ugly red background for luigi output in PyCharm or
             # Jupyter.
             "stream": "ext://sys.stdout",
-            "formatter": "standard",
+            "formatter": "cluster",
         },
         "file_luigi": {
             "class": "logging.FileHandler",
             "filename": "luigi.log",
             "mode": "a",
-            "formatter": "standard",
+            "formatter": "cluster",
         },
         # Mode 'w' clears existing file. Mode 'a' appends.
         "file_sharp": {
             "class": "logging.FileHandler",
             "filename": "sharp.log",
             "mode": "a",
-            "formatter": "standard",
+            "formatter": "cluster",
         },
     },
 )
