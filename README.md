@@ -18,6 +18,8 @@ in the thesis and the paper. More specifically, we seek to find new real-time
 algorithms that make earlier online sharp wave-ripple detections.
 
 
+<br>
+
 ## Documentation
 
 README's are provided for most sub-packages,
@@ -27,6 +29,7 @@ Care is taken to organize the code, and to name objects in a logical way.
 Also see the [_Usage_](#Usage) section below.
 
 
+<br>
 
 ## Installation
 
@@ -92,6 +95,7 @@ import sharp
   and remove the line `ext_modules = [radon_ext]` in the `setup()` call.
 
 
+<br>
 
 ## Usage
 
