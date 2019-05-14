@@ -1,11 +1,11 @@
-msg_format = "%(asctime)s | %(name)s | %(levelname)s: %(message)s"
+MSG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s: %(message)s"
 
 LOGGING_CONFIG = dict(
     version=1,
     disable_existing_loggers=False,
     formatters={
-        "standard": {"format": msg_format},
-        "time_only": {"format": msg_format, "datefmt": "%H:%M:%S"},
+        "standard": {"format": MSG_FORMAT},
+        "time_only": {"format": MSG_FORMAT, "datefmt": "%H:%M:%S"},
         # When using the "time_only" formatter, make sure to log the full date
         # at the start of the log.
     },

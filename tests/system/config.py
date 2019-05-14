@@ -6,7 +6,7 @@ from sharp.config.types import RecordingFileID
 
 config = SharpConfig(
     # [Data]
-    raw_data_paths=(
+    raw_data=(
         RecordingFileID(
             rat=2, day=5, probe="D29", path=Path("data/raw/sig.moz")
         ),

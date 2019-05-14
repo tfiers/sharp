@@ -19,7 +19,7 @@ class PrintFileSizes(SharpTask):
         return DictFile(final_output_dir, "file sizes")
 
     def work(self):
-        rec_files = config.raw_data_paths
+        rec_files = config.raw_data
         file_sizes_GB = [r.path.stat().st_size / 1e9 for r in rec_files]
         out_dict = {
             f"{rec_file} ({rec_file.path})": f"{size:.1f} GB"

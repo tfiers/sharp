@@ -9,7 +9,7 @@ from sharp.config.types import RecordingFileID
 @dataclass(frozen=True)
 class RawDataPathPart:
     ID: Any
-    path_part: str = ""
+    partial_path: str = ""
 
 
 class Rat(RawDataPathPart):
@@ -27,13 +27,14 @@ class File(RawDataPathPart):
 def P1_dat_file(date: str, probe_name: str) -> File:
     return File(
         ID=probe_name,
-        path_part=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
+        partial_path=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
     )
 
 
 def P2_dat_file(probe_name: str) -> File:
     return File(
-        ID=probe_name, path_part=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat"
+        ID=probe_name,
+        partial_path=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat",
     )
 
 
@@ -175,7 +176,9 @@ flat_recordings_list = tuple(
         rat.ID,
         day.ID,
         file.ID,
-        path=Path(rat.path_part) / Path(day.path_part) / Path(file.path_part),
+        path=Path(rat.partial_path)
+        / Path(day.partial_path)
+        / Path(file.partial_path),
     )
     for rat, day_dict in raw_data_paths.items()
     for day, files in day_dict.items()

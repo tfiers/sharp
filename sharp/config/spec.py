@@ -30,7 +30,7 @@ class SharpConfig:
     # Data settings
     # -------------
 
-    raw_data_paths: Sequence[RecordingFileID] = flat_recordings_list
+    raw_data: Sequence[RecordingFileID] = flat_recordings_list
 
     output_dir: str = "output"
     # Path to a directory where the code may store processed data and output

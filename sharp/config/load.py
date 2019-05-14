@@ -41,6 +41,7 @@ except ImportError as err:
 except TypeError as err:
     raise ConfigError(
         "Your custom `config` object could not be initialized."
+        " One of the specified options / arguments may have a wrong name."
         " See preceding exception for details."
     ) from err
 

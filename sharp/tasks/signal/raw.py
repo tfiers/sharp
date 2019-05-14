@@ -40,5 +40,5 @@ class CheckWhetherAllRawRecordingsExist(WrapperTask):
     def requires(self):
         return (
             RawRecording_ExistenceCheck(file_ID=rec_file)
-            for rec_file in config.raw_data_paths
+            for rec_file in config.raw_data
         )
