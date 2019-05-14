@@ -73,7 +73,7 @@ import sharp
 
 ## Usage
 
-### 1. Configuration
+### 1. Working directory
 
 Create a new directory to store run configuration, logs, and (optionally) output
 files:
@@ -88,6 +88,9 @@ $ export SHARP_CONFIG_DIR=~/sharp-run
 ```
 (This is not necessary if you will always run `sharp` from within this new
 directory.)
+
+
+### 2. Configuration
 
 In the new directory, create a file named `config.py`, containing a class named
 `SharpConfig` that subclasses `SharpConfigBase` from [`sharp.config.spec`](sharp/config/spec.py).
@@ -107,28 +110,35 @@ class SharpConfig(SharpConfigBase):
     num_units_per_layer = 16
 ```
 
-See the test [`config.py`](tests/system/config.py) file from this repository
-for a more elaborate example, including raw input file configuration.
-
 > On Windows, make sure to either use forward slashes in paths, or to escape
 backslashes.
 
+See the test [`config.py`](tests/system/config.py) file from this repository
+for a more elaborate example, including raw input file configuration.
 
-### 2. Running tasks
 
-When the `config.py` file is ready, process the raw data and generate figures
-and other output, by running:
+### 3. Running tasks
+
+When the `config.py` file is ready, run:
 ```sh
 ~/sharp-run$  python -m sharp --local-scheduler
 ```
+This will run the tasks specified in the `get_tasks` method of your 
+`SharpConfig` class (typically generating figures), together with the 
+tasks on which they depend (typically processing raw data, training 
+neural networks, calculating evaluation metrics, ...).
 
-Show command documentation with:
+Task dependency resolution and scheduling is outsourced to the
+[Luigi](https://luigi.readthedocs.io) Python package.
+
+
+Show CLI documentation with:
 ```sh
 $ python -m sharp --help
 ```
 
 
-### 3. Parallelization
+### 4. Parallelization
 
 To run subtasks in parallel, a central Luigi task scheduler should be used
 instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
@@ -136,4 +146,7 @@ for instructions.
 
 When the central scheduler is running, and when you have correctly set the
 `luigi_scheduler_host` setting in your `config.py` file, simply start multiple
-`python -m sharp` processes.
+```sh
+$ python -m sharp
+```
+processes.
