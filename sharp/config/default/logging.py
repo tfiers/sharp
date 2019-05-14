@@ -6,7 +6,8 @@ from socket import gethostname
 from sharp.util.misc import format_duration
 
 hostname = gethostname()
-node_nr = getenv("SLURM_NODEID")
+node_ID = getenv("SLURM_NODEID")
+task_ID = getenv("SLURM_LOCALID")
 
 LONG_MODULE_NAME = "sharp.data.hardcoded.filters.literature"
 
@@ -19,12 +20,12 @@ class ClusterFormatter(Formatter):
             rel_time,
             f"{r.name: ^{len(LONG_MODULE_NAME)}}",
         )
-        if node_nr is not None:
-            metadata += (hostname, f"node {node_nr:03d}")
+        if node_ID is not None:
+            metadata += (f"worker {node_ID}.{int(task_ID):02d}",)
         return f"[  {'  |  '.join(metadata)}  ]\n{r.levelname}:\n{r.getMessage()}\n\n"
 
 
-lambda get_formatter: ClusterFormatter()
+get_formatter = lambda: ClusterFormatter()
 
 
 LOGGING_CONFIG = dict(
