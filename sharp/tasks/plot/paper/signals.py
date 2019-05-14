@@ -26,10 +26,10 @@ class PlotSignals(FigureMaker):
         return (rm,) + sweepers
 
     def output(self):
-        return self._outputs
+        return self.outputs
 
     @property
-    def _outputs(self) -> Sequence[FigureTarget]:
+    def outputs(self) -> Sequence[FigureTarget]:
         return [
             FigureTarget(output_dir, f"signals {trange[0]:.2f}")
             for trange in config.time_ranges
@@ -40,7 +40,7 @@ class PlotSignals(FigureMaker):
         axheights = ones(nrows)
         axheights[0] = 2
         axheights[1:3] = 0.84
-        for trange, output in zip(config.time_ranges, self._outputs):
+        for trange, output in zip(config.time_ranges, self.outputs):
             log.info(f"Generating figure {output.filename}")
             fig, axes = subplots(
                 nrows=nrows,

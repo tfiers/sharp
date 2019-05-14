@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List
 
 from luigi import Target, Task
@@ -32,31 +32,38 @@ class SharpTask(Task, ABC):
         completed.
         """
         return all(
-            dependency.complete() for dependency in self._dependencies
-        ) and all(output.exists() for output in self._outputs)
+            dependency.complete() for dependency in self.dependencies
+        ) and all(output.exists() for output in self.outputs)
 
     def run(self):
         self.work()
         self.complete.cache_clear()
 
+    @abstractmethod
     def work(self):
-        pass
+        """
+        Read input file(s) (i.e. outputs of required tasks), process the data,
+        and write output file(s).
+        """
 
     @property
-    def _dependencies(self) -> List[Task]:
+    def dependencies(self) -> List[Task]:
         return flatten(self.requires())
 
     @property
-    def _outputs(self) -> List[Target]:
+    def outputs(self) -> List[Target]:
         return flatten(self.output())
 
 
-class ExternalTask(SharpTask):
+class WrapperTask(SharpTask):
     """
-    Makes sure external dependencies exist.
+    A task that does no work itself, but only requires other tasks, like when
+    many tasks should be triggerde, or the existence of external input files
+    checked.
     """
 
-    work = None
+    def work(self):
+        pass
 
 
 class CustomParameter(Parameter):

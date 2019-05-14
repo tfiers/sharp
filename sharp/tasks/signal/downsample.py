@@ -4,7 +4,7 @@ from fklab.signals.multirate import decimate_chunkwise
 from sharp.config.load import config, shared_output_root
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
-from sharp.tasks.base import SharpTask
+from sharp.tasks.base import WrapperTask
 from sharp.tasks.signal.raw import (
     RawRecording_ExistenceCheck,
     SingleRecordingFileTask,
@@ -43,7 +43,7 @@ class DownsampleRawRecording(SingleRecordingFileTask):
         self.output().write(Signal(signal_down, fs_new))
 
 
-class DownsampleAllRecordings(SharpTask):
+class DownsampleAllRecordings(WrapperTask):
     output_dir = shared_output_root
 
     def requires(self):

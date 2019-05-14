@@ -1,14 +1,14 @@
 from logging import getLogger
 
 from sharp.config.load import config
+from sharp.config.types import RecordingFileID
 from sharp.data.files.raw_data import (
     RawDATFile,
     RawKwikFile,
     RawRecording,
     TahitiFile,
 )
-from sharp.config.types import RecordingFileID
-from sharp.tasks.base import CustomParameter, ExternalTask, SharpTask
+from sharp.tasks.base import CustomParameter, SharpTask, WrapperTask
 
 log = getLogger(__name__)
 
@@ -17,7 +17,7 @@ class SingleRecordingFileTask(SharpTask):
     file_ID: RecordingFileID = CustomParameter()
 
 
-class RawRecording_ExistenceCheck(ExternalTask, SingleRecordingFileTask):
+class RawRecording_ExistenceCheck(SingleRecordingFileTask, WrapperTask):
     def output(self) -> RawRecording:
         path = self.file_ID.path
         filename, extension = path.name.split(".", 1)
@@ -36,7 +36,7 @@ class RawRecording_ExistenceCheck(ExternalTask, SingleRecordingFileTask):
         return FileClass(directory=path.parent, filename=filename)
 
 
-class CheckWhetherAllRawRecordingsExist(SharpTask):
+class CheckWhetherAllRawRecordingsExist(WrapperTask):
     def requires(self):
         return (
             RawRecording_ExistenceCheck(file_ID=rec_file)
