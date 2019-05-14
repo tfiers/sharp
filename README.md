@@ -73,6 +73,7 @@ import sharp
 
 ## Usage
 
+### 1. Configuration
 
 Create a new directory to store run configuration, logs, and (optionally) output
 files:
@@ -90,21 +91,33 @@ directory.)
 
 In the new directory, create a file named `config.py`, containing a class named
 `SharpConfig` that subclasses `SharpConfigBase` from [`sharp.config.spec`](sharp/config/spec.py).
-Change some or all of the parent attributes to suit your needs.
+Change some or all of the parent class attributes to suit your needs.
 
-See the test [`config.py`](tests/system/config.py) file from this repository
-for an example.
+Example (`~/sharp-run/config.py`):
+```py
+from sharp.config.spec import SharpConfigBase
 
-> On Windows, make sure to either use forward slashes in paths, or to escape
-backslashes. Examples:
-```toml
-raw_data_dir = "D:/data/probe/L2"
-output_dir = "subdir/of/current/working/directory"
-logging_conf_file = "D:\\code\\sharp\\logging.cfg"
+class SharpConfig(SharpConfigBase):
+
+    output_dir = "subdir/of/your/sharp_config_dir"
+    shared_output_dir = "D:\\data\\sharp-shared\\"
+    
+    config_id = "deep-RNN"
+    num_layers = 5
+    num_units_per_layer = 16
 ```
 
+See the test [`config.py`](tests/system/config.py) file from this repository
+for a more elaborate example, including raw input file configuration.
+
+> On Windows, make sure to either use forward slashes in paths, or to escape
+backslashes.
+
+
+### 2. Running tasks
+
 When the `config.py` file is ready, process the raw data and generate figures
-and other output by running:
+and other output, by running:
 ```sh
 ~/sharp-run$  python -m sharp --local-scheduler
 ```
@@ -114,7 +127,8 @@ Show command documentation with:
 $ python -m sharp --help
 ```
 
-#### Parallelization
+
+### 3. Parallelization
 
 To run subtasks in parallel, a central Luigi task scheduler should be used
 instead of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
