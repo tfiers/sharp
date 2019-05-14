@@ -54,8 +54,7 @@ Next, install the required packages that are not publicly available on
 ```sh
 ~/code/sharp$  pip install -r requirements.txt
 ```
-(This will fetch them automatically from their 
-respective git repositories).
+This will fetch them automatically from their respective git repositories.
 
 > For now the dependency `fklab-python-core` is closed source, and needs to be
 downloaded and installed manually. Request access to its git repository by
@@ -67,8 +66,8 @@ notes below.
 
 ### 3. Install
 
-Next, install this package (and its dependencies that are publicly available on
-PyPI):
+Next, install the `sharp` package (and its dependencies that are publicly 
+available on PyPI):
 ```sh
 ~/code/sharp$  pip install -e .
 ```
