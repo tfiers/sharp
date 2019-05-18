@@ -1,172 +1,121 @@
-from dataclasses import dataclass, field
-from itertools import product
-from os import environ
-from pathlib import Path
+from dataclasses import dataclass
 from typing import Callable, Optional, Sequence, Tuple
 
-from numpy import linspace
-
-from sharp.config.default.logging import LOGGING_CONFIG
-from sharp.config.default.raw_data import flat_recordings_list
-from sharp.config.default.tasks import get_default_tasks
 from sharp.config.types import ConfigDict, OneOrMoreLuigiTasks, RecordingFileID
 
-CONFIG_DIR_ENV_VAR = "SHARP_CONFIG_DIR"
 
-config_dir_str = environ.get(CONFIG_DIR_ENV_VAR, ".")
-config_dir = Path(config_dir_str).expanduser().resolve()
+CONFIG_FILENAME = "config.py"
 
 
 @dataclass
 class SharpConfig:
+    # (Instruction for the PyCharm code editor, who can't handle dataclass
+    # docstring yet).
+    # noinspection PyUnresolvedReferences
+    """
+    :param get_tasks:  Return instantiated tasks, which will be passed to
+            luigi.build(). The necessary import statements should be contained
+            in this method's body (not at the top of the config.py file). This
+            avoids circular imports (see config/README.md).
+    
+    :param raw_data:  A list of RecordingFiles.
+    :param output_dir:  Path to a directory where the code may store processed
+            data and output figures. Absolute path, or path relative to the
+            config dir (where your "config.py" resides).
+    :param shared_output_dir: Absolute path to a directory where the code may
+            store processed data that is shared between different run
+            configurations; i.e. data for which these different "config.py"
+            files have the same values for all relevant options.
+    
+    :param fs_target:  Target sampling frequency after downsampling. In hertz.
+    
+    :param bitmap_versions:  If True, save PNG versions of figures, in addition
+            to the PDF versions.
+            
+    :param logging:  A logging configuration passed to logging.dictConfig.
+    
+    :param luigi_scheduler_host:  Hostname where the remote luigi task scheduler
+            is running (for when running multiple workers in parallel).
+    :param config_id:  This setting allows to run multiple pipelines (each with
+            a different config.py file) in parallel. Each such pipeline / config
+            file corresponds to a different `config_id`. Default: name of parent
+            directory of "config.py" file.
 
-    get_tasks: Callable[[], OneOrMoreLuigiTasks] = get_default_tasks
-    # Return instantiated tasks, which will be passed to luigi.build(). The
-    # necessary import statements should be contained in this method's body
-    # (not at the top of the config.py file). This avoids circular imports (see
-    # config/README.md).
+    :param mult_detect_ripple
+    :param mult_detect_SW
+    
+    :param lockout_time:  In seconds.
 
-    #
-    # Data settings
-    # -------------
+    :param num_thresholds: Event detectioms are threshold crossings of an
+            algorithm's output envelope, given that a certain "lockout" time
+            has passed after the previous detection. This lockout time is based
+            on the durations of all SWR events, namely the given percentile of
+            durations. See ThresholdSweep.at_recall()
+    
+    :param train_fraction: Border between training and testing data, as a
+            fraction of total signal duration.
+    :param train_first:  Whether the training data comes before the test data or
+            not.
+    
+    :param eval_start_extension:  How many seconds to extend the leading edge of
+            reference SWR segments with when evaluating detections. Allows
+            early detections (i.e. shortly before the reference segment starts)
+            to count as correct detections.
+    :param num_layers:  .. for the RNN
+    :param num_units_per_layer
+    :param chunk_duration:  Length of a chunk used in RNN training, in seconds.
+            Network weights are updated after each chunk of training data has
+            been processed.
+    :param p_dropout:  Probability that a random hidden unit's activation is set
+            to 0 during a training step. Should improve generalisation
+            performance. Only relevant for num_layers > = 2.
+    :param num_epochs:  How many times to pass over the training data when
+            training an RNN.
+    :param valid_fraction:  How much of the training data to use for validation
+            (estimation of generalisation performance -- to choose net of epoch
+            where this was maximal). The rest of the data is used for training
+            proper.
+    :param pos_weight:  When calculating the cost function for training the RNN,
+            weight applied to positive training samples, i.e. where the desired
+            output is "1" (SWR present). `pos_weight > 1` increases the recall,
+            `pos_weight < 1` increases the precision.
+    :param target_fullrect:  Shape of target function. Either variable-width
+            rectangles on full reference segments (target_fullrect == True), or
+            a fixed-width rectangle at refseg_start + [-target_start_pre,
+            +target_start_post].
+    :param target_start_pre
+    :param target_start_post
+    :param reference_seg_extension:  Reference segments are expanded at their
+            leading edge, by the given fraction of total segment duration (=
+            approximate SWR duration) before calculating the target signal.
+            This should encourage SWR 'prediction' in the optimisation
+            procedure.
+    """
 
-    raw_data: Sequence[RecordingFileID] = flat_recordings_list
-
-    output_dir: str = "output"
-    # Path to a directory where the code may store processed data and output
-    # figures. (Absolute path, or path relative to your custom `config.py`
-    # file; i.e. relative to the "SHARP_CONFIG_DIR" env var).
-
-    shared_output_dir: str = "/home/ratlab/tomas/data/shared"
-    # Absolute path to a directory where the code may store processed data
-    # that is shared between different run configurations; i.e. data for which
-    # these different config.py files have the same values for all relevant
-    # options.
-
-    fs_target: float = 1000
-    # Target sampling frequency after downsampling. In hertz.
-
-    bitmap_versions: bool = False
-    # If True, save PNG versions of figures, in addition to the PDF versions.
-
-    #
-    # Logging and Luigi worker config
-    # -----------------
-
-    logging: ConfigDict = field(default_factory=lambda: LOGGING_CONFIG)
-
-    luigi_scheduler_host: str = "nerfcluster-fs"
-    # Hostname where the remote luigi task scheduler is running (useful when
-    # running multiple workers in parallel).
-
-    #
-    # Main settings
-    # -----------------
-
-    config_id: Optional[str] = None
-    # This setting allows to run multiple pipelines (each with a different
-    # config.py file) in parallel. Each such pipeline / config file corresponds
-    # to a different `config_id`. By default, takes the value of the "sharp
-    # config dir" env var.
-
-    mult_detect_ripple = tuple(linspace(0.4, 4, num=7))
-    mult_detect_SW = tuple(linspace(0.9, 5, num=7))
-    make_reference_args = tuple(
-        dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
-        for mult_SW, mult_ripple in product(mult_detect_SW, mult_detect_ripple)
-    )
-
-    # lockout_time: float = 34e-3
-    lockout_time: float = 60e-3
-    # In seconds. Based on the 25-percentile refseg length lockout of earlier.
-
-    # lockout_percentile: float = 25
-    # Event detectios are threshold crossings of an algorithm's output
-    # envelope, given that a certain "lockout" time has passed after the
-    # previous detection. This lockout time is based on the durations of all
-    # SWR events, namely the given percentile of durations.
-
-    num_thresholds: int = 64
-
-    selected_recall: float = 0.8
-    # See ThresholdSweep.at_recall()
-
-    train_fraction: float = 0.6
-    # Border between training and testing data, as a fraction of total signal
-    # duration.
-    train_first: bool = True
-    # Whether the training data comes before the test data or not.
-
-    # Useful for choosing split boundary: relative timestamps of Kloosterman
-    # Lab scientists labelling L2 data ('labelface' web app):
-    #  - common set last event = 161 / 2040 = 0.0789
-    #  - last labeller last event = 860 / 2040 = 0.4216
-
-    time_ranges: Sequence[Tuple[float, float]] = (
-        (107.2, 107.8),
-        # (107.69, 107.79),  # Zoom-in
-        (107.33, 107.45),  # Zoom-in
-        (349.2, 349.8),  # Clean & strong ripples
-        (132.6, 133.2),  # Lotsa ripply & merging
-        # from plot/paper/signals.py:
-        (19.8, 20.8),
-        (606.4, 607.5),
-        (552.6, 553.2),  # early rnn ok visible. But one late SW
-        (369.14, 369.65),  # three clean SPWR, early SW. But RNN not convincing
-        (183.06, 184.5),
-        (343.36, 344.3),  # nah, too weak SWs
-        (183.09, 183.84),  # nice early RNN. Take me.
-    )
-    # Segments of data to use for time-range plots. In seconds, relative to the
-    # start of the evaluation (AKA test) slice.
-
-    eval_start_extension: float = 14 / 1000
-    # How many seconds to extend the leading edge of reference SWR segments
-    # with when evaluating detections. Allows early detections (i.e. shortly
-    # before the reference segment starts) to count as correct detections.
-
-    #
-    # RNN architecture
-    # ----------------
-    num_layers: int = 2
-    num_units_per_layer: int = 40
-    RNN_channel_combo_name: str = "all"
-
-    #
-    # RNN training settings
-    # -----------------
-
-    chunk_duration: float = 0.3
-    # Length of a chunk, in seconds. Network weights are updated after each
-    # chunk of training data has been processed.
-
-    p_dropout: float = 0.4
-    # Probability that a random hidden unit's activation is set to 0 during a
-    # training step. Should improve generalisation performance. Only relevant
-    # for num_layers >= 2.
-
-    num_epochs: int = 15
-    # How many times to pass over the training data when training an RNN.
-
-    valid_fraction: float = 0.22
-    # How much of the training data to use for validation (estimation of
-    # generalisation performance -- to choose net of epoch where this was
-    # maximal). The rest of the data is used for training proper.
-
-    pos_weight: float = 1.0
-    # When calculating the cost function for training the RNN, weight applied
-    # to positive training samples, i.e. where the desired output is "1" (SWR
-    # present). `pos_weight > 1` increases the recall, `pos_weight < 1`
-    # increases the precision.
-
-    target_fullrect: bool = False
-    target_start_pre: float = 14 / 1000
-    target_start_post: float = 25 / 1000
-    # Shape of target function. Either binary on full reference segments,
-    # or a rectangle at refseg_start + [-pre, +post].
-
-    reference_seg_extension: float = 0
-    # Reference segments are expanded at their leading edge, by the given
-    # fraction of total segment duration (= approximate SWR duration) before
-    # calculating the target signal. This should encourage SWR 'prediction' in
-    # the optimisation procedure.
+    get_tasks: Callable[[], OneOrMoreLuigiTasks]
+    raw_data: Sequence[RecordingFileID]
+    output_dir: str
+    shared_output_dir: str
+    fs_target: float
+    bitmap_versions: bool
+    logging: ConfigDict
+    luigi_scheduler_host: str
+    config_id: str
+    mult_detect_ripple: Tuple[float, ...]
+    mult_detect_SW: Tuple[float, ...]
+    lockout_time: float
+    num_thresholds: int
+    train_fraction: float
+    train_first: bool
+    eval_start_extension: float
+    num_layers: int
+    num_units_per_layer: int
+    chunk_duration: float
+    p_dropout: float
+    num_epochs: int
+    valid_fraction: float
+    pos_weight: float
+    target_fullrect: bool
+    target_start_pre: float
+    target_start_post: float
+    reference_seg_extension: float

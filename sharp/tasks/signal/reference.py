@@ -2,6 +2,7 @@
 Offline detection of sharp wave-ripple segments, for use as a reference to
 compare online detections against.
 """
+from itertools import product
 from typing import Optional, Tuple
 
 from luigi import FloatParameter
@@ -37,6 +38,15 @@ class MakeReference(SharpTask):
     SW_cutoff: float = 20  # Hz
 
     downsampler = DownsampleAllRecordings()
+
+    args = (
+        tuple(
+            dict(mult_detect_SW=mult_SW, mult_detect_ripple=mult_ripple)
+            for mult_SW, mult_ripple in product(
+                config.mult_detect_SW, config.mult_detect_ripple
+            )
+        ),
+    )
 
     def requires(self):
         return self.downsampler

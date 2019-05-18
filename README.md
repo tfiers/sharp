@@ -18,6 +18,9 @@ in the thesis and the paper. More specifically, we seek to find new real-time
 algorithms that make earlier online sharp wave-ripple detections.
 
 
+
+
+<br>
 <br>
 
 ## Documentation
@@ -29,6 +32,9 @@ Care is taken to organize the code, and to name objects in a logical way.
 Also see the [_Usage_](#Usage) section below.
 
 
+
+
+<br>
 <br>
 
 ## Installation
@@ -39,7 +45,7 @@ Also see the [_Usage_](#Usage) section below.
 
 Clone this repository to your computer (e.g. to a directory `~/code/sharp` as
 in this example):
-```sh
+```bash
 $ git clone git@github.com:tfiers/sharp.git ~/code/sharp
 ```
 
@@ -51,12 +57,12 @@ These are most easily installed with the [(mini)conda package manager](https://c
 
 Next, install the required packages that are not publicly available on
 [PyPI](https://pypi.org/):
-```sh
+```bash
 ~/code/sharp$  pip install -r requirements.txt
 ```
 This will fetch them automatically from their respective git repositories.
 
-> For now the dependency `fklab-python-core` is closed source, and needs to be
+> For now, the dependency `fklab-python-core` is closed source, and needs to be
 downloaded and installed manually. Request access to its git repository by
 contacting [Kloosterman Lab](https://kloostermanlab.org/). Clone the
 repository, enter its directory, and install with `pip install .`. Verify that
@@ -68,15 +74,35 @@ notes below.
 
 Next, install the `sharp` package (and its dependencies that are publicly 
 available on PyPI):
-```sh
+```bash
 ~/code/sharp$  pip install -e .
+```
+
+Optionally enable tab-autocompletion for `sharp` commands by adding the
+following line to your `.bashrc`:
+```sh
+. ~/code/sharp/sharp/cli/enable-autocomplete.sh
 ```
 
 
 ### 4. Test
 
-You can verify whether the installation was succesful by running Python and
-trying:
+You can verify whether the installation was succesful by trying on the command
+line:
+
+```bash
+$ sharp
+```
+
+A message starting with 
+```
+Usage: sharp <options> <command>
+```
+should appear.
+
+
+Another way to test is to run Python and try:
+
 ```py
 import sharp
 ```
@@ -89,91 +115,70 @@ import sharp
   version of PyTorch may be installed (i.e. `pytorch-cpu`, which corresponds 
   to `CUDA = None` on the PyTorch "get-started" page).
 - The installation of `fklab-python-core` might fail while trying to build its
-  `radonc` extension (especially on Windows). This extension is not used in my
-  thesis, and can be excluded from the install: edit `fklab-python-core/setup.py`, 
-  and remove the line `ext_modules = [radon_ext]` in the `setup()` call.
+  `radonc` extension (especially on Windows). This extension is not used in
+   sharp, and can be excluded from the install: edit `fklab-python-core/setup.py`,
+   and remove the line `ext_modules = [radon_ext]` in the `setup()` call.
 
 
+
+
+<br>
 <br>
 
 ## Usage
 
-### 1. Working directory
+### 1. Configuration
 
-Create a new directory to store run configuration, logs, and (optionally) output
-files:
-```sh
-$ mkdir ~/sharp-run
+In your terminal, run `sharp config`, passing the name of a new directory in
+which a run configuration, logs, and (optionally) task output files will be
+stored:
+
+```bash
+$ sharp config ~/my-sharp-cfg
 ```
 
-Optionally store this directory path to an environment variable named
-`SHARP_CONFIG_DIR`:
-```sh
-$ export SHARP_CONFIG_DIR=~/sharp-run
-```
-(This is not necessary if you will always run `sharp` from within this new
-directory.)
+Edit the newly created "`config.py`" file in this directory and change the
+settings (such as the location of raw data and output directories) to suit your
+needs.
+
+See the [config specification](/sharp/config/spec.py) for explanations of the
+different options.
+
+See the [test `config.py` file](/tests/system/config.py) from this repository
+for a concrete example of a customized configuration.
 
 
-### 2. Configuration
-
-In the new directory, create a file named `config.py`, and create a new instance
-of [`SharpConfig`](sharp/config/spec.py) named "`config`". Change some or all of 
-the default attributes to suit your needs.
-
-Example `~/sharp-run/config.py`:
-```py
-from sharp.config.spec import SharpConfig
-
-config = SharpConfig(
-    output_dir = "subdir/of/your/sharp_config_dir",
-    shared_output_dir = "D:\\data\\sharp-shared\\",
-    config_id = "deep-RNN",
-    num_layers = 8,
-    num_units_per_layer = 16,
-)
-```
-
-> On Windows, make sure to either use forward slashes in paths, or to escape
-backslashes.
-
-See the test [`config.py`](tests/system/config.py) file from this repository
-for a more elaborate example, including specifying the location of raw input
-files.
-
-
-### 3. Running tasks
+### 2. Running tasks
 
 When your `config.py` file is ready, run:
-```sh
-~/sharp-run$  python -m sharp --local-scheduler
+```bash
+$ sharp worker ~/my-sharp-cfg --local-scheduler
 ```
-This will run the tasks specified in the `get_tasks` method of your 
-`config` object (these tasks typically generate figures), together with
-the tasks on which they depend (typically processing raw data, training neural
-networks, calculating evaluation metrics, ...).
+This will run the tasks specified in the `get_tasks` method in your `config.py`
+file (these tasks typically generate figures), together with the tasks on which
+they depend (typically processing raw data, training neural networks,
+calculating evaluation metrics, ...).
 
 `sharp` internally outsources task dependency resolution and scheduling to
 the [Luigi](https://luigi.readthedocs.io) Python package.
 
 
-Show CLI documentation with:
-```sh
-$ python -m sharp --help
-```
 
 
-### Parallelization
+### 3. Parallelization
 
-To run tasks in parallel, a central Luigi task scheduler should be used instead
-of the local scheduler. See [here](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
-for instructions.
+If you want to run tasks in parallel, a [central Luigi task scheduler](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
+should be used instead of the local scheduler.
 
 When the central scheduler is running, and when you have correctly set the
-`luigi_scheduler_host` setting in your `config.py` file(s), simply start multiple
-```sh
-$ python -m sharp
+`luigi_scheduler_host` setting in your `config.py` file, simply start multiple
+```bash
+~/sharp-runs/my-config$  sharp worker
 ```
-processes, where the `SHARP_CONFIG_DIR` environment variable (or if not set,
-the current working directory) specifies which configuration this worker will
-use.
+processes.
+
+Alternatively, the configuration for the worker to use can be set explicitly by
+passing the directory generated by `sharp config`, using the `--config` option:
+```bash
+$ sharp worker --config=~/sharp-runs/my-config
+```

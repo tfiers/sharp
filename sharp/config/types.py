@@ -40,11 +40,3 @@ class ConfigError(Exception):
     Raised when the environment is not configured properly to run `sharp`
     tasks.
     """
-
-    def __init__(self, message: str):
-        # Make sure the complete error message fits nice & square in the
-        # terminal. By default, it's one long line.
-        future_prefix = f"{self.__class__}: "
-        square_text = fill(future_prefix + message, width=80)
-        square_text_with_prefix_sized_hole = square_text[len(future_prefix) :]
-        super().__init__(square_text_with_prefix_sized_hole)

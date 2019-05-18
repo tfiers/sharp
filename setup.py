@@ -17,7 +17,8 @@ setup(
         "h5py",
         "click",
         "typeguard",
-        # Version pin necessary to make luigi install work on Windows:
+        # Version pin of python-daemon is necessary to make Luigi install work
+        # on Windows:
         "python-daemon==2.1.2",
         "luigi[toml]==2.8.5",
         "scikit-learn",
@@ -27,4 +28,5 @@ setup(
         "fklab-python-core",
     ),
     packages=find_packages(),
+    entry_points={"console_scripts": ["sharp=sharp.cli.main:main_cli"]},
 )

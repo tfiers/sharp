@@ -26,7 +26,7 @@ log = getLogger(__name__)
 class PaperGridPlotter(FigureMaker):
     envelope_maker: EnvelopeMaker = TaskParameter()
     reference_makers = [
-        MakeReference(**args) for args in config.make_reference_args
+        MakeReference(**args) for args in MakeReference.args
     ]
     cmap = get_cmap("viridis")
     colorbar_label: str = ...

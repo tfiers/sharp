@@ -77,12 +77,6 @@ class ThresholdSweep:
     def max_F1(self):
         return max(self.F1)
 
-    def at_recall(
-        self, recall: float = config.selected_recall
-    ) -> ThresholdEvaluation:
-        if len(self.threshold_evaluations) > 0:
-            return self.threshold_evaluations[argmax(self.recall > recall)]
-
     def at_max_F1(self) -> ThresholdEvaluation:
         if len(self.threshold_evaluations) > 0:
             return self.threshold_evaluations[argmax(self.F1)]

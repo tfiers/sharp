@@ -3,22 +3,23 @@ from typing import Tuple
 
 from typeguard import check_type
 
-from sharp.config.spec import SharpConfig, config_dir
+from sharp.cli.worker import config_dir
+from sharp.config.spec import SharpConfig
 from sharp.config.types import ConfigError, LuigiTask
 
 
 def validate(config: SharpConfig):
-    default_config = SharpConfig()
     for name in dir(config):
         value = getattr(config, name)
-        expected_type = default_config.__annotations__.get(name)
+        expected_type = SharpConfig.__annotations__.get(name)
         if expected_type:
             try:
                 check_type(name, value, expected_type)
             except TypeError as e:
                 raise ConfigError(
-                    f"The config setting `{name}` has an incorrect type. "
-                    f"Expected type: `{expected_type}`. "
+                    f'The config setting "{name}" has an incorrect type. '
+                    f'Expected type: "{expected_type}". '
+                    f'Got type: "{type(value)}".'
                     f"See preceding exception for details."
                 ) from e
 

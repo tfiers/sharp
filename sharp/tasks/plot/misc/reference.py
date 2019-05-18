@@ -19,7 +19,7 @@ class PlotReferenceMaker(TimeRangesPlotter):
     figwidth = 1
 
     reference_makers = [
-        MakeReference(**args) for args in config.make_reference_args
+        MakeReference(**args) for args in MakeReference.args
     ]
     rm0 = reference_makers[0]
 

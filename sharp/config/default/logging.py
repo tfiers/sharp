@@ -10,6 +10,7 @@ node_ID = getenv("SLURM_NODEID")
 task_ID = getenv("SLURM_LOCALID")
 
 LONG_MODULE_NAME = "sharp.data.hardcoded.filters.literature"
+LONG_LOG_LEVEL = "CRITICAL"
 
 
 class ClusterFormatter(Formatter):
@@ -18,11 +19,11 @@ class ClusterFormatter(Formatter):
         metadata = (
             f"{datetime.now():%Y-%m-%d %H:%M:%S}",
             rel_time,
-            f"{r.name: ^{len(LONG_MODULE_NAME)}}",
+            f"{r.name: >{len(LONG_MODULE_NAME)}}",
         )
         if node_ID is not None:
             metadata += (f"worker {node_ID}.{int(task_ID):02d}",)
-        return f"[  {'  |  '.join(metadata)}  ]\n{r.levelname}:\n{r.getMessage()}\n\n"
+        return f"{' | '.join(metadata)} | {r.levelname+':': <{len(LONG_LOG_LEVEL)}} {r.getMessage()}"
 
 
 get_formatter = lambda: ClusterFormatter()
@@ -40,7 +41,7 @@ LOGGING_CONFIG = dict(
         "handlers": ["console"],
     },
     loggers={
-        # Luigi scheduler
+        # Luigi main and scheduler.
         "luigi": {
             "level": "INFO",
             "propagate": True,

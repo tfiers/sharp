@@ -1,6 +1,6 @@
 """
-Note: in this module, we don't import from other sharp modules, so that it can
-be used in config/...
+Note: this module sits at the top of the import graph for sharp, i.e we
+should'nt import from other sharp modules here.
 """
 from contextlib import contextmanager
 from functools import lru_cache
@@ -21,8 +21,6 @@ compiled = numba.jit(cache=True, nopython=True)
 
 @contextmanager
 def ignore(warning_type: Type[Warning]):
-    # (Instruction for the PyCharm code editor):
-    # noinspection PyUnresolvedReferences
     """
     Executes a block of code while ignoring certain warnings. Usage example:
 
@@ -42,6 +40,7 @@ def format_duration(seconds: float, ms_digits: int = 1) -> str:
     Examples:
         "1h22 43.6s"
         "0h00 05.0s"
+        "21.512 ms"
     """
     if seconds < 0:
         return f"{seconds * 1000:.3f} ms"

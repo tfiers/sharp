@@ -1,4 +1,3 @@
-from datetime import date
 from logging import Logger, getLogger
 from logging.config import dictConfig
 from os import environ
@@ -7,13 +6,10 @@ from typing import Iterable, Union
 
 import toml
 
-from sharp.config.spec import config_dir
-
-
 log = getLogger(__name__)
 
 
-def load_config():
+def load_sharp_config():
     """ Try to load the user specified config. """
     try:
         from sharp.config.load import config
@@ -27,34 +23,45 @@ def load_config():
 
 
 def init_log() -> Logger:
+    from sharp.cli.worker import config_dir
     from sharp.config.load import config, output_root
 
     dictConfig(config.logging)
     log = getLogger("sharp")
-    log.info(f"It's {date.today():%b %d, %Y}.")
-    log.info(f"Config directory: {config_dir}")
+    log.info(
+        f"Succesfully parsed sharp configuration from {config_dir}/config.py"
+    )
     log.info(f"Output root directory: {output_root}")
     return log
 
 
-def setup_luigi_config():
+def setup_luigi_worker_config():
     """ Auto-generate a luigi.toml file to configure Luigi. """
 
+    from sharp.cli.worker import config_dir
     from sharp.config.load import config
-    from sharp.config.spec import config_dir
 
     luigi_config_path = config_dir / "luigi.toml"
     luigi_config = {
-        "core": {"scheduler_host": config.luigi_scheduler_host},
-        "worker": {
-            "keep_alive": True,
-            "task_process_context": "",  # Suppress a luigi bug warning.
-        },
-        "scheduler": {
-            "rpc-retry-attempts": 2 * 60,
+        "core": {
+            "scheduler_host": config.luigi_scheduler_host,
+            "rpc-retry-attempts": 1,
+            # "rpc-retry-attempts": 2 * 60,  todo: get back
             # When the network is down, retry connecting to the scheduler every
             # 30 seconds for this many attempts (instead of the default 3
             # attempts).
+        },
+        "worker": {
+            "keep_alive": True,
+            "task_process_context": "",  # Suppress a Luigi bug warning.
+        },
+        "scheduler": {
+            # ff
+            "record_task_history": True
+        },
+        "task-history": {
+            # SqlAlchemy connection string
+            "db_connection": ""
         },
         "logging": config.logging,
     }
