@@ -29,7 +29,7 @@ def init_log() -> Logger:
     dictConfig(config.logging)
     log = getLogger("sharp")
     log.info(
-        f"Succesfully parsed sharp configuration from {config_dir}/config.py"
+        f'Succesfully parsed sharp configuration from {config_dir / "config.py"}'
     )
     log.info(f"Output root directory: {output_root}")
     return log

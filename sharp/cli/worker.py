@@ -70,7 +70,9 @@ def worker(
     config_file = config_dir / CONFIG_FILENAME
     if not config_file.exists():
         echo(f"Could not find file {config_file}.")
-        echo(f'Did you run "sharp config {config_dir}"?')
+        echo(
+            f'You can run "sharp config {config_dir}" to generate such a file.'
+        )
         return
 
     config = load_sharp_config()
