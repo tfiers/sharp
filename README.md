@@ -196,12 +196,10 @@ processes.
 
 On a computing cluster, this is the command to run in parallel.
 
-Thus, when e.g. using the SLURM cluster manager:
+Thus, when e.g. using the [SLURM cluster manager](https://slurm.schedmd.com/overview.html),
+this could be the job you'd run (via a file `sharp-slurm-job.sh` for example):
 ```bash
-$ cat sharp-slurm-job.sh
-
-#!/bin/sh
 #SBATCH --ntasks=120
-#SBATCH --output=sbatch.log
+[..]
 srun sharp worker ~/my-sharp-cfg
 ```
