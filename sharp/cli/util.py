@@ -46,7 +46,7 @@ def setup_luigi_worker_config():
 
     luigi_config = {
         "core": {
-            "scheduler_host": config.luigi_scheduler_host,
+            "default-scheduler-url": config.scheduler_url,
             "rpc-retry-attempts": 1,
             # "rpc-retry-attempts": 2 * 60,  todo: get back
             # When the network is down, retry connecting to the scheduler every

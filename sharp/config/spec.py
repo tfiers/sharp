@@ -99,7 +99,7 @@ class SharpConfig:
     fs_target: float
     bitmap_versions: bool
     logging: ConfigDict
-    luigi_scheduler_host: str
+    scheduler_url: str
     config_id: str
     mult_detect_ripple: Tuple[float, ...]
     mult_detect_SW: Tuple[float, ...]

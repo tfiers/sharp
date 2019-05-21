@@ -188,7 +188,7 @@ provided.
 
 
 When the central scheduler is running, and when you have correctly set the
-`luigi_scheduler_host` setting in your `config.py` file, simply start multiple
+`scheduler_url` setting in your `config.py` file, simply start multiple
 ```bash
 $ sharp worker ~/my-sharp-cfg
 ```

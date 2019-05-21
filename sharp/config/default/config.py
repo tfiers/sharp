@@ -16,7 +16,7 @@ config = SharpConfig(
     fs_target=1000,
     bitmap_versions=False,
     logging=LOGGING_CONFIG,
-    luigi_scheduler_host="nerfcluster-fs",
+    scheduler_url="http://nerfcluster-fs:8082",
     config_id=str(Path(__file__).parent.stem),
     mult_detect_ripple=tuple(linspace(0.4, 4, num=7)),
     mult_detect_SW=tuple(linspace(0.9, 5, num=7)),
