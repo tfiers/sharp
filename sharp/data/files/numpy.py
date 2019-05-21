@@ -32,20 +32,21 @@ class SignalFile(HDF5Target):
     A `Signal` (subclass of a NumPy array), stored on disk.
     """
 
-    _key_sig = "signal"
-    _key_fs = "sampling frequency (Hz)"
+    KEY_SIG = "signal"
+    KEY_FS = "sampling frequency (Hz)"
 
     @cached
     def read(self) -> Signal:
         with self.open_file_for_read() as f:
-            dataset = f[self._key_sig]
-            fs = dataset.attrs[self._key_fs]
-        return Signal(dataset, fs)
+            dataset = f[self.KEY_SIG]
+            fs = dataset.attrs[self.KEY_FS]
+            array = dataset[:]
+        return Signal(array, fs)
 
     def write(self, signal: Signal):
         with self.open_file_for_write() as f:
-            dataset = f.create_dataset(self._key_sig, data=signal.data)
-            dataset.attrs[self._key_fs] = signal.fs
+            dataset = f.create_dataset(self.KEY_SIG, data=signal.data)
+            dataset.attrs[self.KEY_FS] = signal.fs
 
 
 class SegmentsFile(NumpyArrayFile):
