@@ -83,14 +83,14 @@ def calc_detection_indices(
     N = signal.size
     max_detections = N // lockout_samples
     detection_indices = empty(max_detections, dtype=int32)
-    i = 0  # Sample nr.
-    j = 0  # Detection nr.
-    while i < N:
-        if signal[i] >= threshold:
-            detection_indices[j] = i
-            j += 1
-            i += lockout_samples + 1
+    sample_ix = 0
+    det_ix = 0
+    while sample_ix < N:
+        if signal[sample_ix] >= threshold:
+            detection_indices[det_ix] = sample_ix
+            det_ix += 1
+            sample_ix += lockout_samples + 1
         else:
-            i += 1
+            sample_ix += 1
 
-    return detection_indices[:j]
+    return detection_indices[:det_ix]
