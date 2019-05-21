@@ -38,7 +38,9 @@ class DownsampleRawRecording(SingleRecordingFileTask):
             f"Decimating {self.file_ID} ({self.file_ID.path}) of size"
             f" {self.file_ID.path.stat().st_size / 1E9:.1f} GB by a factor {q}."
         )
-        signal_down = decimate_chunkwise(raw_recording.signal, factor=q)
+        signal_down = decimate_chunkwise(
+            raw_recording.signal, factor=q, log_progress=True
+        )
         raw_recording.close()
         self.output().write(Signal(signal_down, fs_new))
 

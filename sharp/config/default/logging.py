@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import Formatter, LogRecord
-from os import getenv
+from os import getenv, getpid
 from socket import gethostname
 
 from sharp.util.misc import format_duration
@@ -16,13 +16,14 @@ LONG_LOG_LEVEL = "CRITICAL"
 class ClusterFormatter(Formatter):
     def format(self, r: LogRecord):
         rel_time = format_duration(r.relativeCreated / 1000, ms_digits=3)
-        metadata = (
-            f"{datetime.now():%Y-%m-%d %H:%M:%S}",
-            rel_time,
-            f"{r.name: >{len(LONG_MODULE_NAME)}}",
-        )
+        metadata = [f"{datetime.now():%Y-%m-%d %H:%M:%S}", rel_time]
         if node_ID is not None:
-            metadata += (f"worker {node_ID}.{int(task_ID):02d}",)
+            getpid()
+            metadata += [
+                f"PID {getpid(): >5}",
+                f"worker {node_ID}.{int(task_ID):02d}",
+            ]
+        metadata += [f"{r.name: >{len(LONG_MODULE_NAME)}}"]
         return f"{' | '.join(metadata)} | {r.levelname+':': <{len(LONG_LOG_LEVEL)}} {r.getMessage()}"
 
 

@@ -48,4 +48,4 @@ def format_duration(seconds: float, ms_digits: int = 1) -> str:
         minutes, seconds = divmod(seconds, 60)
         minutes = int(minutes)
         hours, minutes = divmod(minutes, 60)
-        return f"{hours:g}h{minutes:02d} {seconds:.{ms_digits}f}s"
+        return f"{hours:g}h{minutes:02d} {seconds:02d.{ms_digits}f}s"
