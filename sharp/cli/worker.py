@@ -22,7 +22,9 @@ config_dir: Path
 # Globally usable object.
 
 
-@command(short_help="Start a process that runs tasks.")
+@command(
+    short_help="Start a process that runs tasks.", options_metavar="<options>"
+)
 @argument("config_directory")
 @option(
     "-l",

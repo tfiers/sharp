@@ -6,8 +6,7 @@ import from anywhere else in `sharp`.
 
 from dataclasses import dataclass
 from pathlib import Path
-from textwrap import fill
-from typing import Any, Dict, TypeVar, Union, Iterable
+from typing import Any, Dict, Iterable, TypeVar, Union
 
 ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
 

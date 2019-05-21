@@ -41,7 +41,7 @@ LOGGING_CONFIG = dict(
         "handlers": ["console"],
     },
     loggers={
-        # Luigi main and scheduler.
+        # Luigi main, scheduler, server.
         "luigi": {
             "level": "INFO",
             "propagate": True,

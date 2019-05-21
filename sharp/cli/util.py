@@ -1,10 +1,13 @@
 from logging import Logger, getLogger
 from logging.config import dictConfig
 from os import environ
+from pathlib import Path
 from shutil import rmtree
 from typing import Iterable, Union
 
 import toml
+
+from sharp.config.types import ConfigDict
 
 log = getLogger(__name__)
 
@@ -36,12 +39,11 @@ def init_log() -> Logger:
 
 
 def setup_luigi_worker_config():
-    """ Auto-generate a luigi.toml file to configure Luigi. """
+    """ Auto-generate a luigi.toml file to configure Luigi workers. """
 
     from sharp.cli.worker import config_dir
     from sharp.config.load import config
 
-    luigi_config_path = config_dir / "luigi.toml"
     luigi_config = {
         "core": {
             "scheduler_host": config.luigi_scheduler_host,
@@ -55,18 +57,15 @@ def setup_luigi_worker_config():
             "keep_alive": True,
             "task_process_context": "",  # Suppress a Luigi bug warning.
         },
-        "scheduler": {
-            # ff
-            "record_task_history": True
-        },
-        "task-history": {
-            # SqlAlchemy connection string
-            "db_connection": ""
-        },
         "logging": config.logging,
     }
+    setup_luigi_config(config_dir, luigi_config)
+
+
+def setup_luigi_config(directory: Path, config_dict: ConfigDict):
+    luigi_config_path = directory / "luigi.toml"
     with open(luigi_config_path, "w") as f:
-        toml.dump(luigi_config, f)
+        toml.dump(config_dict, f)
     environ["LUIGI_CONFIG_PATH"] = str(luigi_config_path)
     environ["LUIGI_CONFIG_PARSER"] = "toml"
 
