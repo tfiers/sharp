@@ -18,7 +18,6 @@ class ClusterFormatter(Formatter):
         rel_time = format_duration(r.relativeCreated / 1000, ms_digits=3)
         metadata = [f"{datetime.now():%Y-%m-%d %H:%M:%S}", rel_time]
         if node_ID is not None:
-            getpid()
             metadata += [
                 f"PID {getpid(): >5}",
                 f"worker {node_ID}.{int(task_ID):02d}",
@@ -27,14 +26,14 @@ class ClusterFormatter(Formatter):
         return f"{' | '.join(metadata)} | {r.levelname+':': <{len(LONG_LOG_LEVEL)}} {r.getMessage()}"
 
 
-get_formatter = lambda: ClusterFormatter()
+get_cluster_formatter = lambda: ClusterFormatter()
 
 
 LOGGING_CONFIG = dict(
     version=1,
     disable_existing_loggers=False,
     formatters={
-        "cluster": {"()": "sharp.config.default.logging.get_formatter"}
+        "cluster": {"()": "sharp.config.default.logging.get_cluster_formatter"}
     },
     root={
         # Root logger neds to be specified separately.
