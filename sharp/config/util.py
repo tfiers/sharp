@@ -3,7 +3,7 @@ from typing import Tuple
 
 from typeguard import check_type
 
-from sharp.cli.worker import config_dir
+import sharp.config.directory
 from sharp.config.spec import SharpConfig
 from sharp.config.types import ConfigError, LuigiTask
 
@@ -26,7 +26,7 @@ def validate(config: SharpConfig):
 
 def normalize(config: SharpConfig) -> SharpConfig:
     if config.config_id is None:
-        config.config_id = str(config_dir)
+        config.config_id = str(sharp.config.directory.config_dir)
     config.output_dir = as_absolute_Path(config.output_dir)
     config.shared_output_dir = as_absolute_Path(config.shared_output_dir)
     return config
@@ -37,7 +37,7 @@ def as_absolute_Path(path: str) -> Path:
     if ppath.is_absolute():
         out = ppath
     else:
-        out = config_dir / ppath
+        out = sharp.config.directory.config_dir / ppath
     return out.resolve()
 
 

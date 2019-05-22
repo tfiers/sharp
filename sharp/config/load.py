@@ -8,11 +8,13 @@ Importing from this module (e.g. importing the `config` object, or the
 from pathlib import Path
 from sys import path
 
-from sharp.cli.worker import config_dir
+import sharp.config.directory
 from sharp.config.spec import SharpConfig
 from sharp.config.types import ConfigError
 from sharp.config.util import normalize, validate
 
+
+config_dir = sharp.config.directory.config_dir
 
 path.insert(0, str(config_dir))
 

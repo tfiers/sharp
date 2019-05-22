@@ -9,14 +9,14 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Iterable, Union
 
+import sharp.config.directory
 from click import argument, command, echo, option
 from sharp.cli.util import setup_luigi_config
 from sharp.config.spec import CONFIG_FILENAME
 from sharp.config.types import ConfigError
 
 
-config_dir: Path
-# Globally usable object.
+log = getLogger(__name__)
 
 
 @command(
@@ -63,9 +63,8 @@ def worker(
     # --workers 2") in this command, as this yields multiprocessing bugs in luigi
     # / PyTorch / Python. See the README for how to run tasks in parallel.
     #
-    global config_dir
-
     config_dir = Path(config_directory).expanduser().resolve().absolute()
+    sharp.config.directory.config_dir = config_dir
     config_file = config_dir / CONFIG_FILENAME
     if not config_file.exists():
         echo(f"Could not find file {config_file}.")
@@ -116,9 +115,6 @@ def worker(
     log.info("Shutting down Python process.")
 
 
-log = getLogger(__name__)
-
-
 def load_sharp_config():
     """ Try to load the user specified config. """
     try:
@@ -137,6 +133,7 @@ def init_log() -> Logger:
 
     dictConfig(config.logging)
     log = getLogger("sharp")
+    config_dir = sharp.config.directory.config_dir
     log.info(
         f'Succesfully parsed sharp configuration from {config_dir / "config.py"}'
     )
@@ -163,6 +160,7 @@ def setup_luigi_worker_config():
         },
         "logging": config.logging,
     }
+    config_dir = sharp.config.directory.config_dir
     setup_luigi_config(config_dir, luigi_config)
 
 
@@ -203,3 +201,8 @@ def clear_output(task):
     else:
         for dependency in flatten(task.requires()):
             clear_output(dependency)
+
+
+if __name__ == "__main__":
+    # For testing in PyCharm
+    worker()
