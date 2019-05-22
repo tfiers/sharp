@@ -4,6 +4,7 @@ Loads the user-customized config.py file, sets up logging, and runs tasks.
 """
 from logging import Logger, getLogger
 from logging.config import dictConfig
+from os import chdir
 from pathlib import Path
 from shutil import rmtree
 from typing import Iterable, Union
@@ -72,6 +73,9 @@ def worker(
             f'You can run "sharp config {config_dir}" to generate such a file.'
         )
         return
+
+    # Make sure e.g. log files are generated in the correct directory.
+    chdir(str(config_dir))
 
     config = load_sharp_config()
     log = init_log()
