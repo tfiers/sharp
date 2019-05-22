@@ -34,8 +34,9 @@ class SharpConfig:
             
     :param logging:  A logging configuration passed to logging.dictConfig.
     
-    :param luigi_scheduler_host:  Hostname where the remote luigi task scheduler
-            is running (for when running multiple workers in parallel).
+    :param scheduler_url:  Hostname where the remote luigi task scheduler
+            is running. Only necessary when running multiple workers in
+            parallel.
     :param config_id:  This setting allows to run multiple pipelines (each with
             a different config.py file) in parallel. Each such pipeline / config
             file corresponds to a different `config_id`. Default: name of parent
@@ -99,7 +100,7 @@ class SharpConfig:
     fs_target: float
     bitmap_versions: bool
     logging: ConfigDict
-    scheduler_url: str
+    scheduler_url: Optional[str]
     config_id: str
     mult_detect_ripple: Tuple[float, ...]
     mult_detect_SW: Tuple[float, ...]
