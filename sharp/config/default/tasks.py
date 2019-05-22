@@ -20,6 +20,9 @@ def minipaper():
 
 
 def get_default_tasks():
-    from sharp.tasks.signal.downsample import DownsampleAllRecordings
+    # from sharp.tasks.signal.downsample import DownsampleAllRecordings
+    # return DownsampleAllRecordings()
+    from sharp.tasks.plot.stat.vignette import PlotVignettes
+    from sharp.config.load import config
 
-    return DownsampleAllRecordings()
+    return (PlotVignettes(file_ID=f) for f in config.raw_data)
