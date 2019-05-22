@@ -34,19 +34,23 @@ class SignalFile(HDF5Target):
 
     KEY_SIG = "signal"
     KEY_FS = "sampling frequency (Hz)"
+    KEY_UNITS = "units"
 
     @cached
     def read(self) -> Signal:
         with self.open_file_for_read() as f:
             dataset = f[self.KEY_SIG]
-            fs = dataset.attrs[self.KEY_FS]
             array = dataset[:]
-        return Signal(array, fs)
+            fs = dataset.attrs[self.KEY_FS]
+            units = dataset.attrs.get(self.KEY_UNITS, None)
+        return Signal(array, fs, units)
 
     def write(self, signal: Signal):
         with self.open_file_for_write() as f:
             dataset = f.create_dataset(self.KEY_SIG, data=signal.data)
             dataset.attrs[self.KEY_FS] = signal.fs
+            if signal.units:
+                dataset.attrs[self.KEY_UNITS] = signal.units
 
 
 class SegmentsFile(NumpyArrayFile):

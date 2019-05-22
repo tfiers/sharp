@@ -1,4 +1,4 @@
-from typing import Iterable, Sequence
+from typing import Iterable, Sequence, Optional
 
 from numpy import array, asarray, diff, linspace, ndarray, stack
 
@@ -15,12 +15,17 @@ class Signal(ndarray):
     time_axis = 0
     channel_axis = 1
 
-    def __new__(cls, data: ArrayLike, fs: float) -> "Signal":
-        """
-        fs: signal sampling frequency, in hertz.
-        """
+    def __new__(
+        cls, data: ArrayLike, fs: float, units: Optional[str] = None
+    ) -> "Signal":
+        '''
+        :param data
+        :param fs:  Signal sampling frequency, in hertz.
+        :param units
+        '''
         instance = asarray(data).view(cls)
         instance.fs = fs
+        instance.units = units
         return instance
 
     # Make sure slices and views are also Signals.

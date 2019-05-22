@@ -41,8 +41,9 @@ class DownsampleRawRecording(SingleRecordingFileTask):
         signal_down = decimate_chunkwise(
             raw_recording.signal, factor=q, log_progress=True
         )
+        signal_down *= raw_recording.to_microvolts
         raw_recording.close()
-        self.output().write(Signal(signal_down, fs_new))
+        self.output().write(Signal(signal_down, fs_new, "μV"))
 
 
 class DownsampleAllRecordings(WrapperTask):
