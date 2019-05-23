@@ -1,16 +1,16 @@
 from datetime import datetime
 from logging import Formatter, LogRecord
 from os import getenv, getpid
-from socket import gethostname
+
+from math import ceil
 
 from sharp.util.misc import format_duration
 
-hostname = gethostname()
+
 node_ID = getenv("SLURM_NODEID")
 task_ID = getenv("SLURM_LOCALID")
 
-LONG_MODULE_NAME = "sharp.data.hardcoded.filters.literature"
-MEDIUM_LENGTH_MODULE_NAME = "sharp.cli.scheduler"
+LOGGER_NAME_LENGTH_UNIT = len("sharp.cli.scheduler")
 LONG_LOG_LEVEL = "CRITICAL"
 
 
@@ -23,7 +23,8 @@ class ClusterFormatter(Formatter):
                 f"PID {getpid(): >5}",
                 f"worker {node_ID}.{int(task_ID):02d}",
             ]
-        metadata += [f"{r.name: >{len(MEDIUM_LENGTH_MODULE_NAME)}}"]
+        k = ceil(len(r.name) / LOGGER_NAME_LENGTH_UNIT)
+        metadata += [f"{r.name: >{k * LOGGER_NAME_LENGTH_UNIT}}"]
         return f"{' | '.join(metadata)} | {r.levelname+':': <{len(LONG_LOG_LEVEL)}} {r.getMessage()}"
 
 
