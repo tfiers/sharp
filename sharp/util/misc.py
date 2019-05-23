@@ -45,9 +45,8 @@ def format_duration(seconds: float, ms_digits: int = 1) -> str:
     if seconds < 0:
         return f"{seconds * 1000:.3f} ms"
     else:
-        seconds, remainder = divmod(seconds, 1)
-        milliseconds = round(remainder * 1000)
-        seconds = int(seconds)
+        milliseconds = round(seconds * 1000)
+        seconds, milliseconds = divmod(milliseconds, 1000)
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
-        return f"{hours:g}h{minutes:02d} {seconds:02d}.{milliseconds:0{ms_digits}d}s"
+        return f"{hours:g}h{minutes:02d}m {seconds:02d}.{milliseconds:0{ms_digits}d}s"
