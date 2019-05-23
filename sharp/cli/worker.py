@@ -79,7 +79,7 @@ def worker(
     config = load_sharp_config()
     log = init_log()
     setup_luigi_worker_config()
-    log.info("Generated Luigi config.")
+    log.info("Luigi config file exists.")
     # Now we can import from Luigi, which will apply the generated config.
 
     if clear_all:

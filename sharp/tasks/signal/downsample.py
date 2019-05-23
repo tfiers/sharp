@@ -47,7 +47,6 @@ class DownsampleRawRecording(SingleRecordingFileTask):
 
 
 class DownsampleAllRecordings(WrapperTask):
-    output_dir = shared_output_root
 
     def requires(self):
         return (
