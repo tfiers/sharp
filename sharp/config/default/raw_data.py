@@ -133,29 +133,29 @@ raw_data_paths = {
             File("L1", "p3.moz"),
             File("D21", "p4.moz"),
             # File("D26", "p5.moz"),  # Not there
-            # File("D30", "p6.moz"),
+            # File("D30", "p6.moz"),  # Not there
             File("L5", "p9.moz"),
             File("D29", "p10.moz"),
             File("D22", "p12.moz"),
             File("D23", "p13.moz"),
             File("L4", "p14.moz"),
             File("L2", "p15.moz"),
-            File("D15", "p16.moz"),
+            # File("D15", "p16.moz"),  # Contains NaN's
         ),
         Day(5, f"{JJ}/S001E000/2014-09-11_16-41-18/FP/"): (
-            File("D24", "p1.moz"),
+            # File("D24", "p1.moz"),  # Contains NaN's (idem for the other 4 of this day)
             File("D27", "p2.moz"),
             File("L1", "p3.moz"),
-            File("D21", "p4.moz"),
+            # File("D21", "p4.moz"),
             File("D26", "p5.moz"),
             File("D30", "p6.moz"),
             File("L5", "p9.moz"),
-            File("D29", "p10.moz"),
+            # File("D29", "p10.moz"),
             File("D22", "p12.moz"),
             File("D23", "p13.moz"),
             File("L4", "p14.moz"),
-            File("L2", "p15.moz"),
-            File("D15", "p16.moz"),
+            # File("L2", "p15.moz"),
+            # File("D15", "p16.moz"),
         ),
     },
     Rat(3, f"{JJ}/S001E015/"): {
