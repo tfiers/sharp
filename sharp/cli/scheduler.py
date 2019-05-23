@@ -173,6 +173,7 @@ def setup_luigi_scheduler_config(scheduler_directory: Path):
         "scheduler": {
             "record_task_history": True,
             "state_path": str(scheduler_directory / STATE_FILENAME),
+            "retry_delay": 60,
         },
         "task_history": {
             # SqlAlchemy connection string
