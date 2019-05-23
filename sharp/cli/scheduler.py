@@ -174,6 +174,10 @@ def setup_luigi_scheduler_config(scheduler_directory: Path):
             "record_task_history": True,
             "state_path": str(scheduler_directory / STATE_FILENAME),
             "retry_delay": 60,
+            # Mark a failed task as pending again after this many seconds.
+            "disable-hard-timeout": 10 * 60,
+            # Stop retrying a failed task after this many seconds; So workers
+            # can quit.
         },
         "task_history": {
             # SqlAlchemy connection string
