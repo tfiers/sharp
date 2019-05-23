@@ -1,8 +1,14 @@
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.pyplot import close
 from numpy import arange, ceil
-from sharp.data.files.figure import FigureTarget
+
+from sharp.data.files.figure import PDF_FigureFile
 from sharp.data.types.aliases import subplots
 from sharp.tasks.plot.base import FigureMaker
+from sharp.tasks.plot.util.scalebar import (
+    add_time_scalebar,
+    add_voltage_scalebar,
+)
 from sharp.tasks.plot.util.signal import plot_signal
 from sharp.tasks.signal.downsample import DownsampleRawRecording
 from sharp.tasks.signal.raw import SingleRecordingFileTask
@@ -18,14 +24,10 @@ class PlotVignettes(FigureMaker, SingleRecordingFileTask):
     def requires(self):
         return DownsampleRawRecording(file_ID=self.file_ID)
 
-    @property
-    def output_dir(self):
-        return FigureMaker.output_dir / "raw-vignettes" / self.file_ID.short_str
+    output_dir = FigureMaker.output_dir / "raw-vignettes"
 
     def output(self):
-        for start, stop in self.time_ranges:
-            filename = f"{start:.1f}--{stop:.1f}"
-            yield FigureTarget(self.output_dir, filename)
+        return PDF_FigureFile(self.output_dir, self.file_ID.short_str)
 
     @property
     def signal(self):
@@ -39,8 +41,13 @@ class PlotVignettes(FigureMaker, SingleRecordingFileTask):
         return [(t0, t0 + self.WINDOW_DURATION) for t0 in starts]
 
     def work(self):
-        for time_range, output in zip(self.time_ranges, self.output()):
-            fig, ax = subplots()
-            plot_signal(self.signal, time_range, ax=ax)
-            output.write(fig)
-            plt.close()
+        with PdfPages(self.output().path_string) as pdf:
+            for time_range in self.time_ranges:
+                fig, ax = subplots()
+                plot_signal(self.signal, time_range, ax=ax, time_grid=False)
+                add_time_scalebar(ax, 500, "ms", pos_across=-0.04)
+                add_voltage_scalebar(ax, pos_across=-0.04)
+                fig.tight_layout()
+                pdf.attach_note(f"Time range: {time_range}")
+                pdf.savefig(fig)
+                close(fig)

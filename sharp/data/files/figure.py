@@ -13,7 +13,7 @@ class BitmapFigureFile(MatplotlibFigureFile):
     extension = ".png"
 
 
-class VectorFigureFile(MatplotlibFigureFile):
+class PDF_FigureFile(MatplotlibFigureFile):
     extension = ".pdf"
 
 
@@ -27,8 +27,8 @@ class FigureTarget(OutputFileTarget):
         return BitmapFigureFile(self.parent / "_png", self.filename)
 
     @property
-    def vector_version(self) -> VectorFigureFile:
-        return VectorFigureFile(self.parent, self.filename)
+    def vector_version(self) -> PDF_FigureFile:
+        return PDF_FigureFile(self.parent, self.filename)
 
     def exists(self):
         if config.bitmap_versions:

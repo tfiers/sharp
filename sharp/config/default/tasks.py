@@ -20,9 +20,12 @@ def minipaper():
 
 
 def get_default_tasks():
-    # from sharp.tasks.signal.downsample import DownsampleAllRecordings
-    # return DownsampleAllRecordings()
-    from sharp.tasks.plot.stat.vignette import PlotVignettes
+    from sharp.tasks.base import WrapperTask
     from sharp.config.load import config
+    from sharp.tasks.plot.explore.vignette import PlotVignettes
 
-    return (PlotVignettes(file_ID=f) for f in config.raw_data)
+    class DoAll(WrapperTask):
+        def requires(self):
+            return (PlotVignettes(file_ID=f) for f in config.raw_data)
+
+    return DoAll()
