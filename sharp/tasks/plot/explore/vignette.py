@@ -12,6 +12,7 @@ from sharp.tasks.plot.util.scalebar import (
 from sharp.tasks.plot.util.signal import plot_signal
 from sharp.tasks.signal.downsample import DownsampleRawRecording
 from sharp.tasks.signal.raw import SingleRecordingFileTask
+from sharp.util.misc import format_duration
 
 
 class PlotVignettes(FigureMaker, SingleRecordingFileTask):
@@ -47,7 +48,7 @@ class PlotVignettes(FigureMaker, SingleRecordingFileTask):
                 plot_signal(self.signal, time_range, ax=ax, time_grid=False)
                 add_time_scalebar(ax, 500, "ms", pos_across=-0.04)
                 add_voltage_scalebar(ax, pos_across=-0.04)
+                ax.set_title(format_duration(time_range[0]))
                 fig.tight_layout()
-                pdf.attach_note(f"Time range: {time_range}")
                 pdf.savefig(fig)
                 close(fig)

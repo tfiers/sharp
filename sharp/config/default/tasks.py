@@ -24,8 +24,8 @@ def get_default_tasks():
     from sharp.config.load import config
     from sharp.tasks.plot.explore.vignette import PlotVignettes
 
-    class DoAll(WrapperTask):
+    class RootTask(WrapperTask):
         def requires(self):
             return (PlotVignettes(file_ID=f) for f in config.raw_data)
 
-    return DoAll()
+    return RootTask()
