@@ -33,20 +33,30 @@ def ignore(warning_type: Type[Warning]):
         yield
 
 
-def format_duration(seconds: float, ms_digits: int = 1) -> str:
+def format_duration(
+    duration_in_seconds: float, auto_ms: bool = False, ms_digits: int = 1
+) -> str:
     """
-    A length of time, in human-readable format.
+    
+    :param duration_in_seconds
+    :param auto_ms:  Whether to switch to "SS.MMM ms" format when the given
+            duration is shorter than a second.
+    :param ms_digits:  Number of digits for the millisecond part in the "1h22m
+            43.784s" format.
+    :return:  The given length of time in human-readable format.
     
     Examples:
         "1h22 43.6s"
         "0h00 05.0s"
         "21.512 ms"
     """
-    if seconds < 0:
-        return f"{seconds * 1000:.3f} ms"
+    if auto_ms and duration_in_seconds < 1:
+        return f"{duration_in_seconds * 1000:.3f} ms"
     else:
-        milliseconds = round(seconds * 1000)
-        seconds, milliseconds = divmod(milliseconds, 1000)
+        # Explicit conversion to int, from float64 e.g.
+        # (int is needed for "02d" format string).
+        duration_in_ms = int(round(duration_in_seconds * 1000))
+        seconds, milliseconds = divmod(duration_in_ms, 1000)
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         return f"{hours:g}h{minutes:02d}m {seconds:02d}.{milliseconds:0{ms_digits}d}s"
