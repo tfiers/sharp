@@ -38,7 +38,7 @@ LOGGING_CONFIG = dict(
         "cluster": {"()": "sharp.config.default.logging.get_cluster_formatter"}
     },
     root={
-        # Root logger neds to be specified separately.
+        # Root logger needs to be specified separately.
         "level": "INFO",
         "handlers": ["console"],
     },
@@ -57,9 +57,9 @@ LOGGING_CONFIG = dict(
         },
         # For logging in our own package.
         "sharp": {
-            "level": "INFO",
-            "propagate": True,
-            "handlers": ["file_sharp"],
+            "level": "DEBUG",
+            "propagate": False,
+            "handlers": ["file_sharp", "console"],
         },
     },
     handlers={

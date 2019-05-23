@@ -31,7 +31,7 @@ class RecordingFileID:
         return f"rat_{self.rat}_day_{self.day}_{self.probe}"
 
     def __str__(self):
-        return f"rat {self.rat}, day {self.day}, {self.probe}, {self.path.name}"
+        return f"Rec(rat {self.rat}, day {self.day}, {self.probe})"
 
 
 class ConfigError(Exception):

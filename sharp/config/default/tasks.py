@@ -22,10 +22,13 @@ def minipaper():
 def get_default_tasks():
     from sharp.tasks.base import WrapperTask
     from sharp.config.load import config
-    from sharp.tasks.plot.explore.vignette import PlotVignettes
+    from sharp.tasks.plot.explore.vignette import PlotAllVignettes
 
     class RootTask(WrapperTask):
         def requires(self):
-            return (PlotVignettes(file_ID=f) for f in config.raw_data)
+            return (
+                PlotAllVignettes(file_ID=rec_file)
+                for rec_file in config.raw_data
+            )
 
     return RootTask()

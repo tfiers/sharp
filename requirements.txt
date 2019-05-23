@@ -4,4 +4,6 @@ git+https://github.com/tfiers/seaborn#seaborn
 git+https://github.com/tfiers/raincloud#raincloud
 
 # Closed source for now - download and install manually
+# Be sure to download my fork (tomasf), as my additions and bugfixes may not be
+# merged yet into the original repo.
 # git+https://bitbucket.org/tomasf/fklab-python-core/src/master/#fklab
