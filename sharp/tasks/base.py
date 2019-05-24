@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
+from logging import getLogger
+from traceback import format_tb
 from typing import List
 
-from luigi import Target, Task
+from luigi import Event, Target, Task
 from luigi.task import Parameter, flatten
 
 from sharp.config.load import config
 from sharp.util.misc import cached
+
+
+log = getLogger(__name__)
 
 
 class SharpTask(Task, ABC):
@@ -53,6 +58,17 @@ class SharpTask(Task, ABC):
     @property
     def outputs(self) -> List[Target]:
         return flatten(self.output())
+
+
+@SharpTask.event_handler(Event.FAILURE)
+def log_exception(task: SharpTask, exception: Exception):
+    """
+    Catch tasks failures and don't let Luigi swallow the useful debugging info.
+    """
+    log.error(
+        f"Reason of task failure:\n{exception}\n\nTraceback:\n"
+        + "".join(format_tb(exception.__traceback__))
+    )
 
 
 class WrapperTask(SharpTask):
