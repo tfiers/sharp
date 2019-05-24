@@ -14,7 +14,10 @@ from sharp.tasks.plot.util.scalebar import (
 )
 from sharp.tasks.plot.util.signal import plot_signal
 from sharp.tasks.signal.downsample import DownsampleRawRecording
-from sharp.tasks.signal.offline_filter import CalcRippleEnvelope, CalcSharpWaveEnvelope
+from sharp.tasks.signal.offline_filter import (
+    CalcRippleEnvelope,
+    CalcSharpWaveEnvelope,
+)
 from sharp.tasks.signal.raw import SingleRecordingFileTask
 from sharp.util.misc import format_duration
 

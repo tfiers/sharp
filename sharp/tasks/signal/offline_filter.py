@@ -1,12 +1,20 @@
 from abc import ABC
+from logging import getLogger
 from typing import Tuple
 
-from fklab.signals.filter import compute_envelope
+from numpy import abs, array, ceil, log, min
+from scipy.signal import hilbert as analytical
+
+from fklab.signals.filter import apply_filter
+from fklab.signals.smooth import smooth1d
 from sharp.config.load import shared_output_root
 from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.downsample import DownsampleRawRecording
 from sharp.tasks.signal.raw import SingleRecordingFileTask
+
+
+logr = getLogger(__name__)
 
 
 output_root = shared_output_root / "offline"
@@ -22,18 +30,35 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
     freq_band: Tuple[float, float] = ...  # Hz
 
     def work(self):
-
         sig_in = self.requires().output().read()
-        envelope = compute_envelope(
+        logr.info("Read raw signal")
+        # We cannot directly use fklab's "compute_envelope", as this function
+        # averages all channel envelopes into one.
+        bpf_out = apply_filter(
             sig_in,
             axis=0,
-            freq_band=self.freq_band,
+            band=self.freq_band,
             fs=sig_in.fs,
-            filter_options=dict(transition_width="20%", attenuation=30),
-            smooth_options=dict(kernel="gaussian", bandwidth=4e-3),
+            transition_width="20%",
+            attenuation=30,
         )
-        sig_out = Signal(envelope, sig_in.fs, sig_in.units)
+        logr.info("Applied bandpass filter")
+        # Use padding to nearest power of 2 or 3 when calculating Hilbert
+        # transform for great speedup (via FFT).
+        N_orig = sig_in.shape[0]
+        N = int(min(array([2, 3]) ** ceil(log(N_orig) / log([2, 3]))))
+        envelope_raw_padded = abs(analytical(bpf_out, N=N, axis=0))
+        envelope_raw = envelope_raw_padded[:N_orig, :]
+        logr.info("Calculated raw envelope")
+        envelope_smooth = smooth1d(
+            envelope_raw, delta=1 / sig_in.fs, kernel="gaussian", bandwidth=4e-3
+        )
+        logr.info("Smoothed envelope")
+        sig_out = Signal(envelope_smooth, sig_in.fs, sig_in.units)
         self.output().write(sig_out)
+        logr.info("Wrote envelope to disk")
+        del sig_in, bpf_out, envelope_raw_padded, envelope_raw, envelope_smooth, sig_out
+        logr.info("Deleted obsolete memory objects")
 
 
 class CalcRippleEnvelope(CalcEnvelopeFromRawSignal):
