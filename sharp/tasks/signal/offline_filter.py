@@ -17,7 +17,7 @@ from sharp.tasks.signal.raw import SingleRecordingFileTask
 logr = getLogger(__name__)
 
 
-output_root = shared_output_root / "offline"
+output_root = shared_output_root / "offline-filter-envelope"
 
 
 class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
@@ -48,26 +48,29 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
         N_orig = sig_in.shape[0]
         N = int(min(array([2, 3]) ** ceil(log(N_orig) / log([2, 3]))))
         envelope_raw_padded = abs(analytical(bpf_out, N=N, axis=0))
+        del bpf_out
         envelope_raw = envelope_raw_padded[:N_orig, :]
         logr.info("Calculated raw envelope")
+        del envelope_raw_padded
         envelope_smooth = smooth1d(
             envelope_raw, delta=1 / sig_in.fs, kernel="gaussian", bandwidth=4e-3
         )
         logr.info("Smoothed envelope")
+        del envelope_raw
         sig_out = Signal(envelope_smooth, sig_in.fs, sig_in.units)
+        del envelope_smooth
         self.output().write(sig_out)
         logr.info("Wrote envelope to disk")
-        del sig_in, bpf_out, envelope_raw_padded, envelope_raw, envelope_smooth, sig_out
-        logr.info("Deleted obsolete memory objects")
+        del sig_in, sig_out
 
 
 class CalcRippleEnvelope(CalcEnvelopeFromRawSignal):
-    subdir = "ripple-envelope"
+    subdir = "ripple"
     freq_band = (100, 250)
 
 
 class CalcSharpWaveEnvelope(CalcEnvelopeFromRawSignal):
-    subdir = "sharpwave-envelope"
+    subdir = "sharpwave"
 
     @property
     def freq_band(self):
