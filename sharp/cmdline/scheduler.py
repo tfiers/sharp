@@ -11,7 +11,7 @@ from typing import Tuple, Optional
 
 from click import group, option, argument, echo
 
-from sharp.cli.util import setup_luigi_config
+from sharp.cmdline.util import setup_luigi_config
 
 PID_FILENAME = "scheduler.pid"
 STATE_FILENAME = "scheduler-state.pickle"

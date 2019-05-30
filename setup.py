@@ -30,5 +30,5 @@ setup(
         "fklab-python-core",
     ),
     packages=find_packages(),
-    entry_points={"console_scripts": ["sharp=sharp.cli.main:main_cli"]},
+    entry_points={"console_scripts": ["sharp=sharp.cmdline.main:main_cli"]},
 )

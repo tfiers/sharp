@@ -10,7 +10,7 @@ from sharp.util.misc import format_duration
 node_ID = getenv("SLURM_NODEID")
 task_ID = getenv("SLURM_LOCALID")
 
-LOGGER_NAME_LENGTH_UNIT = len("sharp.cli.scheduler")
+LOGGER_NAME_LENGTH_UNIT = len("sharp.cmdline.worker")
 LONG_LOG_LEVEL = "CRITICAL"
 
 

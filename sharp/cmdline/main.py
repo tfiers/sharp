@@ -1,8 +1,8 @@
 from click import Group, group
 
-from sharp.cli.config import config
-from sharp.cli.scheduler import scheduler
-from sharp.cli.worker import worker
+from sharp.cmdline.config import config
+from sharp.cmdline.scheduler import scheduler
+from sharp.cmdline.worker import worker
 
 
 # Flag when we have entered our own code.

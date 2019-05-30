@@ -11,7 +11,7 @@ from typing import Iterable, Union
 
 import sharp.config.directory
 from click import argument, command, echo, option
-from sharp.cli.util import setup_luigi_config
+from sharp.cmdline.util import setup_luigi_config
 from sharp.config.spec import CONFIG_FILENAME
 from sharp.config.types import ConfigError
 
