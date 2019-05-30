@@ -10,7 +10,7 @@ CONFIG_FILENAME = "config.py"
 @dataclass
 class SharpConfig:
     # (Instruction for the PyCharm code editor, who can't handle dataclass
-    # docstring yet).
+    # docstring yet):
     # noinspection PyUnresolvedReferences
     """
     :param get_tasks:  Return instantiated tasks, which will be passed to
@@ -18,7 +18,7 @@ class SharpConfig:
             in this method's body (not at the top of the config.py file). This
             avoids circular imports (see config/README.md).
     
-    :param raw_data:  A list of RecordingFiles.
+    :param raw_data:  A list of RecordingFileIDs.
     :param output_dir:  Path to a directory where the code may store processed
             data and output figures. Absolute path, or path relative to the
             config dir (where your "config.py" resides).

@@ -22,13 +22,22 @@ def minipaper():
 def get_default_tasks():
     from sharp.tasks.base import WrapperTask
     from sharp.config.load import config
-    from sharp.tasks.plot.explore.vignette import PlotAllVignettes
+
+    # from sharp.tasks.plot.explore.vignette import PlotAllVignettes
+    from sharp.tasks.signal.stats import DetectRipples
+    from sharp.tasks.signal.stats import DetectSharpwaves
 
     class RootTask(WrapperTask):
         def requires(self):
-            return (
-                PlotAllVignettes(file_ID=rec_file)
-                for rec_file in config.raw_data
+            return sum(
+                [
+                    (
+                        DetectRipples(file_ID=rec_file),
+                        DetectSharpwaves(file_ID=rec_file),
+                    )
+                    for rec_file in config.raw_data
+                ],
+                (),
             )
 
     return RootTask()

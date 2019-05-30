@@ -6,9 +6,9 @@ from typing import Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import torch
-from numpy import ndarray
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from numpy import ndarray
 
 
 TorchArray = torch.Tensor

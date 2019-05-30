@@ -1,14 +1,20 @@
 """
 Describes how processed data is stored, and how it can be accessed.
 """
+from logging import getLogger
+from typing import List, Sequence
 
 import numpy as np
+from h5py import Dataset
 
 from fklab.segments import Segment
 from sharp.data.files.base import FileTarget, HDF5Target
 from sharp.data.types.aliases import ArrayLike
 from sharp.data.types.signal import Signal
 from sharp.util.misc import cached
+
+
+log = getLogger(__name__)
 
 
 class NumpyArrayFile(FileTarget):
@@ -38,6 +44,7 @@ class SignalFile(HDF5Target):
 
     @cached
     def read(self) -> Signal:
+        log.info(f"Reading signal file at {self} ({self.size}) into memory.")
         with self.open_file_for_read() as f:
             dataset = f[self.KEY_SIG]
             array = dataset[:]
@@ -51,16 +58,39 @@ class SignalFile(HDF5Target):
             dataset.attrs[self.KEY_FS] = signal.fs
             if signal.units:
                 dataset.attrs[self.KEY_UNITS] = signal.units
+        log.info(f"Wrote signal to {self} ({self.size})")
 
 
-class SegmentsFile(NumpyArrayFile):
+class MultiChannelDataFile(HDF5Target):
     """
-    fklab Segments, stored on disk.
+    A sequence of arbitrarily sized and shaped NumPy arrays, stored on disk.
     """
 
     @cached
-    def read(self) -> Segment:
-        return Segment(super().read())
+    def read(self) -> List[np.ndarray]:
+        with self.open_file_for_read() as f:
+            datasets: List[Dataset] = f.values()
+            array_list = [None] * len(datasets)
+            for dataset in datasets:
+                channel_nr = int(dataset.name)
+                array_list[channel_nr] = dataset[()]
+        return array_list
 
-    def write(self, segs: Segment):
-        super().write(segs.asarray())
+    def write(self, arrays: Sequence[np.ndarray]):
+        with self.open_file_for_write() as f:
+            for channel_nr, array in enumerate(arrays):
+                f.create_dataset(name=str(channel_nr), data=array)
+
+
+class MultiChannelSegmentsFile(MultiChannelDataFile):
+    """
+    A sequence of fklab Segments, stored on disk.
+    (Where each "Segment" is actually a full sequence of (start, stop) tuples).
+    """
+
+    @cached
+    def read(self) -> List[Segment]:
+        return [Segment(array) for array in super().read()]
+
+    def write(self, segs: Sequence[Segment]):
+        super().write(seg.asarray() for seg in segs)
