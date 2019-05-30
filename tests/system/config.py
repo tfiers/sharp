@@ -45,4 +45,5 @@ config = SharpConfig(
     target_start_pre=14e-3,
     target_start_post=25e-3,
     reference_seg_extension=0,
+    max_memory_usage=None,
 )

@@ -10,7 +10,7 @@ CONFIG_FILENAME = "config.py"
 @dataclass
 class SharpConfig:
     # (Instruction for the PyCharm code editor, who can't handle dataclass
-    # docstring yet):
+    # docstrings yet):
     # noinspection PyUnresolvedReferences
     """
     :param get_tasks:  Return instantiated tasks, which will be passed to
@@ -91,6 +91,8 @@ class SharpConfig:
             approximate SWR duration) before calculating the target signal.
             This should encourage SWR 'prediction' in the optimisation
             procedure.
+    :param max_memory_usage:  Fraction of (physical) system memory in use after
+            which no new tasks will be ran.
     """
 
     get_tasks: Callable[[], OneOrMoreLuigiTasks]
@@ -120,3 +122,4 @@ class SharpConfig:
     target_start_pre: float
     target_start_post: float
     reference_seg_extension: float
+    max_memory_usage: Optional[float]
