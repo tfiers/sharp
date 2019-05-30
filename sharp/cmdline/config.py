@@ -42,7 +42,9 @@ def config(directory: str, overwrite: bool):
     else:
         echo('A "config.py" file already exists in this directory.')
         if overwrite or confirm(
-            'Do you want to overwrite it with a new, default "config.py" file?'
+            'Do you want to overwrite it with a new, default "config.py" file?\n'
+            '(Existing file will be copied to "old__config.py" first)'
         ):
+            copyfile(config_file, config_file.parent / "old__config.py")
             copyfile(default_config.__file__, config_file)
             echo(f'Overwritten existing "config.py" with the default file.')

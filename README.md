@@ -83,7 +83,7 @@ available on PyPI):
 Optionally enable tab-autocompletion for `sharp` commands by adding the
 following line to your `.bashrc`:
 ```sh
-. ~/code/sharp/sharp/cli/enable-autocomplete.sh
+. ~/code/sharp/sharp/cmdline/enable-autocomplete.sh
 ```
 
 
