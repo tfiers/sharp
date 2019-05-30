@@ -1,5 +1,4 @@
-_build/
-docs/api/
+.luigi-config/
 
 *.egg-info
 __pycache__/

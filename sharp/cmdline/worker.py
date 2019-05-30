@@ -2,16 +2,18 @@
 Reads the config dir from CLI input for global use in the application.
 Loads the user-customized config.py file, sets up logging, and runs tasks.
 """
+from socket import gethostname
 from logging import Logger, getLogger
 from logging.config import dictConfig
-from os import chdir
+from os import chdir, getpid
 from pathlib import Path
 from shutil import rmtree
 from typing import Iterable, Union
 
-import sharp.config.directory
 from click import argument, command, echo, option
-from sharp.cmdline.util import setup_luigi_config
+
+import sharp.config.directory
+from sharp.cmdline.util import write_luigi_config
 from sharp.config.spec import CONFIG_FILENAME
 from sharp.config.types import ConfigError
 
@@ -78,9 +80,14 @@ def worker(
 
     config = load_sharp_config()
     log = init_log()
-    setup_luigi_worker_config()
-    log.info("Luigi config file exists.")
-    # Now we can import from Luigi, which will apply the generated config.
+
+    write_luigi_worker_config()
+
+    log.info("Importing luigi")
+
+    from luigi import build, RPCError
+
+    log.info("Luigi read config file")
 
     if clear_all:
         log.info("Clearing entire output directories, if they exist.")
@@ -96,8 +103,6 @@ def worker(
         for task in tasks_to_run:
             clear_output(task)
 
-    from luigi import build, RPCError
-
     try:
         scheduling_succeeded = build(
             tasks_to_run, local_scheduler=local_scheduler
@@ -111,8 +116,10 @@ def worker(
             " option of your config is correctly set."
         ) from err
 
-    log.info("Luigi worker has no more tasks to complete.")
-    log.info("Shutting down Python process.")
+    log.info(
+        "Luigi worker has no more tasks to run."
+        " Shutting down Python process."
+    )
 
 
 def load_sharp_config():
@@ -141,27 +148,35 @@ def init_log() -> Logger:
     return log
 
 
-def setup_luigi_worker_config():
+def write_luigi_worker_config():
     """ Auto-generate a luigi.toml file to configure Luigi workers. """
+
+    # We provide a unique filename for the Luigi config file for each "sharp
+    # worker" process. This is to avoid the situation where in one process,
+    # luigi is reading the config file, while it another process is halfway in
+    # the process of overwriting it.
 
     from sharp.config.load import config
 
-    luigi_config = {
-        "core": {
-            "default-scheduler-url": config.scheduler_url,
-            "rpc-retry-attempts": 2 * 60,
-            # When the network is down, retry connecting to the scheduler every
-            # 30 seconds for this many attempts (instead of the default 3
-            # attempts).
+    output_dir = sharp.config.directory.config_dir / ".luigi-config"
+    write_luigi_config(
+        output_dir,
+        {
+            "core": {
+                "default-scheduler-url": config.scheduler_url,
+                "rpc-retry-attempts": 2 * 60,
+                # When the network is down, retry connecting to the scheduler every
+                # 30 seconds for this many attempts (instead of the default 3
+                # attempts).
+            },
+            "worker": {
+                "keep_alive": True,
+                "task_process_context": "",  # Suppress a Luigi bug warning.
+            },
+            "logging": config.logging,
         },
-        "worker": {
-            "keep_alive": True,
-            "task_process_context": "",  # Suppress a Luigi bug warning.
-        },
-        "logging": config.logging,
-    }
-    config_dir = sharp.config.directory.config_dir
-    setup_luigi_config(config_dir, luigi_config)
+        filename=f"{gethostname()}__{getpid()}.toml",
+    )
 
 
 def clear_all_output():

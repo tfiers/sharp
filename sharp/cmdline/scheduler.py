@@ -11,7 +11,7 @@ from typing import Tuple, Optional
 
 from click import group, option, argument, echo
 
-from sharp.cmdline.util import setup_luigi_config
+from sharp.cmdline.util import write_luigi_config
 
 PID_FILENAME = "scheduler.pid"
 STATE_FILENAME = "scheduler-state.pickle"
@@ -169,19 +169,21 @@ def setup_luigi_scheduler_config(scheduler_directory: Path):
     
     :param scheduler_directory:  An absolute and resolved path.
     """
-    luigi_config = {
-        "scheduler": {
-            "record_task_history": True,
-            "state_path": str(scheduler_directory / STATE_FILENAME),
-            "retry_delay": 60,
-            # Mark a failed task as pending again after this many seconds.
-            "disable-hard-timeout": 10 * 60,
-            # Stop retrying a failed task after this many seconds; So workers
-            # can quit.
+    write_luigi_config(
+        scheduler_directory,
+        {
+            "scheduler": {
+                "record_task_history": True,
+                "state_path": str(scheduler_directory / STATE_FILENAME),
+                "retry_delay": 60,
+                # Mark a failed task as pending again after this many seconds.
+                "disable-hard-timeout": 10 * 60,
+                # Stop retrying a failed task after this many seconds; So workers
+                # can quit.
+            },
+            "task_history": {
+                # SqlAlchemy connection string
+                "db_connection": f"sqlite:///{scheduler_directory/'task-history.db'}"
+            },
         },
-        "task_history": {
-            # SqlAlchemy connection string
-            "db_connection": f"sqlite:///{scheduler_directory/'task-history.db'}"
-        },
-    }
-    setup_luigi_config(scheduler_directory, luigi_config)
+    )
