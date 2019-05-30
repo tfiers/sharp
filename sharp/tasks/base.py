@@ -80,7 +80,7 @@ def log_exception(task: SharpTask, exception: Exception):
     Catch tasks failures and don't let Luigi swallow the useful debugging info.
     """
     log.error(
-        f"Reason of task failure:\n{exception}\n\nTraceback:\n"
+        f"Reason of task failure: {exception}\n\nTraceback:\n"
         + "".join(format_tb(exception.__traceback__))
     )
 
