@@ -143,18 +143,18 @@ Edit the newly created "`config.py`" file in this directory and change the
 settings (such as the location of raw data and output directories) to suit your
 needs.
 
-See the [config specification](/sharp/config/spec.py) for explanations of the
+- See the [config specification](/sharp/config/spec.py) for explanations of the
 different options.
-
-See the [test `config.py` file](/tests/system/config.py) from this repository
+- See the [test `config.py` file](/tests/system/config.py) from this repository
 for a concrete example of a customized configuration.
 
 
 ### 2. Running tasks
 
-When your `config.py` file is ready, run:
+When your `config.py` file is ready, run `sharp worker -l`, passing the name
+of your config directory:
 ```bash
-$ sharp worker ~/my-sharp-cfg --local-scheduler
+$ sharp worker -l ~/my-sharp-cfg
 ```
 This will run the tasks specified in the `get_tasks` method in your `config.py`
 file (these tasks typically generate figures), together with the tasks on which
@@ -164,6 +164,8 @@ calculating evaluation metrics, ...).
 `sharp` internally outsources task dependency resolution and scheduling to
 the [Luigi](https://luigi.readthedocs.io) Python package.
 
+The `-l`, or `--local-scheduler`, option specifies that no multiple workers
+will run in parallel, and that no separate scheduling server is needed.
 
 
 
@@ -172,19 +174,20 @@ the [Luigi](https://luigi.readthedocs.io) Python package.
 If you want to run tasks in parallel, a [central Luigi task scheduler](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
 should be used instead of the local scheduler.
 
-> Note that because the Luigi scheduling server only runs on Linux-like
-operating systems, running multiple sharp workers in parallel is not supported
-on Windows.
-
-`sharp` provides a wrapper script to configure and start the Luigi scheduling
-server. It takes as argument the name of a new directory in which the server
-logs, task history database, and scheduler PID and state file will be stored:
+`sharp` provides a wrapper script, `sharp scheduler start`, to configure and
+start the Luigi scheduling server as a background (daemon) process. It takes
+as argument the name of a new directory in which the server logs, task history
+database, and scheduler PID and state files will be stored:
 ```bash
 $ sharp scheduler start ~/luigi-scheduler
 ```
 
 Similarly, `sharp scheduler stop` and `sharp scheduler state` commands are
 provided.
+
+> The Luigi scheduling server can only run as a daemon on Linux-like operating
+systems. If you want to use the scheduling server on Windows, run it manually
+in the foreground using the `luigid` command.
 
 
 When the central scheduler is running, and when you have correctly set the
@@ -195,7 +198,6 @@ $ sharp worker ~/my-sharp-cfg
 processes.
 
 On a computing cluster, this is the command to run in parallel.
-
 Thus, when e.g. using the [SLURM cluster manager](https://slurm.schedmd.com/overview.html),
 this could be the job you'd run (in a file `sharp-slurm-job.sh` for example):
 ```bash
