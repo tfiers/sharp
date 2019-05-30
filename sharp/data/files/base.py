@@ -62,6 +62,21 @@ class FileTarget(PathlibPath, Target, ABC):
             self.unlink()
             log.info(f"Deleted {self.relative_to(output_root)}")
 
+    @property
+    def size(self) -> str:
+        """
+        Giga and Mega are SI multiples of 10 here, not powers of 2 as Windows
+        (wrongly) uses them -- these are Gibi and Mebi.
+        """
+        size = self.stat().st_size  # In bytes
+        for unit in ("bytes", "kB", "MB", "GB"):
+            if size > 1000:
+                size /= 1000
+                continue
+            else:
+                break
+        return f"{size:.1f} {unit}"
+
 
 class InputFileTarget(FileTarget, ABC):
     def write(self, object):
@@ -79,8 +94,12 @@ class OutputFileTarget(FileTarget, ABC):
 class HDF5Target(FileTarget, ABC):
     extension = ".hdf5"
 
-    def open_file_for_write(self) -> HDF5File:
-        return HDF5File(self.path_string, "w")
-
     def open_file_for_read(self) -> HDF5File:
         return HDF5File(self.path_string, "r")
+
+    def open_file_for_write(self, clear_existing: bool = False) -> HDF5File:
+        if clear_existing:
+            mode = "w"
+        else:
+            mode = "a"
+        return HDF5File(self.path_string, mode)
