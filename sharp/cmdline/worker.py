@@ -8,6 +8,7 @@ from logging.config import dictConfig
 from os import chdir, getpid
 from pathlib import Path
 from shutil import rmtree
+from time import time
 from typing import Iterable, Union
 
 from click import argument, command, echo, option
@@ -16,6 +17,7 @@ import sharp.config.directory
 from sharp.cmdline.util import write_luigi_config
 from sharp.config.spec import CONFIG_FILENAME
 from sharp.config.types import ConfigError
+from sharp.util.misc import format_duration
 
 
 log = getLogger(__name__)
@@ -74,35 +76,30 @@ def worker(
             f'You can run "sharp config {config_dir}" to generate such a file.'
         )
         return
-
     # Make sure e.g. log files are generated in the correct directory.
     chdir(str(config_dir))
-
     config = load_sharp_config()
     log = init_log()
-
     write_luigi_worker_config()
-
     log.info("Importing luigi")
 
     from luigi import build, RPCError
 
     log.info("Luigi read config file")
-
     if clear_all:
         log.info("Clearing entire output directories, if they exist.")
         clear_all_output()
-
     log.info("Importing tasks to run...")
+    t0 = time()
     from sharp.config.util import get_tasks_tuple
 
     tasks_to_run = get_tasks_tuple(config)
-    log.info("Done importing tasks to run.")
-
+    log.info(
+        f"Done importing tasks to run. Took {format_duration(time() - t0)}"
+    )
     if clear_last:
         for task in tasks_to_run:
             clear_output(task)
-
     try:
         scheduling_succeeded = build(
             tasks_to_run, local_scheduler=local_scheduler
@@ -117,8 +114,7 @@ def worker(
         ) from err
 
     log.info(
-        "Luigi worker has no more tasks to run."
-        " Shutting down Python process."
+        "Luigi worker has no more tasks to run. Shutting down Python process."
     )
 
 
@@ -218,6 +214,6 @@ def clear_output(task):
             clear_output(dependency)
 
 
+# For testing in PyCharm
 if __name__ == "__main__":
-    # For testing in PyCharm
     worker()

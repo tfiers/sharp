@@ -5,13 +5,6 @@ from sharp.cmdline.scheduler import scheduler
 from sharp.cmdline.worker import worker
 
 
-# Flag when we have entered our own code.
-# print("\nWelcome to the sharp CLI.\n", flush=True)
-#
-# --> Printing something here messes up Click bash tab completion (even with
-# click.echo)
-
-
 @group(
     options_metavar="<options>",
     subcommand_metavar="<command>",
