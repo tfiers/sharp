@@ -2,6 +2,7 @@
 Reads the config dir from CLI input for global use in the application.
 Loads the user-customized config.py file, sets up logging, and runs tasks.
 """
+import os
 from socket import gethostname
 from logging import Logger, getLogger
 from logging.config import dictConfig
@@ -99,11 +100,10 @@ def worker(
     )
     if clear_last:
         for task in tasks_to_run:
+            log.info(f"Removing output of task {task}")
             clear_output(task)
     try:
-        scheduling_succeeded = build(
-            tasks_to_run, local_scheduler=local_scheduler
-        )
+        build(tasks_to_run, local_scheduler=local_scheduler)
     except RPCError as err:
         raise ConfigError(
             "Could not connect to centralized Luigi task scheduler. Either run"
@@ -155,6 +155,15 @@ def write_luigi_worker_config():
     from sharp.config.load import config
 
     output_dir = sharp.config.directory.config_dir / ".luigi-config"
+    if os.name == "nt":
+        # On Windows, don't use multiprocessing (cannot fork process on
+        # Windows).
+        work_in_subprocess = False
+    else:
+        # On Unix, work in a subprocess. This avoids memory only accumulating
+        # (Python doesn't normally release memory back to OS).
+        work_in_subprocess = True
+
     write_luigi_config(
         output_dir,
         {
@@ -168,6 +177,7 @@ def write_luigi_worker_config():
             "worker": {
                 "keep_alive": True,
                 "task_process_context": "",  # Suppress a Luigi bug warning.
+                "force_multiprocessing": work_in_subprocess,
             },
             "logging": config.logging,
         },
