@@ -19,9 +19,6 @@ setup(
         "typeguard",
         "scikit-learn",
         "psutil",
-        # Version pin of python-daemon is necessary to make Luigi install work
-        # on Windows:
-        "python-daemon==2.1.2",
         # Sqlalchemy is a Luigi dependency (but weirdly not in their setup.py).
         "sqlalchemy",
         "luigi[toml]==2.8.5",
