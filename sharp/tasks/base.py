@@ -54,12 +54,16 @@ class SharpTask(Task, ABC):
         and write output file(s).
         """
 
-    def check_memory_usage(self):
+    @staticmethod
+    def check_memory_usage():
         mem_usage = virtual_memory().percent / 100
         # This is the percentage of *physical* memory used (i.e. not
         # including swap). "virtual_memory()" is thus a confusing name.
         log.info(f"Currently {mem_usage:.1%} of system memory in use.")
-        if mem_usage > config.max_memory_usage:
+        if (
+            config.max_memory_usage is not None
+            and mem_usage > config.max_memory_usage
+        ):
             raise MemoryError(
                 f"More than {config.max_memory_usage:.0%}% of system memory"
                 f" already in use. Will not start the current task."
