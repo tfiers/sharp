@@ -34,29 +34,47 @@ def ignore(warning_type: Type[Warning]):
 
 
 def format_duration(
-    duration_in_seconds: float, auto_ms: bool = False, ms_digits: int = 1
+    duration_in_seconds: float,
+    fixed_len: bool = False,
+    precision: int = 1,
+    auto_ms: bool = True,
 ) -> str:
     """
-    
-    :param duration_in_seconds
-    :param auto_ms:  Whether to switch to "SS.MMM ms" format when the given
-            duration is shorter than a second.
-    :param ms_digits:  Number of digits for the millisecond part in the "1h22m
-            43.784s" format.
     :return:  The given length of time in human-readable format.
+    :param duration_in_seconds:  .
+    :param fixed_len:  Whether to output leading 0 parts. See examples below.
+    :param precision:  Number of digits after the decimal dot. Must be ≥ 0.
+    :param auto_ms:  Whether to use "MM.M ms" format when duration is less than
+            a second. Ignored when fixed_len is True.
     
-    Examples:
-        "1h22 43.6s"
-        "0h00 05.0s"
-        "21.512 ms"
+    Output examples for fixed_len = True:
+        "1h08m 05.6s"
+        "0h08m 05.6s"
+        "0h00m 05.6s"
+    
+    Output examples for fixed_len = False :
+        "1h08m 05.6s"
+        "8m 05.6s"
+        "5.6s"
+        "21.5 ms"
     """
-    if auto_ms and duration_in_seconds < 1:
-        return f"{duration_in_seconds * 1000:.3f} ms"
+    if not fixed_len and auto_ms and duration_in_seconds < 1:
+        return f"{duration_in_seconds * 1000:.{precision}f} ms"
     else:
-        # Explicit conversion to int, from float64 e.g.
+        seconds, fractional_part = divmod(duration_in_seconds, 1)
+        # Explicit conversion to int, from float or np.float64 e.g.
         # (int is needed for "02d" format string).
-        duration_in_ms = int(round(duration_in_seconds * 1000))
-        seconds, milliseconds = divmod(duration_in_ms, 1000)
+        seconds = int(seconds)
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
-        return f"{hours:g}h{minutes:02d}m {seconds:02d}.{milliseconds:0{ms_digits}d}s"
+        decimal_digits = round(fractional_part * 10 ** precision)
+        if precision == 0:
+            suffix = "s"
+        else:
+            suffix = f".{decimal_digits:0{precision}d}s"
+        if fixed_len or hours > 0:
+            return f"{hours}h{minutes:02d}m {seconds:02d}{suffix}"
+        elif minutes > 0:
+            return f"{minutes}m {seconds:02d}{suffix}"
+        else:
+            return f"{seconds}{suffix}"
