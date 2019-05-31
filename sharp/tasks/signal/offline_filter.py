@@ -1,5 +1,4 @@
 from abc import ABC
-from logging import getLogger
 from typing import Tuple
 
 from numpy import abs, array, ceil, log, min
@@ -12,9 +11,6 @@ from sharp.data.files.numpy import SignalFile
 from sharp.data.types.signal import Signal
 from sharp.tasks.signal.downsample import DownsampleRawRecording
 from sharp.tasks.signal.raw import SingleRecordingFileTask
-
-
-logr = getLogger(__name__)
 
 
 output_root = shared_output_root / "offline-filter-envelope"
@@ -31,7 +27,7 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
 
     def work(self):
         sig_in = self.requires().output().read()
-        logr.info("Read raw signal")
+        self.update_status("Read raw signal")
         # We cannot directly use fklab's "compute_envelope", as this function
         # averages all channel envelopes into one.
         bpf_out = apply_filter(
@@ -42,7 +38,7 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
             transition_width="20%",
             attenuation=30,
         )
-        logr.info("Applied bandpass filter")
+        self.update_status("Applied bandpass filter")
         # Use padding to nearest power of 2 or 3 when calculating Hilbert
         # transform for great speedup (via FFT).
         N_orig = sig_in.shape[0]
@@ -50,17 +46,17 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
         envelope_raw_padded = abs(analytical(bpf_out, N=N, axis=0))
         del bpf_out
         envelope_raw = envelope_raw_padded[:N_orig, :]
-        logr.info("Calculated raw envelope")
+        self.update_status("Calculated raw envelope")
         del envelope_raw_padded
         envelope_smooth = smooth1d(
             envelope_raw, delta=1 / sig_in.fs, kernel="gaussian", bandwidth=4e-3
         )
-        logr.info("Smoothed envelope")
+        self.update_status("Smoothed envelope")
         del envelope_raw
         sig_out = Signal(envelope_smooth, sig_in.fs, sig_in.units)
         del envelope_smooth
         self.output().write(sig_out)
-        logr.info("Wrote envelope to disk")
+        self.update_status("Wrote envelope to disk")
         del sig_in, sig_out
 
 

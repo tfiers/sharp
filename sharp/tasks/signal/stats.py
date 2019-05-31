@@ -1,5 +1,4 @@
 from abc import ABC
-from logging import getLogger
 from typing import Optional, Type
 
 from numpy import median
@@ -14,9 +13,6 @@ from sharp.tasks.signal.offline_filter import (
     CalcSharpWaveEnvelope,
 )
 from sharp.tasks.signal.raw import SingleRecordingFileTask
-
-
-log = getLogger(__name__)
 
 
 class DetectMountains(SingleRecordingFileTask, ABC):
@@ -48,13 +44,15 @@ class DetectMountains(SingleRecordingFileTask, ABC):
         return self.requires().output().read()
 
     def work(self):
-        log.info("Calculating thresholds")
+        self.update_status("Calculating thresholds")
         # Calculate thresholds flattened over all channels
         thr_support = self.threshold(self.mult_support)
         thr_detect = self.threshold(self.mult_detect)
         seg_list = []
-        for channel in range(self.envelope.num_channels):
-            log.info(f"Detecting mountains in channel {channel}")
+        num_channels = self.envelope.num_channels
+        for channel in range(num_channels):
+            self.update_status(f"Detecting mountains in channel {channel}")
+            self.update_progress(channel / num_channels)
             sig: Signal = self.envelope[:, channel]
             mountain_segs = detect_mountains(
                 sig,

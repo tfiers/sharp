@@ -10,8 +10,6 @@ from sharp.tasks.signal.raw import (
     SingleRecordingFileTask,
 )
 
-log = getLogger(__name__)
-
 
 class DownsampleRawRecording(SingleRecordingFileTask):
     output_dir = shared_output_root / "downsampled-recordings"
@@ -28,13 +26,13 @@ class DownsampleRawRecording(SingleRecordingFileTask):
         q, remainder = divmod(fs_orig, config.fs_target)
         fs_new = fs_orig / q
         if remainder > 0:
-            log.warning(
+            getLogger(__name__).warning(
                 f"Original sampling rate of {self.file_ID} ({fs_orig} Hz) is"
                 f" not an integer multiple of the target sampling rate"
                 f" ({config.fs_target} Hz). Sampling rate after downsampling"
                 f" will instead be {fs_new} Hz."
             )
-        log.info(
+        self.update_status(
             f"Decimating {self.file_ID} ({self.file_ID.path}) of size"
             f" {self.file_ID.path.stat().st_size / 1E9:.1f} GB by a factor {q}."
         )
@@ -47,7 +45,6 @@ class DownsampleRawRecording(SingleRecordingFileTask):
 
 
 class DownsampleAllRecordings(WrapperTask):
-
     def requires(self):
         return (
             DownsampleRawRecording(file_ID=rec_file)

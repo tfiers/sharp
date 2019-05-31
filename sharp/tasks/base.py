@@ -11,9 +11,6 @@ from sharp.config.load import config
 from sharp.util.misc import cached
 
 
-log = getLogger(__name__)
-
-
 class SharpTask(Task, ABC):
     """
     Base class for all tasks in this package.
@@ -54,12 +51,13 @@ class SharpTask(Task, ABC):
         and write output file(s).
         """
 
-    @staticmethod
-    def check_memory_usage():
+    def check_memory_usage(self):
         mem_usage = virtual_memory().percent / 100
         # This is the percentage of *physical* memory used (i.e. not
         # including swap). "virtual_memory()" is thus a confusing name.
-        log.info(f"Currently {mem_usage:.1%} of system memory in use.")
+        self.update_status(
+            f"Currently {mem_usage:.1%} of system memory in use."
+        )
         if (
             config.max_memory_usage is not None
             and mem_usage > config.max_memory_usage
@@ -68,6 +66,13 @@ class SharpTask(Task, ABC):
                 f"More than {config.max_memory_usage:.0%}% of system memory"
                 f" already in use. Will not start the current task."
             )
+
+    def update_status(self, message: str):
+        getLogger(self.__class__.__name__).info(message)
+        self.set_status_message(message)
+
+    def update_progress(self, progress: float):
+        self.set_progress_percentage(progress * 100)
 
     @property
     def dependencies(self) -> List[Task]:
@@ -83,7 +88,7 @@ def log_exception(task: SharpTask, exception: Exception):
     """
     Catch tasks failures and don't let Luigi swallow the useful debugging info.
     """
-    log.error(
+    getLogger(__name__).error(
         f"Reason of task failure: {exception}\n"
         f"Traceback:\n"
         "".join(format_tb(exception.__traceback__))
