@@ -1,31 +1,30 @@
 from datetime import datetime
 from logging import Formatter, LogRecord
 from os import getenv, getpid
+from socket import gethostname
 
 from math import ceil
-
-from sharp.util.misc import format_duration
 
 
 node_ID = getenv("SLURM_NODEID")
 task_ID = getenv("SLURM_LOCALID")
 
-LOGGER_NAME_LENGTH_UNIT = len("sharp.cmdline.worker")
-LONG_LOG_LEVEL = "CRITICAL"
+LOGGER_NAME_LENGTH_UNIT = len("sharp.cmdline.util")
 
 
 class ClusterFormatter(Formatter):
     def format(self, r: LogRecord):
-        rel_time = format_duration(r.relativeCreated / 1000, ms_digits=3)
-        metadata = [f"{datetime.now():%Y-%m-%d %H:%M:%S}", rel_time]
+        parts = [datetime.now().isoformat(sep=" ", timespec="milliseconds")]
         if node_ID is not None:
-            metadata += [
-                f"PID {getpid(): >5}",
-                f"worker {node_ID}.{int(task_ID):02d}",
-            ]
+            process = f"{gethostname()}.{getpid()}"
+            # Example: "compute01.45904"
+            parts += [f"{process: <15}", f"n{node_ID}.t{int(task_ID):02d}"]
         k = ceil(len(r.name) / LOGGER_NAME_LENGTH_UNIT)
-        metadata += [f"{r.name: >{k * LOGGER_NAME_LENGTH_UNIT}}"]
-        return f"{' | '.join(metadata)} | {r.levelname+':': <{len(LONG_LOG_LEVEL)}} {r.getMessage()}"
+        parts += [
+            f"{r.name: >{k * LOGGER_NAME_LENGTH_UNIT}}",
+            f"{r.levelname}: {r.getMessage()}",
+        ]
+        return f"{' | '.join(parts)}"
 
 
 get_cluster_formatter = lambda: ClusterFormatter()
