@@ -1,4 +1,5 @@
 from logging import getLogger
+from time import time
 
 from fklab.signals.multirate import decimate_chunkwise
 from sharp.config.load import config, shared_output_root
@@ -36,8 +37,21 @@ class DownsampleRawRecording(SingleRecordingFileTask):
             f"Decimating {self.file_ID} ({self.file_ID.path}) of size"
             f" {self.file_ID.path.stat().st_size / 1E9:.1f} GB by a factor {q}."
         )
+        t_prev = time()
+
+        # Circumvent PyCharm bug:
+        # noinspection PyUnresolvedReferences
+        def track_downsampling_progress(progress: float):
+            t_now = time()
+            time_passed = t_now - t_prev
+            if time_passed > 5:
+                self.update_progress(progress)
+                t_prev = t_now
+
         signal_down = decimate_chunkwise(
-            raw_recording.signal, factor=q, log_progress=True
+            raw_recording.signal,
+            factor=q,
+            loop_callback=track_downsampling_progress,
         )
         signal_down *= raw_recording.to_microvolts
         raw_recording.close()
