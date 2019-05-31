@@ -61,12 +61,12 @@ def format_duration(
     if not fixed_len and auto_ms and duration_in_seconds < 1:
         return f"{duration_in_seconds * 1000:.{precision}f} ms"
     else:
-        seconds, fractional_part = divmod(duration_in_seconds, 1)
+        total_seconds, fractional_part = divmod(duration_in_seconds, 1)
         # Explicit conversion to int, from float or np.float64 e.g.
         # (int is needed for "02d" format string).
-        seconds = int(seconds)
-        minutes, seconds = divmod(seconds, 60)
-        hours, minutes = divmod(minutes, 60)
+        total_seconds = int(total_seconds)
+        total_minutes, seconds = divmod(total_seconds, 60)
+        hours, minutes = divmod(total_minutes, 60)
         decimal_digits = round(fractional_part * 10 ** precision)
         if precision == 0:
             suffix = "s"
