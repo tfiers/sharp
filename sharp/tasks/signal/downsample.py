@@ -40,7 +40,7 @@ class DownsampleRawRecording(SingleRecordingFileTask):
         t_prev = time()
 
         def track_downsampling_progress(progress: float):
-            global t_prev
+            nonlocal t_prev
             t_now = time()
             time_passed = t_now - t_prev
             if time_passed > 5:

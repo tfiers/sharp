@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from inspect import getmodule
 from logging import getLogger
 from traceback import format_tb
 from typing import List
@@ -68,7 +69,8 @@ class SharpTask(Task, ABC):
             )
 
     def update_status(self, message: str):
-        getLogger(self.__class__.__name__).info(message)
+        log = getLogger(getmodule(self).__name__)
+        log.info(message)
         self.set_status_message(message)
 
     def update_progress(self, progress: float):
