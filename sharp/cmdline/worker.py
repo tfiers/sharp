@@ -23,6 +23,14 @@ from sharp.util.misc import format_duration
 
 log = getLogger(__name__)
 
+if os.name == "nt":
+    # On Windows, don't use multiprocessing (cannot fork process on Windows).
+    work_in_subprocess = False
+else:
+    # On Unix, work in a subprocess. This avoids memory only accumulating
+    # (Python doesn't normally release memory back to OS).
+    work_in_subprocess = True
+
 
 @command(
     short_help="Start a process that runs tasks.", options_metavar="<options>"
@@ -154,16 +162,7 @@ def write_luigi_worker_config():
 
     from sharp.config.load import config
 
-    output_dir = sharp.config.directory.config_dir / ".luigi-config"
-    if os.name == "nt":
-        # On Windows, don't use multiprocessing (cannot fork process on
-        # Windows).
-        work_in_subprocess = False
-    else:
-        # On Unix, work in a subprocess. This avoids memory only accumulating
-        # (Python doesn't normally release memory back to OS).
-        work_in_subprocess = True
-
+    output_dir = sharp.config.directory.config_dir / "temp.luigi-config"
     write_luigi_config(
         output_dir,
         {

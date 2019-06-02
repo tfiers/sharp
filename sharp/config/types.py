@@ -10,10 +10,12 @@ from typing import Any, Dict, Iterable, TypeVar, Union
 
 ConfigDict = Dict[str, Union[Any, "ConfigDict"]]
 
-# We do not want to import from luigi yet in config/spec.py. (As luigi executes
-# initalization code on import. We want to control this initialization by
-# setting env vars, later). Therefore make a dummy Luigi.Task type.
-LuigiTask = TypeVar("LuigiTask")
+# We do not want to import from luigi yet wherever this type is used -- e.g. in
+# config/spec.py. (This is because luigi executes initalization code at import
+# time. We want to control this initialization by programmatically generating a
+# luigi config file and setting env vars, later). Therefore make a dummy
+# Luigi.Task type.
+LuigiTask = TypeVar("Luigi.Task")
 
 OneOrMoreLuigiTasks = Union[LuigiTask, Iterable[LuigiTask]]
 

@@ -7,11 +7,13 @@ from sharp.config.types import ConfigDict, OneOrMoreLuigiTasks, RecordingFileID
 CONFIG_FILENAME = "config.py"
 
 
+# (Instruction for the PyCharm code editor, who can't handle dataclass
+# docstrings yet):
+# noinspection PyUnresolvedReferences
+
+
 @dataclass
 class SharpConfig:
-    # (Instruction for the PyCharm code editor, who can't handle dataclass
-    # docstrings yet):
-    # noinspection PyUnresolvedReferences
     """
     :param get_tasks:  Return instantiated tasks, which will be passed to
             luigi.build(). The necessary import statements should be contained
