@@ -1,8 +1,12 @@
+# This "config.py" file was copied from "[source_code]/sharp/config/default/"
+# to your custom sharp configuration directory. Change the argument values
+# in the "SharpConfig()" initialisation call below to suit your needs.
+
 from pathlib import Path
 
 from numpy import linspace
 
-from sharp.config.default.logging import LOGGING_CONFIG
+from sharp.config.default.logging import get_logging_config
 from sharp.config.default.raw_data import flat_recordings_list
 from sharp.config.default.tasks import get_default_tasks
 from sharp.config.spec import SharpConfig
@@ -15,7 +19,7 @@ config = SharpConfig(
     shared_output_dir="/home/ratlab/tomas/data/shared",
     fs_target=1000,
     bitmap_versions=False,
-    logging=LOGGING_CONFIG,
+    logging=get_logging_config(multiple_workers=True),
     scheduler_url="http://nerfcluster-fs:8082",
     config_id=str(Path(__file__).parent.stem),
     mult_detect_ripple=tuple(linspace(0.4, 4, num=7)),

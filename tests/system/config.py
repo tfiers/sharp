@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from numpy import linspace
-from sharp.config.default.logging import LOGGING_CONFIG
+
+from sharp.config.default.logging import get_logging_config
 from sharp.config.default.tasks import get_default_tasks
 from sharp.config.spec import SharpConfig
 from sharp.config.types import RecordingFileID
@@ -24,7 +25,7 @@ config = SharpConfig(
     shared_output_dir="data/processed-shared",
     fs_target=1000,
     bitmap_versions=False,
-    logging=LOGGING_CONFIG,
+    logging=get_logging_config(multiple_workers=False),
     scheduler_url=None,
     config_id="test",
     mult_detect_ripple=tuple(linspace(0.4, 4, num=7)),

@@ -1,4 +1,4 @@
 data/processed/
 data/processed-shared/
-luigi.toml
-*.log
+logs/
+temp.luigi-config/
