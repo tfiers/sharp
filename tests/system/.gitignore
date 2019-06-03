@@ -1,4 +1,4 @@
 data/processed/
 data/processed-shared/
 logs/
-temp.luigi-config/
+.temp-luigi-config-files/

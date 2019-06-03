@@ -162,7 +162,7 @@ def write_luigi_worker_config():
 
     from sharp.config.load import config
 
-    output_dir = sharp.config.directory.config_dir / "temp.luigi-config"
+    output_dir = sharp.config.directory.config_dir / ".temp-luigi-config-files"
     write_luigi_config(
         output_dir,
         {
