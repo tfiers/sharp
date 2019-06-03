@@ -9,12 +9,8 @@ from math import ceil
 
 LOGGER_NAME_LENGTH_UNIT = len("sharp.cmdline.util")
 
-logfile_dirs = {
-    "per_process": Path("logs/per-process"),
-    "multiprocess": Path("logs/multiprocess"),
-    "single_worker": Path("logs"),
-}
-
+PER_PROCESS_LOGFILES_DIR = Path("logs/per-process")
+SINGLE_WORKER_LOGFILES_DIR = Path("logs")
 
 running_as_slurm_task = True if "SLURM_JOB_ID" in environ else False
 if running_as_slurm_task:
@@ -26,9 +22,11 @@ if running_as_slurm_task:
 else:
     filename_suffix = ""
 
-per_process_log_filename = (
-    f"{gethostname()}__PID_{getpid()}{filename_suffix}.log"
-)
+# When doing work in subprocess, still use PID of parent process in logs.
+host = gethostname()
+pid = getpid()
+
+per_process_log_filename = f"{host}__PID_{pid}{filename_suffix}.log"
 
 
 class SharpFormatter(Formatter):
@@ -38,7 +36,7 @@ class SharpFormatter(Formatter):
     def format(self, r: LogRecord):
         parts = [datetime.now().isoformat(sep=" ", timespec="milliseconds")]
         if self.mention_process:
-            parts += [f"{gethostname()}.PID_{getpid(): <5}"]
+            parts += [f"{host}.PID_{pid: <5}"]
             # Example: "compute01.PID_45904"
             if running_as_slurm_task:
                 parts += [slurm_task_ID]
@@ -59,47 +57,25 @@ def mkdir(d: Path):
 
 
 def get_logging_config(multiple_workers: bool):
-    kwargs_for_all_filehandlers = {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "when": "D",
-    }
+    kwargs_for_all_filehandlers = {}
     if multiple_workers:
         console_fmt = "multiprocess"
-        file_handlers = {
-            "multiprocess_file": {
-                "filename": str(logfile_dirs["multiprocess"] / "sharp.log"),
-                "formatter": "multiprocess",
-                **kwargs_for_all_filehandlers,
-            },
-            "per_process_file": {
-                "filename": str(
-                    logfile_dirs["per_process"] / per_process_log_filename
-                ),
-                "formatter": "single_process",
-                **kwargs_for_all_filehandlers,
-            },
-        }
-        mkdir(logfile_dirs["multiprocess"])
-        mkdir(logfile_dirs["per_process"])
+        filename = str(PER_PROCESS_LOGFILES_DIR / per_process_log_filename)
+        mkdir(PER_PROCESS_LOGFILES_DIR)
     else:
         console_fmt = "single_process"
-        file_handlers = {
-            "single_worker_file": {
-                "filename": str(logfile_dirs["single_worker"] / "sharp.log"),
-                "formatter": "single_process",
-                **kwargs_for_all_filehandlers,
-            }
-        }
-        mkdir(logfile_dirs["single_worker"])
+        filename = str(SINGLE_WORKER_LOGFILES_DIR / "sharp.log")
+        mkdir(SINGLE_WORKER_LOGFILES_DIR)
 
     return {
         "version": 1,
         "disable_existing_loggers": False,
         "root": {
-            # Root logger needs to be specified outside of a 'loggers' key.
+            # Root logger needs to be specified outside of the "loggers" key.
             "level": "INFO",
-            "handlers": ["console", *file_handlers.keys()],
+            "handlers": ["console", "file"],
         },
+        "loggers": {"luigi": {"level": "DEBUG"}, "sharp": {"level": "DEBUG"}},
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
@@ -108,7 +84,12 @@ def get_logging_config(multiple_workers: bool):
                 "stream": "ext://sys.stdout",
                 "formatter": console_fmt,
             },
-            **file_handlers,
+            "file": {
+                "class": "logging.handlers.TimedRotatingFileHandler",
+                "when": "D",
+                "filename": filename,
+                "formatter": "single_process",
+            },
         },
         "formatters": {
             "multiprocess": {
