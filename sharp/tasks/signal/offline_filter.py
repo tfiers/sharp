@@ -48,7 +48,6 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
         envelope_raw_padded = abs(analytical(bpf_out, N=N, axis=0))
         del bpf_out
         envelope_raw = envelope_raw_padded[:N_orig, :]
-        raise UserWarning("yo")
         self.update_status("Calculated raw envelope. Smoothing envelope.")
         del envelope_raw_padded
         envelope_smooth = smooth1d(
