@@ -1,4 +1,4 @@
-# This "config.py" file was copied from "[source_code]/sharp/config/default/"
+# This "config.py" file was copied from "[sharp_source_code]/sharp/config/default/"
 # to your custom sharp configuration directory. Change the argument values
 # in the "SharpConfig()" initialisation call below to suit your needs.
 

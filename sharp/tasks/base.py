@@ -69,12 +69,16 @@ class SharpTask(Task, ABC):
             )
 
     def update_status(self, message: str):
-        log = getLogger(getmodule(self).__name__)
-        log.info(message)
+        self.log.info(message)
         self.set_status_message(message)
 
-    def update_progress(self, progress: float):
-        self.set_progress_percentage(progress * 100)
+    def update_progress(self, progress: float, log_prefix="Task progress"):
+        self.log.info(f"{log_prefix}: {progress:.1%}")
+        self.set_progress_percentage(round(progress * 100, 1))
+
+    @property
+    def log(self):
+        return getLogger(getmodule(self).__name__)
 
     @property
     def dependencies(self) -> List[Task]:
@@ -90,10 +94,9 @@ def log_exception(task: SharpTask, exception: Exception):
     """
     Catch tasks failures and don't let Luigi swallow the useful debugging info.
     """
-    getLogger(__name__).error(
-        f"Reason of task failure: {exception}\n"
-        f"Traceback:\n"
-        "".join(format_tb(exception.__traceback__))
+    task.log.error(
+        f"{exception.__class__.__name__}: {exception} - Traceback:\n"
+        + "".join(format_tb(exception.__traceback__))
     )
 
 

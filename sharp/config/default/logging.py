@@ -16,30 +16,30 @@ logfile_dirs = {
 }
 
 
-process_ID = f"{gethostname()}.{getpid()}"
-# Example: "compute01.45904"
-
 running_as_slurm_task = True if "SLURM_JOB_ID" in environ else False
 if running_as_slurm_task:
     job = getenv("SLURM_JOB_ID")
     node = getenv("SLURM_NODEID")
     task = getenv("SLURM_LOCALID")
     slurm_task_ID = f"j{job}.n{node}.t{int(task):02d}"
-    filename_stem = f"{process_ID}__{slurm_task_ID}"
+    filename_suffix = f'__{slurm_task_ID.replace(".", "_")}'
 else:
-    filename_stem = process_ID
+    filename_suffix = ""
 
-per_process_log_filename = f'{filename_stem.replace(".", "_")}.log'
+per_process_log_filename = (
+    f"{gethostname()}__PID_{getpid()}{filename_suffix}.log"
+)
 
 
-class ClusterFormatter(Formatter):
+class SharpFormatter(Formatter):
     def __init__(self, mention_process: bool):
         self.mention_process = mention_process
 
     def format(self, r: LogRecord):
         parts = [datetime.now().isoformat(sep=" ", timespec="milliseconds")]
         if self.mention_process:
-            parts += [f"{process_ID: <15}"]
+            parts += [f"{gethostname()}.PID_{getpid(): <5}"]
+            # Example: "compute01.PID_45904"
             if running_as_slurm_task:
                 parts += [slurm_task_ID]
         num_length_units = ceil(len(r.name) / LOGGER_NAME_LENGTH_UNIT)
@@ -50,8 +50,8 @@ class ClusterFormatter(Formatter):
         return f"{' | '.join(parts)}"
 
 
-def get_cluster_formatter(**kwargs):
-    return ClusterFormatter(**kwargs)
+def get_formatter(**kwargs):
+    return SharpFormatter(**kwargs)
 
 
 def mkdir(d: Path):
@@ -91,6 +91,7 @@ def get_logging_config(multiple_workers: bool):
             }
         }
         mkdir(logfile_dirs["single_worker"])
+
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -111,11 +112,11 @@ def get_logging_config(multiple_workers: bool):
         },
         "formatters": {
             "multiprocess": {
-                "()": "sharp.config.default.logging.get_cluster_formatter",
+                "()": "sharp.config.default.logging.get_formatter",
                 "mention_process": True,
             },
             "single_process": {
-                "()": "sharp.config.default.logging.get_cluster_formatter",
+                "()": "sharp.config.default.logging.get_formatter",
                 "mention_process": False,
             },
         },

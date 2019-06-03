@@ -19,13 +19,12 @@ config_dir = sharp.config.directory.config_dir
 path.insert(0, str(config_dir))
 
 try:
-    # Try importing an object named `config` from a file named `config.py`:
+    # Try importing an object named `config` from a file named `config.py`.
+
+    # Instruction for PyCharm code editor:
+    # noinspection PyUnresolvedReferences
     from config import config
 
-except ImportError as err:
-    raise ConfigError(
-        "Your custom `config.py` file must define an object named `config`."
-    ) from err
 except TypeError as err:
     raise ConfigError(
         "Your custom `config` object could not be initialized."

@@ -27,7 +27,7 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
 
     def work(self):
         sig_in = self.requires().output().read()
-        self.update_status("Read raw signal")
+        self.update_status("Read raw signal. Applying bandpass filter.")
         # We cannot directly use fklab's "compute_envelope", as this function
         # averages all channel envelopes into one.
         bpf_out = apply_filter(
@@ -38,7 +38,9 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
             transition_width="20%",
             attenuation=30,
         )
-        self.update_status("Applied bandpass filter")
+        self.update_status(
+            "Applied bandpass filter. Calculating raw envelope via Hilbert transform."
+        )
         # Use padding to nearest power of 2 or 3 when calculating Hilbert
         # transform for great speedup (via FFT).
         N_orig = sig_in.shape[0]
@@ -46,17 +48,17 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
         envelope_raw_padded = abs(analytical(bpf_out, N=N, axis=0))
         del bpf_out
         envelope_raw = envelope_raw_padded[:N_orig, :]
-        self.update_status("Calculated raw envelope")
+        raise UserWarning("yo")
+        self.update_status("Calculated raw envelope. Smoothing envelope.")
         del envelope_raw_padded
         envelope_smooth = smooth1d(
             envelope_raw, delta=1 / sig_in.fs, kernel="gaussian", bandwidth=4e-3
         )
-        self.update_status("Smoothed envelope")
+        self.update_status("Smoothed envelope. Writing envelope to disk.")
         del envelope_raw
         sig_out = Signal(envelope_smooth, sig_in.fs, sig_in.units)
         del envelope_smooth
         self.output().write(sig_out)
-        self.update_status("Wrote envelope to disk")
         del sig_in, sig_out
 
 

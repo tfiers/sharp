@@ -44,7 +44,7 @@ class DownsampleRawRecording(SingleRecordingFileTask):
             t_now = time()
             time_passed = t_now - t_prev
             if time_passed > 5:
-                self.update_progress(progress)
+                self.update_progress(progress, "Downsampling progress")
                 t_prev = t_now
 
         signal_down = decimate_chunkwise(
