@@ -164,18 +164,30 @@ calculating evaluation metrics, ...).
 `sharp` internally outsources task dependency resolution and scheduling to
 the [Luigi](https://luigi.readthedocs.io) Python package.
 
-The `-l`, or `--local-scheduler` option specifies that no multiple workers
-will run in parallel, and that no separate scheduling server is needed.
+The `-l`, or `--local-scheduler` option tells that no separate task
+scheduling server is needed. Instead, an in-process scheduler will be used.
+
+On Linux-like operating systems, by default as many subprocesses as CPU's will
+be launched, to run tasks in parallel. The number of subprocesses can be
+set explicitly with the `-n` or `--num-subprocesses` option.
+
+On Windows, running Luigi tasks in subprocesses is [not supported](https://github.com/spotify/luigi/pull/2720),
+and `sharp worker` will therefore run only one task at a time. If task
+parallelization on Windows is desired, run a central Luigi server (see below),
+and start multiple `sharp worker` processes.
 
 
 
-### 3. Parallelization
+### 3. Visualization & Cluster computing
 
-If you want to run tasks in parallel, a [central Luigi task scheduler](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
-should be used instead of the local scheduler.
+The [central Luigi server](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
+provides:
+1. Visualization of the task dependency graph and task completion progress;
+2. A central task scheduler, to distribute task execution over multiple nodes
+    in a computing cluster (or over multiple Python processes on Windows). 
 
-`sharp` provides a wrapper script, `sharp scheduler start`, to configure and
-start a Luigi scheduling server as a background (daemon) process. It takes as
+`sharp` provides a utility script, `sharp scheduler start`, to configure and
+start a central Luigi server as a background (daemon) process. It takes as
 argument the name of a new directory in which the server logs, task history
 database, and scheduler PID and state files will be stored:
 ```bash
@@ -187,21 +199,18 @@ provided.
 
 > The Luigi scheduling server can only run as a daemon on Linux-like operating
 systems. If you want to use the scheduling server on Windows, run it manually,
-in the foreground, using the `luigid` command.
+using the [`luigid`](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
+command without the `--background` option.
 
-
-When the central scheduler is running, and when you have correctly set the
-`scheduler_url` setting in your `config.py` file, simply start multiple
+On each host of your computing cluster, simply start a
 ```bash
 $ sharp worker ~/my-sharp-cfg
 ```
-processes.
+process.
 
-On a computing cluster, this is the command to run in parallel.
-Thus, when e.g. using the [SLURM cluster manager](https://slurm.schedmd.com/overview.html),
-this could be the batch job script you'd submit:
+Sharp provides a utility script to automatically start workers on different
+nodes when the computing cluster is managed by [SLURM](https://slurm.schedmd.com/overview.html):
 ```bash
-#SBATCH --ntasks=120
-[..]
-srun sharp worker ~/my-sharp-cfg
+$ sharp slurm ~/my-sharp-cfg --nodes=2
 ```
+

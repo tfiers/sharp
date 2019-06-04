@@ -1,5 +1,6 @@
 from datetime import datetime
 from logging import Formatter, LogRecord
+from logging.handlers import TimedRotatingFileHandler
 from os import environ, getenv, getpid
 from pathlib import Path
 from socket import gethostname
@@ -52,20 +53,20 @@ def get_formatter(**kwargs):
     return SharpFormatter(**kwargs)
 
 
-def mkdir(d: Path):
-    d.mkdir(parents=True, exist_ok=True)
+class DailyRotatingLogFile(TimedRotatingFileHandler):
+    def __init__(self, file_path):
+        log_directory = Path(file_path).parent
+        log_directory.mkdir(parents=True, exist_ok=True)
+        super().__init__(str(file_path), when="D")
 
 
 def get_logging_config(multiple_workers: bool):
-    kwargs_for_all_filehandlers = {}
     if multiple_workers:
         console_fmt = "multiprocess"
-        filename = str(PER_PROCESS_LOGFILES_DIR / per_process_log_filename)
-        mkdir(PER_PROCESS_LOGFILES_DIR)
+        file_path = PER_PROCESS_LOGFILES_DIR / per_process_log_filename
     else:
         console_fmt = "single_process"
-        filename = str(SINGLE_WORKER_LOGFILES_DIR / "sharp.log")
-        mkdir(SINGLE_WORKER_LOGFILES_DIR)
+        file_path = SINGLE_WORKER_LOGFILES_DIR / "sharp.log"
 
     return {
         "version": 1,
@@ -85,9 +86,8 @@ def get_logging_config(multiple_workers: bool):
                 "formatter": console_fmt,
             },
             "file": {
-                "class": "logging.handlers.TimedRotatingFileHandler",
-                "when": "D",
-                "filename": filename,
+                "class": "sharp.config.default.logging.DailyRotatingLogFile",
+                "file_path": file_path,
                 "formatter": "single_process",
             },
         },

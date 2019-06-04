@@ -3,38 +3,44 @@ Reads the config dir from CLI input for global use in the application.
 Loads the user-customized config.py file, sets up logging, and runs tasks.
 """
 import os
-from socket import gethostname
 from logging import Logger, getLogger
 from logging.config import dictConfig
+from multiprocessing import cpu_count
 from os import chdir, getpid
-from pathlib import Path
 from shutil import rmtree
+from socket import gethostname
 from time import time
 from typing import Iterable, Union
+from urllib.error import URLError
+from urllib.request import urlopen
 
-from click import argument, command, echo, option
+from click import argument, echo
 
 import sharp.config.directory
-from sharp.cmdline.util import write_luigi_config
-from sharp.config.spec import CONFIG_FILENAME
+from sharp.cmdline.util import (
+    option,
+    resolve_path_str,
+    sharp_command,
+    write_luigi_config,
+)
+from sharp.config.spec import CONFIG_FILENAME, SharpConfig
 from sharp.config.types import ConfigError
-from sharp.util.misc import format_duration
+from sharp.util.misc import format_duration, linearize
 
 
 log = getLogger(__name__)
 
 if os.name == "nt":
     # On Windows, don't use multiprocessing (cannot fork process on Windows).
-    work_in_subprocess = False
+    use_subprocesses = False
 else:
-    # On Unix, work in a subprocess. This avoids memory only accumulating
+    # On Unix, work in one or more subprocesses. Even when only one subprocess
+    # is used, this has the advantage that memory is not only accumulating
     # (Python doesn't normally release memory back to OS).
-    work_in_subprocess = True
+    use_subprocesses = True
 
 
-@command(
-    short_help="Start a process that runs tasks.", options_metavar="<options>"
-)
+@sharp_command(short_help="Start a process that runs tasks.")
 @argument("config_directory")
 @option(
     "-l",
@@ -42,6 +48,16 @@ else:
     default=False,
     help="Use an in-process task scheduler. Useful for testing.",
     is_flag=True,
+)
+@option(
+    "-n",
+    "--num-subprocesses",
+    type=int,
+    default=cpu_count(),
+    help=(
+        "Number of subprocess that are launched, to run tasks in parallel."
+        f" Default is number of CPU's. Ignored on Windows (see README)."
+    ),
 )
 @option(
     "--clear-last",
@@ -60,6 +76,7 @@ else:
 )
 def worker(
     config_directory: str,
+    num_subprocesses: int,
     local_scheduler: bool,
     clear_last: bool,
     clear_all: bool,
@@ -71,12 +88,7 @@ def worker(
     Optionally forces tasks to re-run, even if they have been completed
     previously, by deleting their output files before running the tasks.
     """
-    #
-    # Note: we do not start more than one luigi worker (like e.g.  "luigi
-    # --workers 2") in this command, as this yields multiprocessing bugs in luigi
-    # / PyTorch / Python. See the README for how to run tasks in parallel.
-    #
-    config_dir = Path(config_directory).expanduser().resolve().absolute()
+    config_dir = resolve_path_str(config_directory)
     sharp.config.directory.config_dir = config_dir
     config_file = config_dir / CONFIG_FILENAME
     if not config_file.exists():
@@ -89,10 +101,14 @@ def worker(
     chdir(str(config_dir))
     config = load_sharp_config()
     log = init_log()
+    if config.scheduler_url is None:
+        local_scheduler = True
+    if not local_scheduler:
+        check_scheduling_server(config)
     write_luigi_worker_config()
     log.info("Importing luigi")
 
-    from luigi import build, RPCError
+    from luigi import build
 
     log.info("Luigi read config file")
     if clear_all:
@@ -110,16 +126,12 @@ def worker(
         for task in tasks_to_run:
             log.info(f"Removing output of task {task}")
             clear_output(task)
-    try:
-        build(tasks_to_run, local_scheduler=local_scheduler)
-    except RPCError as err:
-        raise ConfigError(
-            "Could not connect to centralized Luigi task scheduler. Either run"
-            ' the "sharp worker" command with option "--local-scheduler", or see'
-            ' the "Parallelization" section of the sharp README on how to start'
-            ' a centralized scheduler. Check whether the "scheduler_url" option'
-            " option of your config is correctly set."
-        ) from err
+
+    build(
+        tasks_to_run,
+        local_scheduler=local_scheduler,
+        workers=num_subprocesses if use_subprocesses else 1,
+    )
 
     log.info(
         "Luigi worker has no more tasks to run. Shutting down Python process."
@@ -152,6 +164,21 @@ def init_log() -> Logger:
     return log
 
 
+def check_scheduling_server(config: SharpConfig):
+    try:
+        urlopen(config.scheduler_url, timeout=2)
+    except URLError as err:
+        msg = linearize(
+            f"""Could not connect to centralized Luigi task scheduler at
+            "{config.scheduler_url}". Either run the "sharp worker" command
+            with option "--local-scheduler", or see the "Visualization &
+            Cluster computing" section of the sharp README on how to start a
+            centralized scheduler. Check whether the "scheduler_url" option
+            of your config is correctly set."""
+        )
+        raise ConfigError(msg) from err
+
+
 def write_luigi_worker_config():
     """ Auto-generate a luigi.toml file to configure Luigi workers. """
 
@@ -176,7 +203,7 @@ def write_luigi_worker_config():
             "worker": {
                 "keep_alive": True,
                 "task_process_context": "",  # Suppress a Luigi bug warning.
-                "force_multiprocessing": work_in_subprocess,
+                "force_multiprocessing": True if use_subprocesses else False,
             },
             "logging": config.logging,
         },

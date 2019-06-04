@@ -2,6 +2,7 @@
 Note: this module sits at the top of the import graph for sharp, i.e we
 should'nt import from other sharp modules here.
 """
+import re
 from contextlib import contextmanager
 from functools import lru_cache
 from typing import Type
@@ -31,6 +32,16 @@ def ignore(warning_type: Type[Warning]):
     with catch_warnings():
         simplefilter("ignore", warning_type)
         yield
+
+
+def linearize(multiline_string: str) -> str:
+    """
+    :param multiline_string:  ..as found in source code.
+    :return:  A string without newlines nor multiple consecutive whitespace
+            characters.
+    """
+    line = re.sub(r"\s+", " ", multiline_string)
+    return line.strip()
 
 
 def format_duration(

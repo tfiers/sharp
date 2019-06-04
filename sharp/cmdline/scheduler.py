@@ -3,38 +3,40 @@ A CLI to start, stop, and check the Luigi centralized task scheduler
 (https://luigi.readthedocs.io/en/stable/central_scheduler.html).
 """
 import re
-from socket import gethostname
 from pathlib import Path
-from subprocess import run, PIPE
+from socket import gethostname
+from subprocess import PIPE, run
 from time import sleep
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
-from click import group, option, argument, echo
+from click import Group, argument, echo
 
-from sharp.cmdline.util import write_luigi_config
+from sharp.cmdline.util import (
+    option,
+    resolve_path_str,
+    sharp_command,
+    sharp_command_group,
+    write_luigi_config,
+)
+
 
 PID_FILENAME = "scheduler.pid"
 STATE_FILENAME = "scheduler-state.pickle"
 LOGDIR_NAME = "logs"
 
 
-@group(
+@sharp_command_group(
     short_help="Manage the centralized task scheduler.",
-    options_metavar="<options>",
-    subcommand_metavar="<command>",
     epilog='Type "sharp scheduler <command> -h" for more help.',
 )
 def scheduler():
     """
     Manage the state of the centralized Luigi task scheduler.
-    See the "Parallelization" section of the sharp README.
+    See the "Visualization & Cluster computing" section of the sharp README.
     """
 
 
-@scheduler.command(
-    short_help="Setup and start the scheduling server.",
-    options_metavar="<options>",
-)
+@sharp_command(short_help="Setup and start the scheduling server.")
 @argument("directory")
 @option(
     "-p",
@@ -49,7 +51,7 @@ def start(directory: str, port: int):
     provided DIRECTORY to store server logs, the task history database, a PID
     file, and a pickled scheduler state file.
     """
-    scheduler_dir = resolve_dir_arg(directory)
+    scheduler_dir = resolve_path_str(directory)
     scheduler_dir.mkdir(exist_ok=True, parents=True)
     pid_file = scheduler_dir / PID_FILENAME
     if pid_file.exists():
@@ -82,13 +84,13 @@ def start(directory: str, port: int):
         state(directory)
 
 
-@scheduler.command(options_metavar="<options>")
+@sharp_command()
 @argument("directory")
 def stop(directory: str):
     """
     Stop the scheduling server.
     """
-    scheduler_dir = resolve_dir_arg(directory)
+    scheduler_dir = resolve_path_str(directory)
     pid_file = scheduler_dir / PID_FILENAME
     pid, port = get_pid_and_port(scheduler_dir)
     if port is not None:
@@ -100,13 +102,13 @@ def stop(directory: str):
         echo(f"Removed PID file {pid_file}")
 
 
-@scheduler.command(options_metavar="<options>")
+@sharp_command()
 @argument("directory")
 def state(directory: str):
     """
     Check status of the scheduling server.
     """
-    scheduler_dir = resolve_dir_arg(directory)
+    scheduler_dir = resolve_path_str(directory)
     pid, port = get_pid_and_port(scheduler_dir)
     if port is not None:
         echo(
@@ -116,10 +118,6 @@ def state(directory: str):
         echo(
             f"Check out the task scheduler GUI at http://{gethostname()}:{port}"
         )
-
-
-def resolve_dir_arg(directory: str):
-    return Path(directory).expanduser().resolve().absolute()
 
 
 def get_pid_and_port(
@@ -187,3 +185,9 @@ def setup_luigi_scheduler_config(scheduler_directory: Path):
             },
         },
     )
+
+
+scheduler: Group
+scheduler.add_command(start)
+scheduler.add_command(stop)
+scheduler.add_command(state)
