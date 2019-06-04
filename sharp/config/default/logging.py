@@ -54,19 +54,19 @@ def get_formatter(**kwargs):
 
 
 class DailyRotatingLogFile(TimedRotatingFileHandler):
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         log_directory = Path(file_path).parent
         log_directory.mkdir(parents=True, exist_ok=True)
-        super().__init__(str(file_path), when="D")
+        super().__init__(file_path, when="D")
 
 
 def get_logging_config(multiple_workers: bool):
     if multiple_workers:
         console_fmt = "multiprocess"
-        file_path = PER_PROCESS_LOGFILES_DIR / per_process_log_filename
+        file_path = str(PER_PROCESS_LOGFILES_DIR / per_process_log_filename)
     else:
         console_fmt = "single_process"
-        file_path = SINGLE_WORKER_LOGFILES_DIR / "sharp.log"
+        file_path = str(SINGLE_WORKER_LOGFILES_DIR / "sharp.log")
 
     return {
         "version": 1,
