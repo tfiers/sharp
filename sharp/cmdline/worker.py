@@ -171,10 +171,10 @@ def check_scheduling_server(config: SharpConfig):
         msg = linearize(
             f"""Could not connect to centralized Luigi task scheduler at
             "{config.scheduler_url}". Either run the "sharp worker" command
-            with option "--local-scheduler", or see the "Visualization &
-            Cluster computing" section of the sharp README on how to start a
-            centralized scheduler. Check whether the "scheduler_url" option
-            of your config is correctly set."""
+            with option "--local-scheduler", or see the "Central server"
+            section of the sharp README on how to start a centralized
+            scheduler. Check whether the "scheduler_url" option of your config
+            is correctly set."""
         )
         raise ConfigError(msg) from err
 

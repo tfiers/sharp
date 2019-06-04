@@ -32,7 +32,7 @@ LOGDIR_NAME = "logs"
 def scheduler():
     """
     Manage the state of the centralized Luigi task scheduler.
-    See the "Visualization & Cluster computing" section of the sharp README.
+    See the "Central server" section of the sharp README.
     """
 
 

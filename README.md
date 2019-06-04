@@ -17,6 +17,9 @@ the electrical brain motif related to memories and learning that is studied
 in the thesis and the paper. More specifically, we seek to find new real-time
 algorithms that make earlier online sharp wave-ripple detections.
 
+Jump to: 
+[Installation](#installation) |
+[Usage](#usage)
 
 
 
@@ -161,32 +164,31 @@ file (these tasks typically generate figures), together with the tasks on which
 they depend (typically processing raw data, training neural networks,
 calculating evaluation metrics, ...).
 
-`sharp` internally outsources task dependency resolution and scheduling to
+**Notes**
+- `sharp` internally outsources task dependency resolution and scheduling to
 the [Luigi](https://luigi.readthedocs.io) Python package.
-
-The `-l`, or `--local-scheduler` option tells that no separate task
+- The `-l`, or `--local-scheduler` option tells that no separate task
 scheduling server is needed. Instead, an in-process scheduler will be used.
-
-On Linux-like operating systems, by default as many subprocesses as CPU's will
+- On Linux-like operating systems, by default as many subprocesses as CPU's will
 be launched, to run tasks in parallel. The number of subprocesses can be
 set explicitly with the `-n` or `--num-subprocesses` option.
-
-On Windows, running Luigi tasks in subprocesses is [not supported](https://github.com/spotify/luigi/pull/2720),
+- On Windows, running Luigi tasks in subprocesses is [not supported](https://github.com/spotify/luigi/pull/2720),
 and `sharp worker` will therefore run only one task at a time. If task
 parallelization on Windows is desired, run a central Luigi server (see below),
 and start multiple `sharp worker` processes.
 
 
 
-### 3. Visualization & Cluster computing
+### 3. Central server
 
-The [central Luigi server](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
-provides:
-1. Visualization of the task dependency graph and task completion progress;
-2. A central task scheduler, to distribute task execution over multiple nodes
-    in a computing cluster (or over multiple Python processes on Windows). 
+Sharp can be used without a central Luigi server. Running [such a server](https://luigi.readthedocs.io/en/stable/central_scheduler.html)
+however provides:
+1. **Visualization** of task completion progress, and the task dependency graph;
+2. A centralized task scheduler, to distribute task execution over multiple
+    nodes in a **computing cluster** (or over multiple Python processes on
+    Windows).
 
-`sharp` provides a utility script, `sharp scheduler start`, to configure and
+Sharp provides a utility script, "`sharp scheduler start`", to configure and
 start a central Luigi server as a background (daemon) process. It takes as
 argument the name of a new directory in which the server logs, task history
 database, and scheduler PID and state files will be stored:
@@ -194,7 +196,7 @@ database, and scheduler PID and state files will be stored:
 $ sharp scheduler start ~/luigi-scheduler
 ```
 
-Similarly, `sharp scheduler stop` and `sharp scheduler state` commands are
+Similarly, "`sharp scheduler stop`" and "`sharp scheduler state`" commands are
 provided.
 
 > The Luigi scheduling server can only run as a daemon on Linux-like operating
@@ -208,9 +210,13 @@ $ sharp worker ~/my-sharp-cfg
 ```
 process.
 
-Sharp provides a utility script to automatically start workers on different
-nodes when the computing cluster is managed by [SLURM](https://slurm.schedmd.com/overview.html):
+Sharp provides a utility script, "`sharp slurm`", to automatically start
+workers on different nodes, if [SLURM](https://slurm.schedmd.com/overview.html)
+is used to manage jobs on the computing cluster:
 ```bash
 $ sharp slurm ~/my-sharp-cfg --nodes=2
 ```
-
+This:
+1. submits a well-behaved Slurm job that runs "`sharp worker ~/my-sharp-cfg`" on
+    two cluster nodes;
+2. shows the Slurm job queue and job details.
