@@ -147,17 +147,19 @@ settings (such as the location of raw data and output directories) to suit your
 needs.
 
 - See the [config specification](/sharp/config/spec.py) for explanations of the
-different options.
+    different options.
 - See the [test `config.py` file](/tests/system/config.py) from this repository
-for a concrete example of a customized configuration.
+    for a concrete example of a customized configuration.
+- Set `central_server = None` to test without having to start a [central server](#3-central-server)
+    first.
 
 
 ### 2. Running tasks
 
-When your `config.py` file is ready, run `sharp worker -l`, passing the name
+When your `config.py` file is ready, run "`sharp worker`", passing the name
 of your config directory:
 ```bash
-$ sharp worker -l ~/my-sharp-cfg
+$ sharp worker ~/my-sharp-cfg
 ```
 This will run the tasks specified in the `get_tasks` method of your `config.py`
 file (these tasks typically generate figures), together with the tasks on which
@@ -165,17 +167,14 @@ they depend (typically processing raw data, training neural networks,
 calculating evaluation metrics, ...).
 
 **Notes**
-- `sharp` internally outsources task dependency resolution and scheduling to
-the [Luigi](https://luigi.readthedocs.io) Python package.
-- The `-l`, or `--local-scheduler` option tells that no separate task
-scheduling server is needed. Instead, an in-process scheduler will be used.
-- On Linux-like operating systems, by default as many subprocesses as CPU's will
-be launched, to run tasks in parallel. The number of subprocesses can be
-set explicitly with the `-n` or `--num-subprocesses` option.
+- `sharp` internally outsources task dependency resolution and scheduling to [Luigi](https://luigi.readthedocs.io).
+- On Linux-like operating systems, by default, as many subprocesses as CPU's
+    will be launched, to run tasks in parallel. The number of subprocesses can
+    be set explicitly with the `-n` or `--num-subprocesses` option.
 - On Windows, running Luigi tasks in subprocesses is [not supported](https://github.com/spotify/luigi/pull/2720),
-and `sharp worker` will therefore run only one task at a time. If task
-parallelization on Windows is desired, run a central Luigi server (see below),
-and start multiple `sharp worker` processes.
+    and `sharp worker` will therefore run only one task at a time. If task
+    parallelization on Windows is desired, run a central Luigi server (see
+    below), and start multiple `sharp worker` processes.
 
 
 

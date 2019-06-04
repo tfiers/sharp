@@ -15,6 +15,10 @@ CONFIG_FILENAME = "config.py"
 @dataclass
 class SharpConfig:
     """
+    :param central_server:  Hostname where the centralized Luigi server is
+            running. If "None", a local, in-process scheduler will be used
+            (useful for testing).
+    
     :param get_tasks:  Return instantiated tasks, which will be passed to
             luigi.build(). The necessary import statements should be contained
             in this method's body (not at the top of the config.py file). This
@@ -36,9 +40,6 @@ class SharpConfig:
             
     :param logging:  A logging configuration passed to logging.dictConfig.
     
-    :param scheduler_url:  Hostname where the centralized Luigi server is
-            running. If "None", the command "sharp worker" will always run
-            with a local scheduler (as if "--local-scheduler" is given).
     :param config_id:  This setting allows to run multiple pipelines (each with
             a different config.py file) in parallel. Each such pipeline / config
             file corresponds to a different `config_id`. Default: name of parent
@@ -97,6 +98,7 @@ class SharpConfig:
             which no new tasks will be ran.
     """
 
+    central_server: Optional[str]
     get_tasks: Callable[[], OneOrMoreLuigiTasks]
     raw_data: Sequence[RecordingFileID]
     output_dir: str
@@ -104,7 +106,6 @@ class SharpConfig:
     fs_target: float
     bitmap_versions: bool
     logging: ConfigDict
-    scheduler_url: Optional[str]
     config_id: str
     mult_detect_ripple: Tuple[float, ...]
     mult_detect_SW: Tuple[float, ...]

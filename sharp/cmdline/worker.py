@@ -43,13 +43,6 @@ else:
 @sharp_command(short_help="Start a process that runs tasks.")
 @argument("config_directory")
 @option(
-    "-l",
-    "--local-scheduler",
-    default=False,
-    help="Use an in-process task scheduler. Useful for testing.",
-    is_flag=True,
-)
-@option(
     "-n",
     "--num-subprocesses",
     type=int,
@@ -60,6 +53,7 @@ else:
     ),
 )
 @option(
+    "-c",
     "--clear-last",
     default=False,
     help=(
@@ -69,6 +63,7 @@ else:
     is_flag=True,
 )
 @option(
+    "-C",
     "--clear-all",
     default=False,
     help='Empty the entire "output_dir" and "shared_output_dir" directories.',
@@ -77,7 +72,6 @@ else:
 def worker(
     config_directory: str,
     num_subprocesses: int,
-    local_scheduler: bool,
     clear_last: bool,
     clear_all: bool,
 ):
@@ -101,18 +95,19 @@ def worker(
     chdir(str(config_dir))
     config = load_sharp_config()
     log = init_log()
-    if config.scheduler_url is None:
-        local_scheduler = True
-    if not local_scheduler:
+    use_local_scheduler = True if config.central_server is None else False
+    if use_local_scheduler:
+        log.info("Using in-process, local scheduling server.")
+    else:
         check_scheduling_server(config)
+        log.info(f"Using central scheduling server at {config.central_server}.")
     write_luigi_worker_config()
-    log.info("Importing luigi")
+    log.info("Importing luigi..")
 
-    from luigi import build
+    import luigi
 
     log.info("Luigi read config file")
     if clear_all:
-        log.info("Clearing entire output directories, if they exist.")
         clear_all_output()
     log.info("Importing tasks to run...")
     t0 = time()
@@ -127,9 +122,9 @@ def worker(
             log.info(f"Removing output of task {task}")
             clear_output(task)
 
-    build(
+    luigi.build(
         tasks_to_run,
-        local_scheduler=local_scheduler,
+        local_scheduler=use_local_scheduler,
         workers=num_subprocesses if use_subprocesses else 1,
     )
 
@@ -166,15 +161,13 @@ def init_log() -> Logger:
 
 def check_scheduling_server(config: SharpConfig):
     try:
-        urlopen(config.scheduler_url, timeout=2)
+        urlopen(config.central_server, timeout=2)
     except URLError as err:
         msg = linearize(
             f"""Could not connect to centralized Luigi task scheduler at
-            "{config.scheduler_url}". Either run the "sharp worker" command
-            with option "--local-scheduler", or see the "Central server"
-            section of the sharp README on how to start a centralized
-            scheduler. Check whether the "scheduler_url" option of your config
-            is correctly set."""
+            "{config.central_server}". See the "Central server" section of the
+            sharp README on how to start a centralized scheduler. Check whether
+            the "central_server" option of your config is correctly set."""
         )
         raise ConfigError(msg) from err
 
@@ -194,7 +187,7 @@ def write_luigi_worker_config():
         output_dir,
         {
             "core": {
-                "default-scheduler-url": config.scheduler_url,
+                "default-scheduler-url": config.central_server,
                 "rpc-retry-attempts": 2 * 60,
                 # When the network is down, retry connecting to the scheduler every
                 # 30 seconds for this many attempts (instead of the default 3
@@ -216,10 +209,12 @@ def clear_all_output():
 
     for dir in (output_root, shared_output_root):
         if dir.exists():
+            rmtree(dir, ignore_errors=True)
             # Ignore the sporadic (and wrong)
             # "OSError: [WinError 145] The directory is not empty: ..."
-            rmtree(dir, ignore_errors=True)
             log.info(f"Cleared directory {dir}.")
+        else:
+            log.info(f"Directory to be deleted does not exist: {dir}")
 
 
 def clear_output(task):

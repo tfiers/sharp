@@ -13,6 +13,7 @@ from sharp.config.spec import SharpConfig
 
 
 config = SharpConfig(
+    central_server="http://nerfcluster-fs:8082",
     get_tasks=get_default_tasks,
     raw_data=flat_recordings_list,
     output_dir="./output",
@@ -20,7 +21,6 @@ config = SharpConfig(
     fs_target=1000,
     bitmap_versions=False,
     logging=get_logging_config(multiple_workers=True),
-    scheduler_url="http://nerfcluster-fs:8082",
     config_id=str(Path(__file__).parent.stem),
     mult_detect_ripple=tuple(linspace(0.4, 4, num=7)),
     mult_detect_SW=tuple(linspace(0.9, 5, num=7)),
