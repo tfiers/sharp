@@ -18,15 +18,15 @@ if running_as_slurm_task:
     node = getenv("SLURM_NODEID")
     task = getenv("SLURM_LOCALID")
     slurm_task_ID = f"j{job}.n{node}.t{int(task):02d}"
-    filename_suffix = f'__{slurm_task_ID.replace(".", "_")}'
+    filename_prefix = f'{slurm_task_ID.replace(".", "_")}__'
 else:
-    filename_suffix = ""
+    filename_prefix = ""
 
 # When doing work in subprocess, still use PID of parent process in logs.
 host = gethostname()
 pid = getpid()
 
-per_process_log_filename = f"{host}__PID_{pid}{filename_suffix}.log"
+per_process_log_filename = f"{filename_prefix}{host}__PID_{pid}.log"
 
 
 class SharpFormatter(Formatter):
