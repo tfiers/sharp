@@ -1,4 +1,4 @@
-from subprocess import PIPE, run
+from subprocess import run
 from time import sleep
 
 from click import argument
@@ -26,7 +26,7 @@ def slurm(config_directory, nodes, workers_per_node, cpus_per_worker, contact):
     # fmt: off
     parallelized_script = (
         f"#!/bin/bash\n"
-        f"sharp worker {config_dir}"
+        f"sharp worker -n {cpus_per_worker} {config_dir}"
     )
     # fmt: on
     log_path = config_dir / "logs" / "slurm-j%j.log"
@@ -46,6 +46,6 @@ def slurm(config_directory, nodes, workers_per_node, cpus_per_worker, contact):
     # transgression; disk swap will be used instead.
     run(slurm_cmd, input=parallelized_script, text=True)
     sleep(1)
-    run("squeue", stdout=PIPE, stderr=PIPE)
+    run("squeue")
     print("\n")
-    run(("scontrol", "show", "job", "--details"), stdout=PIPE, stderr=PIPE)
+    run(("scontrol", "show", "job", "--details"))
