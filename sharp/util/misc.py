@@ -5,7 +5,8 @@ should'nt import from other sharp modules here.
 import re
 from contextlib import contextmanager
 from functools import lru_cache
-from typing import Type
+from pathlib import Path
+from typing import Type, Union
 from warnings import catch_warnings, simplefilter
 
 import numba
@@ -32,6 +33,16 @@ def ignore(warning_type: Type[Warning]):
     with catch_warnings():
         simplefilter("ignore", warning_type)
         yield
+
+
+def make_parent_dirs(file_path: Union[Path, str]):
+    """
+    Make sure the containing directories exist.
+    
+    :param file_path:  Pointing to a file in a directory.
+    """
+    dir_path: Path = Path(file_path).parent
+    dir_path.mkdir(exist_ok=True, parents=True)
 
 
 def linearize(multiline_string: str) -> str:

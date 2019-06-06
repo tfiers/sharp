@@ -7,6 +7,8 @@ from socket import gethostname
 
 from math import ceil
 
+from sharp.util.misc import make_parent_dirs
+
 
 LOGGER_NAME_LENGTH_UNIT = len("sharp.cmdline.util")
 
@@ -18,7 +20,7 @@ if running_as_slurm_task:
     job = getenv("SLURM_JOB_ID")
     node = getenv("SLURM_NODEID")
     task = getenv("SLURM_LOCALID")
-    slurm_task_ID = f"j{job}.n{node}.t{int(task):02d}"
+    slurm_task_ID = f"j{job}.n{node}.t{task}"
     filename_prefix = f'{slurm_task_ID.replace(".", "_")}__'
 else:
     filename_prefix = ""
@@ -55,8 +57,7 @@ def get_formatter(**kwargs):
 
 class DailyRotatingLogFile(TimedRotatingFileHandler):
     def __init__(self, file_path: str):
-        log_directory = Path(file_path).parent
-        log_directory.mkdir(parents=True, exist_ok=True)
+        make_parent_dirs(file_path)
         super().__init__(file_path, when="D")
 
 
