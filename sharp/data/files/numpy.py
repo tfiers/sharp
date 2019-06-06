@@ -72,7 +72,9 @@ class MultiChannelDataFile(HDF5Target):
             datasets: List[Dataset] = f.values()
             array_list = [None] * len(datasets)
             for dataset in datasets:
-                channel_nr = int(dataset.name)
+                full_path: str = dataset.name
+                name = full_path.split("/")[-1]
+                channel_nr = int(name)
                 array_list[channel_nr] = dataset[()]
         return array_list
 

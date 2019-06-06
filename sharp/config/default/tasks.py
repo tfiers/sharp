@@ -23,21 +23,16 @@ def get_default_tasks():
     from sharp.tasks.base import WrapperTask
     from sharp.config.load import config
 
-    # from sharp.tasks.plot.explore.vignette import PlotAllVignettes
-    from sharp.tasks.signal.stats import DetectRipples
-    from sharp.tasks.signal.stats import DetectSharpwaves
+    from sharp.tasks.signal.mountains import (
+        CalcRippleStrength,
+        CalcSharpwaveStrength,
+    )
 
     class RootTask(WrapperTask):
         def requires(self):
-            return sum(
-                [
-                    (
-                        DetectRipples(file_ID=rec_file),
-                        DetectSharpwaves(file_ID=rec_file),
-                    )
-                    for rec_file in config.raw_data
-                ],
-                (),
-            )
+            recordings = config.raw_data
+            return [CalcRippleStrength(file_ID=r) for r in recordings] + [
+                CalcSharpwaveStrength(file_ID=r) for r in recordings
+            ]
 
     return RootTask()

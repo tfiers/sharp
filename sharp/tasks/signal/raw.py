@@ -1,3 +1,4 @@
+from abc import ABC
 from logging import getLogger
 
 from sharp.config.load import config
@@ -10,11 +11,16 @@ from sharp.data.files.raw_data import (
 )
 from sharp.tasks.base import CustomParameter, SharpTask, WrapperTask
 
+
 log = getLogger(__name__)
 
 
-class SingleRecordingFileTask(SharpTask):
+class SingleRecordingFileTask(SharpTask, ABC):
     file_ID: RecordingFileID = CustomParameter()
+
+    # To help code completion:
+    def __init__(self, file_ID: RecordingFileID, **kwargs):
+        super().__init__(file_ID=file_ID, **kwargs)
 
 
 class RawRecording_ExistenceCheck(SingleRecordingFileTask, WrapperTask):

@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import Type
 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.pyplot import close
@@ -33,7 +34,7 @@ class PlotVignettes(FigureMaker, SingleRecordingFileTask, ABC):
     # Seconds between window starts.
 
     subdir: str = ...
-    parent_task_class: SingleRecordingFileTask = ...
+    parent_task_class: Type[SingleRecordingFileTask] = ...
 
     def requires(self):
         return self.parent_task_class(file_ID=self.file_ID)

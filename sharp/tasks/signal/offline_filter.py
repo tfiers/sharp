@@ -16,7 +16,7 @@ from sharp.tasks.signal.raw import SingleRecordingFileTask
 output_root = shared_output_root / "offline-filter-envelope"
 
 
-class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
+class CalcBPFEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
     def requires(self):
         return DownsampleRawRecording(file_ID=self.file_ID)
 
@@ -61,12 +61,12 @@ class CalcEnvelopeFromRawSignal(SingleRecordingFileTask, ABC):
         del sig_in, sig_out
 
 
-class CalcRippleEnvelope(CalcEnvelopeFromRawSignal):
+class CalcRippleEnvelope(CalcBPFEnvelopeFromRawSignal):
     subdir = "ripple"
     freq_band = (100, 250)
 
 
-class CalcSharpWaveEnvelope(CalcEnvelopeFromRawSignal):
+class CalcSharpWaveEnvelope(CalcBPFEnvelopeFromRawSignal):
     subdir = "sharpwave"
 
     @property
