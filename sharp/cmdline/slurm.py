@@ -19,8 +19,15 @@ from sharp.util.misc import make_parent_dirs
 )
 def slurm(config_directory, nodes, workers_per_node, cpus_per_worker, contact):
     """
-    Start a job on a SLURM-managed computing cluster (https://slurm.schedmd.com/).
-    The job consists of running many "sharp worker" processes in parallel.
+    Submit a job on a SLURM-managed computing cluster. The job consists of
+    running a bunch of:
+    
+        sharp worker --num-subprocesses={cpus-per-worker} {CONFIG_DIRECTORY}
+    
+    processes in parallel. After the job is submitted, the results of "squeue"
+    and "scontrol show job --details" are shown. Console output of the job
+    (consolidated from all workers and subprocesses) is written to a file
+    "logs/slurm-j{jobID}.log".
     """
     config_dir = resolve_path_str(config_directory)
     # fmt: off
