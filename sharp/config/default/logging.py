@@ -7,6 +7,7 @@ from socket import gethostname
 
 from math import ceil
 
+from sharp.config.types import ConfigDict
 from sharp.util.misc import make_parent_dirs
 
 
@@ -25,11 +26,8 @@ if running_as_slurm_task:
 else:
     filename_prefix = ""
 
-# When doing work in subprocess, still use PID of parent process in logs.
 host = gethostname()
-pid = getpid()
-
-per_process_log_filename = f"{filename_prefix}{host}__PID_{pid}.log"
+per_process_log_filename = f"{filename_prefix}{host}__PID_{getpid()}.log"
 
 
 class SharpFormatter(Formatter):
@@ -39,7 +37,9 @@ class SharpFormatter(Formatter):
     def format(self, r: LogRecord):
         parts = [datetime.now().isoformat(sep=" ", timespec="milliseconds")]
         if self.mention_process:
-            parts += [f"{host}.PID_{pid: <5}"]
+            # When doing work in subprocess, don't use PID of parent process,
+            # but instead that of the subprocess.
+            parts += [f"{host}.PID_{getpid(): <5}"]
             # Example: "compute01.PID_45904"
             if running_as_slurm_task:
                 parts += [slurm_task_ID]
@@ -61,7 +61,7 @@ class DailyRotatingLogFile(TimedRotatingFileHandler):
         super().__init__(file_path, when="D")
 
 
-def get_logging_config(multiple_workers: bool):
+def get_logging_config(multiple_workers: bool) -> ConfigDict:
     if multiple_workers:
         console_fmt = "multiprocess"
         file_path = str(PER_PROCESS_LOGFILES_DIR / per_process_log_filename)
