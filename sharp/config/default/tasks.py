@@ -21,6 +21,8 @@ def minipaper():
 
 def get_default_tasks():
     from sharp.tasks.base import WrapperTask
+    from sharp.tasks.plot.explore.mountain_stats import PlotMountainDensity
+
     from sharp.config.load import config
 
     from sharp.tasks.signal.mountains import (
@@ -30,9 +32,6 @@ def get_default_tasks():
 
     class RootTask(WrapperTask):
         def requires(self):
-            recordings = config.raw_data
-            return [CalcRippleStrength(file_ID=r) for r in recordings] + [
-                CalcSharpwaveStrength(file_ID=r) for r in recordings
-            ]
+            return PlotMountainDensity()
 
     return RootTask()
