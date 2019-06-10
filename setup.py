@@ -19,9 +19,6 @@ setup(
         "typeguard",
         "scikit-learn",
         "psutil",
-        # Sqlalchemy is a Luigi dependency (but weirdly not in their setup.py).
-        "sqlalchemy",
-        "luigi[toml]==2.8.5",
         #
         # Custom-made dependencies, not available on PyPI, that should be
         # installed manually before installing sharp:
@@ -31,5 +28,4 @@ setup(
         "fklab-python-core",
     ),
     packages=find_packages(),
-    entry_points={"console_scripts": ["sharp=sharp.cmdline.main:main_cli"]},
 )
