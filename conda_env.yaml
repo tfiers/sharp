@@ -3,7 +3,9 @@ channels:
   - bioconda
   - pytorch
 dependencies:
-  - snakemake-minimal =5.5.1
-  - pytorch-cpu
+  - python=3.7
+  - snakemake-minimal=5.5.1
+  - pytorch-cpu  # Or if you have CUDA-enabled GPU(s): "- pytorch"
   - scikit-learn
+  - matplotlib
   - pip

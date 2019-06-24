@@ -14,12 +14,7 @@ pytest
 
 ### System test
 
-Go to the correct working directory (containing a `luigi.toml` file):
-```
-cd system/
-```
-
 Run system test:
 ```
-python -m sharp --local-scheduler --clear-all
+...
 ```

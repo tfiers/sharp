@@ -6,14 +6,13 @@ Algorithms and evaluation code for real-time sharp wave-ripple detection.
 
 setup(
     name="sharp",
-    version="1.0",
+    version="2.0",
     description=description,
     author="Tomas Fiers",
     author_email="tomas.fiers@gmail.com",
     license="GPL-3.0",
     install_requires=(
         "torch",
-        "toml",
         "h5py",
         "scikit-learn",
         #
@@ -25,5 +24,4 @@ setup(
         "fklab-python-core",
     ),
     packages=find_packages(),
-    entry_points={"console_scripts": ["sharp=sharp.cmdline.main:main_cli"]},
 )
