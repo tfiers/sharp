@@ -1,6 +1,6 @@
 """
-Programatically construct list of raw data paths; as there is much redundancy
-in these paths.
+Programatically construct list of raw data paths (we don't do this manually as
+there is much redundancy in these paths).
 """
 
 
@@ -9,13 +9,11 @@ from pathlib import Path
 from typing import Any
 
 
-@dataclass
+# Freeze to make usable as key in the nested dict structure below.
+@dataclass(frozen=True)
 class RawDataPathPart:
     ID: Any
-    path: Path = ""
-
-    def __post_init__(self):
-        self.path = Path(self.path)
+    path: str = ""
 
 
 class Rat(RawDataPathPart):
@@ -33,14 +31,13 @@ class File(RawDataPathPart):
 def P1_dat_file(date: str, probe_name: str) -> File:
     return File(
         ID=probe_name,
-        partial_path=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
+        path=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
     )
 
 
 def P2_dat_file(probe_name: str) -> File:
     return File(
-        ID=probe_name,
-        partial_path=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat",
+        ID=probe_name, path=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat"
     )
 
 
@@ -48,7 +45,7 @@ FRED = "/mnt/nerffs01/ratlab/Frederic/organized/Long Flexible Probes/For the pap
 JJ = "/mnt/nerffs01/ratlab/Projects/Subiculum/Raw"
 
 
-raw_data_paths = {
+raw_data_nesting = {
     Rat(1, f"{FRED}/P1/"): {
         Day(1): (
             P1_dat_file("16052014", "D1"),
@@ -177,8 +174,8 @@ raw_data_paths = {
 }
 
 fklab_data = {
-    f"{rat.ID}__{day.ID}__{file.ID}": rat.path / day.path / file.path
-    for rat, day_dict in raw_data_paths.items()
+    f"{rat.ID}__{day.ID}__{file.ID}": Path(rat.path) / day.path / file.path
+    for rat, day_dict in raw_data_nesting.items()
     for day, files in day_dict.items()
     for file in files
 }

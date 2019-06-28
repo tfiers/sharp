@@ -1,4 +1,4 @@
-from functools import lru_cache
+import functools
 
 import numba
 
@@ -6,7 +6,7 @@ import numba
 # Short alias. (We don't care that it's an _LRU_ cache, and we don't want to
 # change the cache size).
 # NOTE: when combined with @property, @cached goes nearest to the function.
-cached = lru_cache(maxsize=256)
+cached = functools.lru_cache(maxsize=256)
 
 # Another short alias
 compiled = numba.jit(cache=True, nopython=True)
