@@ -1,11 +1,8 @@
 from functools import lru_cache
-from pathlib import Path
-from typing import Union
 
 import numba
 
 
-...
 # Short alias. (We don't care that it's an _LRU_ cache, and we don't want to
 # change the cache size).
 # NOTE: when combined with @property, @cached goes nearest to the function.
@@ -13,16 +10,6 @@ cached = lru_cache(maxsize=256)
 
 # Another short alias
 compiled = numba.jit(cache=True, nopython=True)
-
-
-def make_parent_dirs(file_path: Union[Path, str]):
-    """
-    Make sure the containing directories exist.
-
-    :param file_path:  Pointing to a file in a directory.
-    """
-    dir_path: Path = Path(file_path).parent
-    dir_path.mkdir(exist_ok=True, parents=True)
 
 
 def format_duration(

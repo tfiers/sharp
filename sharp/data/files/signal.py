@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from sharp.data.files.base import HDF5Target
+from sharp.data.files.base import HDF5File
 from sharp.data.types.signal import Signal
 from sharp.util.misc import cached
 
 
-class SignalFile(HDF5Target):
+class SignalFile(HDF5File):
     """
     A `Signal` (subclass of a NumPy array), stored on disk.
     """

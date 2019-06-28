@@ -1,10 +1,9 @@
-from typing import Iterable, Sequence, Optional
-
-from numpy import array, asarray, diff, linspace, ndarray, stack
+from typing import Iterable, Optional, Sequence
 
 from fklab.segments import Segment
-from sharp.util.misc import format_duration
+from numpy import array, asarray, diff, linspace, ndarray, stack
 from sharp.data.types.aliases import ArrayLike
+from sharp.util.misc import format_duration
 from sharp.util.signal import time_to_index
 
 
@@ -18,11 +17,11 @@ class Signal(ndarray):
     def __new__(
         cls, data: ArrayLike, fs: float, units: Optional[str] = None
     ) -> "Signal":
-        '''
+        """
         :param data
         :param fs:  Signal sampling frequency, in hertz.
         :param units
-        '''
+        """
         instance = asarray(data).view(cls)
         instance.fs = fs
         instance.units = units
