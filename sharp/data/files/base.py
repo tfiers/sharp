@@ -1,10 +1,8 @@
-from abc import ABC
-
-from h5py import File as HDF5Reader
 from farao import File
+from h5py import File as HDF5Reader
 
 
-class HDF5File(File, ABC):
+class HDF5File(File):
     extension = ".hdf5"
 
     def open_file_for_read(self) -> HDF5Reader:

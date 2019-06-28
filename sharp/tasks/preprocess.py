@@ -27,7 +27,7 @@ def downsample_raw(
         t_now = time()
         time_passed = t_now - t_prev
         if time_passed > 5:
-            print(f"Downsampling progress: {progress}")
+            print(f"Downsampling progress: {progress:.1%}")
             t_prev = t_now
 
     print(f"Decimating {input} of size {input.size} by a factor {factor}")

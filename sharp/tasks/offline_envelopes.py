@@ -20,9 +20,18 @@ def SHARPWAVE_BAND():
     return (lowest_f, highest_f)
 
 
+# 100__250
+# 5__25
+
 def calc_BPF_envelope(
     input: SignalFile, output: SignalFile, freq_band: Tuple[float, float]
 ):
+    """
+    :param input:  An unfiltered neural recording.
+    :param output:  A smoothed, positive signal of the same shape as "input",
+                that is high wherever "input" has high power in the "freq_band".
+    :param freq_band:  in Hz.
+    """
     print("Reading raw signal")
     sig_in = input.read()
     print("Read raw signal. Applying bandpass filter.")

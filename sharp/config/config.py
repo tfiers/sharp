@@ -9,7 +9,7 @@ from sharp.config.fklab_data import fklab_data
 @dataclass
 class SharpConfig(Config):
 
-    output_root = "output/"
+    output_root: Path = "output/"
 
     raw_data: Mapping[str, Path] = field(default_factory=lambda: fklab_data)
     # A list of paths to ".raw.kwd", ".dat", and ".moz" files containing raw

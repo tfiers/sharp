@@ -174,7 +174,9 @@ raw_data_nesting = {
 }
 
 fklab_data = {
-    f"{rat.ID}__{day.ID}__{file.ID}": Path(rat.path) / day.path / file.path
+    f"rat_{rat.ID}__day_{day.ID}__{file.ID}": Path(rat.path)
+    / day.path
+    / file.path
     for rat, day_dict in raw_data_nesting.items()
     for day, files in day_dict.items()
     for file in files

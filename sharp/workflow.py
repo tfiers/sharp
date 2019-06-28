@@ -7,8 +7,9 @@ from pathlib import Path
 from farao import Scheduler
 from sharp.config.config import SharpConfig
 from sharp.data.files.raw import RawRecordingFile
-from sharp.tasks.preprocess.downsample import downsample_raw
-from sharp.tasks.preprocess.filter import (
+from sharp.tasks.preprocess import downsample_raw
+from sharp.tasks.segments import detect_mountains
+from sharp.tasks.offline_envelopes import (
     calc_ripple_envelope,
     calc_sharpwave_envelope,
 )
@@ -27,9 +28,15 @@ for recording_ID, path in config.raw_data.items():
     )
     ripple_env = schedule(calc_ripple_envelope, input=downsampled_rec)
     sharpwave_env = schedule(calc_sharpwave_envelope, input=downsampled_rec)
+    ripple_segs = schedule(detect_mountains, input=ripple_env)
 
 
-schedule.run_sequentially()
+def run_sequentailly():
+    schedule.run_sequentially()
+
+
+if __name__ == "__main__":
+    run_sequentailly()
 
 # Continue: ..
 # - convert all luigi tasks to functions + workflow schedule call
