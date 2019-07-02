@@ -29,5 +29,5 @@ setup(
         "fklab-python-core",
     ),
     packages=find_packages(),
-    entry_points={"console_scripts": ["sharp=sharp.workflow:run_sequentailly"]},
+    entry_points={"console_scripts": ["sharp=sharp.workflow:main"]},
 )

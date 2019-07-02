@@ -1,16 +1,21 @@
 from time import time
+from typing import Tuple
 from warnings import warn
 
 from fklab.signals.multirate import decimate_chunkwise
+from sharp.config.config import SharpConfig
+from sharp.data.files.base import ArrayFile, ArrayListFile
 from sharp.data.files.raw import RawRecordingFile
+from sharp.data.files.segments import MultiChannelSegmentsFile
 from sharp.data.files.signal import SignalFile
 from sharp.data.types.signal import Signal
 
 
 def downsample_raw(
-    input: RawRecordingFile, output: SignalFile, fs_target: float = 1000
+    input: RawRecordingFile, output: SignalFile, config: SharpConfig
 ):
     fs_orig = input.fs
+    fs_target = config.fs_target
     factor, remainder = divmod(fs_orig, fs_target)
     factor = round(factor)
     fs_new = fs_orig / factor
@@ -37,3 +42,17 @@ def downsample_raw(
     signal_down *= input.to_microvolts
     input.close()
     output.write(Signal(signal_down, fs_new, "μV"))
+
+
+def select_channel(
+    input: Tuple[MultiChannelSegmentsFile, ArrayListFile], output: ArrayFile
+):
+    seg_list = input[0].read()
+    seg_height_list = input[1].read()
+    ...
+
+
+def trim_recording(
+    input: Tuple[SignalFile, MultiChannelSegmentsFile], output: SignalFile
+):
+    ...

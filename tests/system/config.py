@@ -10,5 +10,5 @@ config = SharpConfig(
         "rat_2__day_2__probe_L2": Path("data/raw/sig.dat"),
         "rat_3__day_1__probe_Waluigi": Path("data/raw/sig.raw.kwd"),
     },
-    fs_target=1000,
+    epochs=3,
 )

@@ -20,7 +20,7 @@ class SignalFile(HDF5File):
     def read(self) -> Signal:
         with self.open_file_for_read() as f:
             dataset = f[self.Keys.SIGNAL]
-            array = dataset[:]
+            array = dataset[()]
             fs = dataset.attrs[self.Keys.FS]
             units = dataset.attrs.get(self.Keys.UNITS, None)
         return Signal(array, fs, units)
