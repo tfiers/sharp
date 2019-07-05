@@ -24,6 +24,7 @@ setup(
         "h5py >=2.9",
         "click >=7",
         "preludio >=1",
+        "cached-property >=1.5.1",
         #
         # Custom-made packages, not available on PyPI, that should be
         # installed manually before installing "sharp" (see README):

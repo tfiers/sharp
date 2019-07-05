@@ -1,7 +1,7 @@
 from itertools import product
 
-from sharp.data.files.raw import RawRecordingFile
-from sharp.startup import config
+from sharp.raw import RawRecordingFile
+from sharp.config import config
 from sharp.tasks.offline_analysis import (
     calc_SWR_segments,
     calc_mountain_heights,
@@ -10,10 +10,10 @@ from sharp.tasks.offline_analysis import (
     calc_sharpwave_envelope,
     detect_mountains,
 )
-from sharp.tasks.online_detectors import (
-    calc_SOTA_output_envelope,
+from sharp.tasks.online_detectors.train import (
     train_RNN_one_epoch,
 )
+from sharp.tasks.online_detectors.train import calc_SOTA_output_envelope
 from sharp.tasks.preprocess import (
     downsample_raw,
     select_channel,
@@ -54,10 +54,10 @@ for recording_ID, raw_recording_path in config.raw_data.items():
             mult_detect_ripple=mult_detect_ripple,
             mult_detect_SW=mult_detect_SW,
         )
-        RNNs = []
-        RNN = None
+        models = []
+        model = None
         for epoch in range(config.num_epochs):
-            RNN = train_RNN_one_epoch([RNN, trimmed_rec, reference_SWR_segs])
+            model = train_RNN_one_epoch([model, trimmed_rec, reference_SWR_segs])
 
 
 if __name__ == "__main__":

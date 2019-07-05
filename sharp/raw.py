@@ -8,7 +8,7 @@ from numpy import int16, memmap
 
 from farao import File
 from sharp.data.files.base import HDF5File
-from sharp.util.misc import cached
+from sharp.util.alias import cached
 
 
 T = TypeVar("T")

@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 
 
-# Freeze to make usable as key in the nested dict structure below.
+# Freeze dataclass to make instances usable as keys in the nested dict
+# structure below.
 @dataclass(frozen=True)
 class RawDataPathPart:
     ID: Any
@@ -174,13 +175,10 @@ raw_data_nesting = {
 }
 
 
-def ID(rat: Rat, day: Day, file: File):
-    return f"rat_{rat.ID}__day_{day.ID}__{file.ID}"
-
-
-fklab_data = {
-    ID(rat, day, file): Path(rat.path_part) / day.path_part / file.path_part
-    for rat, day_dict in raw_data_nesting.items()
-    for day, files in day_dict.items()
-    for file in files
-}
+fklab_probe_recordings = []
+for rat, day_dict in raw_data_nesting.items():
+    for day, files in day_dict.items():
+        for file in files:
+            ID = f"rat_{rat.ID}__day_{day.ID}__{file.ID}"
+            full_path = Path(rat.path_part) / day.path_part / file.path_part
+            fklab_probe_recordings.append((ID, full_path))

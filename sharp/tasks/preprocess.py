@@ -5,7 +5,7 @@ from warnings import warn
 from fklab.segments import Segment
 from fklab.signals.multirate import decimate_chunkwise
 from sharp.config import SharpConfig
-from sharp.data.files.raw import RawRecordingFile
+from sharp.raw import RawRecordingFile
 from sharp.data.types.signal import Signal
 
 

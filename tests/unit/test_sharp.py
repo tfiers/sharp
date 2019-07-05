@@ -4,7 +4,7 @@ from numpy.testing import assert_equal
 
 # todo: fix import
 from sharp.data.types.neuralnet import RNN
-from sharp.util.signal import view
+from sharp.util.alias import view
 
 
 def test_view():
