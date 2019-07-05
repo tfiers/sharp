@@ -1,6 +1,6 @@
 """
-Programatically construct list of raw data paths (we don't do this manually as
-there is much redundancy in these paths).
+Programatically construct list of raw data paths with corresponding ID's. (We
+don't do this manually as there is much redundancy in the data paths).
 """
 
 
@@ -13,7 +13,7 @@ from typing import Any
 @dataclass(frozen=True)
 class RawDataPathPart:
     ID: Any
-    path: str = ""
+    path_part: str = ""
 
 
 class Rat(RawDataPathPart):
@@ -173,10 +173,13 @@ raw_data_nesting = {
     },
 }
 
+
+def ID(rat: Rat, day: Day, file: File):
+    return f"rat_{rat.ID}__day_{day.ID}__{file.ID}"
+
+
 fklab_data = {
-    f"rat_{rat.ID}__day_{day.ID}__{file.ID}": Path(rat.path)
-    / day.path
-    / file.path
+    ID(rat, day, file): Path(rat.path_part) / day.path_part / file.path_part
     for rat, day_dict in raw_data_nesting.items()
     for day, files in day_dict.items()
     for file in files

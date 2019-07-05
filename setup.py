@@ -13,20 +13,22 @@ setup(
     license="GPL-3.0",
     install_requires=(
         #
-        # Ideally installed using conda (see README):
-        "torch",
-        "scikit-learn",  # and its dependencies: NumPy, SciPy
+        # Most easily installed using conda (see "environment.yml")
+        "torch >=1",
+        "numpy >=1.11",
+        "scipy >=0.17",
+        "scikit-learn >=0.21.2",
+        "matplotlib >=3.1",
         #
-        # Normal PyPI packages:
-        "h5py",
-        "click",
+        # Plain PyPI packages:
+        "h5py >=2.9",
+        "click >=7",
+        "preludio >=1",
         #
         # Custom-made packages, not available on PyPI, that should be
-        # installed manually before installing sharp:
-        #   pip install -r requirements.txt
-        "seaborn==0.9.0+tomas",
-        "raincloud",
-        "fklab-python-core",
+        # installed manually before installing "sharp" (see README):
+        "farao",
+        "fklab-python-core >=1.1.1",
     ),
     packages=find_packages(),
     entry_points={"console_scripts": ["sharp=sharp.workflow:main"]},

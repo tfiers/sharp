@@ -1,8 +1,0 @@
-channels:
-  - pytorch
-dependencies:
-  - python=3.7
-  - pytorch-cpu  # Or if you have CUDA-enabled GPU(s), use instead:
-# - pytorch
-  - scikit-learn
-  - pip

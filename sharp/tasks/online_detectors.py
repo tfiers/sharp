@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, Sequence
 
-from sharp.config.config import SharpConfig
+from sharp.config import SharpConfig
 from sharp.data.files.base import ArrayFile
 from sharp.data.files.neuralnet import RNNFile
 from sharp.data.files.segments import SegmentsFile
