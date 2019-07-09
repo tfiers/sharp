@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from sharp.config import SharpConfig
+from sharp.config_spec import SharpConfig
 
 
 config = SharpConfig(

@@ -1,12 +1,14 @@
 from dataclasses import asdict, dataclass
 from enum import IntEnum
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional, Sequence, Tuple
+
+import numpy as np
+from h5py import Dataset
 
 import fklab.segments
-import numpy as np
-from farao import Saveable
+from fileflow import Saveable
 from sharp.datatypes.base import HDF5File
-from sharp.util.time import format_duration, time_to_index
+from sharp.util.time import format_duration
 
 
 @dataclass
@@ -18,7 +20,7 @@ class Signal(np.ndarray, Saveable):
     units: Optional[str] = None
     # Example: "μV"
 
-    class AXES(IntEnum):
+    class Axes(IntEnum):
         TIME = 0
         CHANNEL = 1
 
@@ -45,12 +47,12 @@ class Signal(np.ndarray, Saveable):
 
     @property
     def num_samples(self) -> int:
-        return self.shape[self.AXES.TIME]
+        return self.shape[self.Axes.TIME]
 
     @property
     def num_channels(self) -> int:
         if self.ndim > 1:
-            return self.shape[self.AXES.CHANNEL]
+            return self.shape[self.Axes.CHANNEL]
         else:
             return 1
 
@@ -109,22 +111,30 @@ class Signal(np.ndarray, Saveable):
             yield self.time_slice(*seg)
 
     def time_slice(self, start: float, stop: float) -> "Signal":
-        indices = time_to_index(
-            [start, stop], self.fs, self.num_samples, clip=True
-        )
-        result = self.as_matrix()[slice(*indices), :]
+        ix = self.index([start, stop])
         if self.ndim == 1:
-            return result.as_vector()
+            return self[slice(*ix)]
         else:
-            return result
+            return self[slice(*ix), :]
+
+    def index(self, t) -> np.ndarray:
+        """
+        Convert times to array indices.
+
+        :param t:  One or more times, in seconds. Number / array-like.
+        :return:  A NumPy array of integer indices.
+        """
+        indices = (np.array(t) * self.fs).round().astype("int")
+        return indices.clip(0, self.num_samples - 1)
 
 
 class SignalFile(HDF5File[Signal]):
     def write_to_file(self, sig: Signal, f):
         f.create_dataset(self.main_key, data=sig.data)
-        f.attrs = asdict(sig)
+        for k, v in asdict(sig).items():
+            f.attrs[k] = v
 
     def read_from_file(self, f) -> Signal:
-        dataset = f[self.main_key]
+        dataset: Dataset = f[self.main_key]
         array = self.read_into_memory(dataset)
         return Signal(array, **dataset.attrs)

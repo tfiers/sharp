@@ -14,22 +14,22 @@ setup(
     install_requires=(
         #
         # Most easily installed using conda (see "environment.yml")
-        "torch >=1",
-        "numpy >=1.11",
-        "scipy >=0.17",
-        "scikit-learn >=0.21.2",
-        "matplotlib >=3.1",
+        "torch ~=1.0.1",
+        "numpy ~=1.16.2",
+        "scipy ~=1.2.1",
+        "scikit-learn ~=0.21.2",
+        "matplotlib ~=3.1",
         #
         # Plain PyPI packages:
-        "h5py >=2.9",
-        "click >=7",
-        "preludio >=1",
-        "cached-property >=1.5.1",
+        "h5py ~=2.9",
+        "click ~=7.0",
+        "preload ~=2.0",
+        "cached-property ~=1.5.1",
+        "fileflow",
         #
         # Custom-made packages, not available on PyPI, that should be
         # installed manually before installing "sharp" (see README):
-        "farao",
-        "fklab-python-core >=1.1.1",
+        "fklab-python-core ~=1.1.1",
     ),
     packages=find_packages(),
     entry_points={"console_scripts": ["sharp=sharp.workflow:main"]},

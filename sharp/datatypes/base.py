@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 
-import farao
 import h5py
 import numpy as np
-from farao.file import ContainedDatatype
+from matplotlib.figure import Figure
+
+import fileflow
+from fileflow.file import ContainedDatatype
 
 
-class HDF5File(farao.File, ABC):
+class HDF5File(fileflow.File, ABC):
     extension = ".hdf5"
 
     @abstractmethod
@@ -53,3 +55,8 @@ class ArrayFile(HDF5File[np.ndarray]):
         dataset = f[self.main_key]
         array = self.read_into_memory(dataset)
         return array
+
+
+class FigureFile(fileflow.File[Figure]):
+    def write(self, fig: Figure):
+        fig.savefig(self.path)

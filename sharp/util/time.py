@@ -48,33 +48,6 @@ def format_duration(
             return f"{seconds}{suffix}"
 
 
-def time_to_index(
-    t, fs: float, arr_size: int = np.inf, clip: bool = False
-) -> np.ndarray:
-    """
-    Convert times to array indices.
-
-    :param t:  Times, in seconds. Type: number / array-like.
-    :param fs:  Sampling frequency, in hertz.
-    :param arr_size:  Size of the array in which the indices will be used.
-    :param clip:  If True, clips the indices between 0 and the `arr_size`.
-                If False (default), raises a ValueError when the indices cannot
-                be used to index an array of size `arr_size`.
-    :return: Indices.
-    """
-    indices = (np.array(t) * fs).round().astype("int")
-    if clip:
-        return indices.clip(0, arr_size - 1)
-    else:
-        if np.all(indices >= 0) and np.all(indices < arr_size):
-            return indices
-        else:
-            raise ValueError(
-                f"Times {t} cannot be used to index an array of size "
-                f"{arr_size} at sampling frequency {fs}."
-            )
-
-
 def view(time, *args) -> np.ndarray:
     """
     A range around some timestamp(s). Useful for plotting.

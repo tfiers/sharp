@@ -1,27 +1,8 @@
-from abc import ABC
 from typing import List
 
+import fklab.segments
 import h5py
 import numpy as np
-
-import fklab.segments
-from farao import Saveable
-
-
-class SavedAsHDF5(Saveable, ABC):
-    extension = ".hdf5"
-
-    @staticmethod
-    def file_reader(path) -> h5py.File:
-        """ Context manager for reading. """
-        return h5py.File(path, mode="r")
-
-    @staticmethod
-    def file_writer(path) -> h5py.File:
-        """ Context manager for writing. """
-        # Mode 'w' clears (truncates) the file if it already exists. 'a' leaves
-        # existing contents intact.
-        return h5py.File(path, mode="a")
 
 
 class ArrayList(List[np.ndarray], SavedAsHDF5):
