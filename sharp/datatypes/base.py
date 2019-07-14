@@ -1,25 +1,25 @@
 from abc import ABC, abstractmethod
+from typing import Generic, List
 
 import h5py
 import numpy as np
 from matplotlib.figure import Figure
 
-import fileflow
-from fileflow.file import ContainedDatatype
+from fileflow.file import File, T
 
 
-class HDF5File(fileflow.File, ABC):
+class HDF5File(File, ABC, Generic[T]):
     extension = ".hdf5"
 
     @abstractmethod
-    def write_to_file(self, object: ContainedDatatype, f: h5py.File):
+    def write_to_file(self, object: T, f: h5py.File):
         ...
 
     @abstractmethod
-    def read_from_file(self, f: h5py.File) -> ContainedDatatype:
+    def read_from_file(self, f: h5py.File) -> T:
         ...
 
-    def write(self, object: ContainedDatatype):
+    def write(self, object: T):
         # Mode 'w' clears (truncates) the file if it already exists. 'a' leaves
         # existing contents intact.
         with h5py.File(self.path, mode="a") as f:
@@ -28,7 +28,7 @@ class HDF5File(fileflow.File, ABC):
             f.attrs[".. in file"] = __file__
             self.write_to_file(object, f)
 
-    def read(self) -> ContainedDatatype:
+    def read(self) -> T:
         with h5py.File(str(self.path), mode="r") as f:
             object = self.read_from_file(f)
         return object
@@ -57,6 +57,27 @@ class ArrayFile(HDF5File[np.ndarray]):
         return array
 
 
-class FigureFile(fileflow.File[Figure]):
+class MultichannelArrayFile(HDF5File[List[np.ndarray]]):
+    """
+    Saves an ordered collection of arbitrarily sized and shaped NumPy arrays as
+    an HDF5 file.
+    """
+
+    def write_to_file(self, arrays: List[np.ndarray], f: h5py.File):
+        for index, array in enumerate(arrays):
+            f.create_dataset(name=str(index), data=array)
+            
+    def read_from_file(self, f: h5py.File) -> List[np.ndarray]:
+        datasets: List[h5py.Dataset] = f.values()
+        array_list = [None] * len(datasets)
+        for dataset in datasets:
+            full_path: str = dataset.name
+            name = full_path.split("/")[-1]
+            index = int(name)
+            array_list[index] = dataset[()]
+        return array_list
+
+
+class FigureFile(File[Figure]):
     def write(self, fig: Figure):
         fig.savefig(self.path)

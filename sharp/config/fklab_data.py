@@ -32,13 +32,13 @@ class File(RawDataPathPart):
 def P1_dat_file(date: str, probe_name: str) -> File:
     return File(
         ID=probe_name,
-        path=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
+        path_part=f"{probe_name}/RatP1_{date}_{probe_name}/Klusta_raw_7-3.5/{probe_name}.dat",
     )
 
 
 def P2_dat_file(probe_name: str) -> File:
     return File(
-        ID=probe_name, path=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat"
+        ID=probe_name, path_part=f"{probe_name}/Klusta_T7-3.5/{probe_name}.dat"
     )
 
 

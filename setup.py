@@ -32,5 +32,5 @@ setup(
         "fklab-python-core ~=1.1.1",
     ),
     packages=find_packages(),
-    entry_points={"console_scripts": ["sharp=sharp.workflow:main"]},
+    entry_points={"console_scripts": ["sharp=sharp.run:run"]},
 )

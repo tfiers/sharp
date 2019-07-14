@@ -24,18 +24,17 @@ class Signal(np.ndarray, Saveable):
         TIME = 0
         CHANNEL = 1
 
-    @property
-    def saveable_as():
+    def get_filetype():
         return SignalFile
 
     # See "Subclassing ndarray":
     # https://docs.scipy.org/doc/numpy/user/basics.subclassing.html
 
-    # def __new__(cls, data, fs: float, units: Optional[str] = None) -> "Signal":
-    #     instance = super().__new__(cls, data)
-    #     instance.fs = fs
-    #     instance.units = units
-    #     return instance
+    def __new__(cls, data, fs: float, units: Optional[str] = None) -> "Signal":
+        instance = super().__new__(cls, data)
+        instance.fs = fs
+        instance.units = units
+        return instance
 
     # Make sure slices and views are also Signals.
     def __array_finalize__(self, instance):

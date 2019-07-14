@@ -9,7 +9,7 @@ from fklab.signals.filter import apply_filter
 from fklab.signals.smooth import smooth1d
 from sharp.datatypes.segments import SegmentArray
 from sharp.datatypes.signal import Signal
-from sharp.main import sharp_workflow
+from sharp.init import sharp_workflow
 
 
 RIPPLE_BAND = (100, 250)
@@ -75,7 +75,9 @@ calc_sharpwave_envelope = partial(
 
 
 @sharp_workflow.task
-def detect_mountains(envelope: Signal, mult_detect: float) -> List[SegmentArray]:
+def detect_mountains(
+    envelope: Signal, mult_detect: float
+) -> List[SegmentArray]:
     """
     :param envelope
     :param mult_detect: Determines the detection threshold; see def threshold.
@@ -117,6 +119,7 @@ def threshold(envelope: Signal, multiplier: float):
     return multiplier * median(envelope)
 
 
+@sharp_workflow.task
 def calc_mountain_heights(
     envelope: Signal, seg_list: List[SegmentArray]
 ) -> List[np.ndarray]:

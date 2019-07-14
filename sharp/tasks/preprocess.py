@@ -5,14 +5,14 @@ from warnings import warn
 import numpy as np
 
 from fklab.signals.multirate import decimate_chunkwise
-from sharp.config_spec import SharpConfig
 from sharp.datatypes.raw import RawRecordingFile
 from sharp.datatypes.segments import SegmentArray
 from sharp.datatypes.signal import Signal
-from sharp.main import sharp_workflow
+from sharp.init import config, sharp_workflow
 
 
-def downsample_raw(input: RawRecordingFile, config: SharpConfig) -> Signal:
+@sharp_workflow.task
+def downsample_raw(input: RawRecordingFile) -> Signal:
     fs_orig = input.fs
     fs_target = config.fs_target
     factor, remainder = divmod(fs_orig, fs_target)
@@ -43,13 +43,14 @@ def downsample_raw(input: RawRecordingFile, config: SharpConfig) -> Signal:
     return Signal(data=signal_down, fs=fs_new, units="μV")
 
 
+@sharp_workflow.task
 def select_channel(
-    mountain_segs: Sequence[SegmentArray],
-    mountain_heights: Sequence[np.ndarray],
-) -> np.ndarray:
+    mountain_segs: [SegmentArray], mountain_heights: Sequence[np.ndarray]
+) -> int:
     ...
 
 
+@sharp_workflow.task
 def trim_recording(
     full_downsampled_recording: Signal,
     ripple_segs_per_channel: Sequence[SegmentArray],
@@ -57,13 +58,13 @@ def trim_recording(
     ...
 
 
-@sharp_workflow.task(saved=False)
+@sharp_workflow.task
 def split_signal(full: Signal, fraction: float) -> Tuple[Signal, Signal]:
     t_cut = fraction * full.duration
     return (full.time_slice(0, t_cut), full.time_slice(t_cut, full.duration))
 
 
-@sharp_workflow.task(saved=False)
+@sharp_workflow.task
 def split_segmentarray(
     full_segmentarray: SegmentArray, full_sig: Signal, fraction: float
 ) -> Tuple[SegmentArray, SegmentArray]:

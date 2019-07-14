@@ -1,5 +1,6 @@
 ## Import hierarchy
 
+
 `util/*`
 
 🡑
@@ -8,7 +9,7 @@
 
 🡑
 
-`config_spec.py`
+`config/*`
 
 🡑
 
@@ -20,7 +21,7 @@ Custom `config.py` (Optional)
 
 🡑
 
-`main.py`
+`init.py`
 
 🡑
 
@@ -29,3 +30,7 @@ Custom `config.py` (Optional)
 🡑
 
 `workflow.py`
+
+🡑
+
+`run.py`

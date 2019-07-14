@@ -19,8 +19,7 @@ class SharpRNN(torch.nn.Module, Saveable):
     output layer (i.e. with unbounded output values).
     """
 
-    @property
-    def saveable_as():
+    def get_filetype():
         return SharpRNNFile
 
     @dataclass

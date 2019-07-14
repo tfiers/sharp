@@ -2,12 +2,13 @@ from abc import ABC, abstractmethod
 from typing import TypeVar
 from warnings import warn
 
-from fklab.io.common import BinaryFileReader
-from fklab.io.neuralynx import NlxOpen
+import h5py
 from numpy import int16, memmap
 
-from farao import File
-from sharp.data.files.base import HDF5File
+from fileflow import File
+from fklab.io.common import BinaryFileReader
+from fklab.io.neuralynx import NlxOpen
+from sharp.datatypes.base import HDF5File
 from sharp.util.alias import cached
 
 
@@ -104,7 +105,7 @@ class RawKwikFile(RawRecordingFile, HDF5File):
     extension = ".raw.kwd"
 
     def _open(self):
-        return self.open_file_for_read()
+        return h5py.File(str(self.path), mode="r")
 
     def close(self):
         self.opened_file.close()
@@ -136,6 +137,12 @@ class RawKwikFile(RawRecordingFile, HDF5File):
                 f'Not all channels have the same "{name}" value in file {self}.'
             )
         return values[0]
+
+    def read_from_file(self, f: h5py.File) -> T:
+        ...
+
+    def write_to_file(self, object: T, f: h5py.File):
+        ...
 
 
 class RawDATFile(RawRecordingFile):
