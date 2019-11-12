@@ -14,7 +14,7 @@ from sharp.init import config, sharp_workflow
 
 
 @sharp_workflow.task
-def get_init_model(LFP: Signal) -> SharpRNN:
+def get_init_RNN(LFP: Signal) -> SharpRNN:
     """ Initialize a fresh model for the first epoch. """
     hyperparams = config.RNN_hyperparams
     hyperparams.num_input_channels = LFP.num_channels
@@ -82,7 +82,7 @@ def tune_RNN_one_epoch(
 
 
 @sharp_workflow.task
-def initial_test_RNN_performance(
+def calc_mean_sample_loss(
     model: SharpRNN, LFP: Signal, reference_SWRs: SegmentArray
 ) -> float:
     _, logger = _apply_RNN_chunked(model, LFP, reference_SWRs)
@@ -117,8 +117,8 @@ def _apply_RNN_chunked(
     h = model.get_init_h()
     outputs = []
     for chunk in chunks:
-        # PyCharm can't find "no_grad" in torch.pyi file
         # noinspection PyUnresolvedReferences
+        # (PyCharm can't find "no_grad" in torch.pyi file)
         with torch.no_grad():
             output, h = model.forward(chunk.torch_input, h)
             outputs.append(output)

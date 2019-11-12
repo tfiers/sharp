@@ -65,7 +65,7 @@ def split_signal(full: Signal, fraction: float) -> Tuple[Signal, Signal]:
 
 
 @sharp_workflow.task
-def split_segmentarray(
+def split_segmentlist(
     full_segmentarray: SegmentArray, full_sig: Signal, fraction: float
 ) -> Tuple[SegmentArray, SegmentArray]:
     t_cut = fraction * full_sig.duration
