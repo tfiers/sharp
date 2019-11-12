@@ -4,11 +4,10 @@
   <sup>A warm thank you to <a href="https://github.com/zuurw">@zuurw</a> for the free logo design.</sup>
 </p>
 
-Software written for my [master's thesis](https://github.com/tfiers/master-thesis) 
-and for the related [journal paper](https://github.com/tfiers/neural-network-paper).
+Software written for my [master's thesis](https://github.com/tfiers/master-thesis).
 
 This code takes raw neural recordings as input, and generates the figures found
-in the papers (and more) as output. In between, it processes the raw
+in the thesis (and more) as output. In between, it processes the raw
 recordings, trains neural networks, calculates detection performance metrics,
 etc.
 
